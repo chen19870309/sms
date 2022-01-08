@@ -1,0 +1,169 @@
+header {
+    width: 100%;
+    display: block;
+}
+footer {
+    display: block;
+    text-align: center;
+    font-size: 1.2em;
+    margin-top: 64px;
+    padding: 15px;
+}
+.thin {
+    width: 93%;
+    max-width: 1200px;
+    min-height: 600px;
+    margin: auto;
+}
+.section-inner {
+    margin: 0 auto;
+    max-width: 1000px;
+    width: 93%;
+}
+.animated {
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+}
+.fadeIn {
+    -webkit-animation-name: fadeIn;
+    animation-name: fadeIn;
+}
+.body {
+    min-height: 600px;
+}
+#blog-header {
+    z-index: 1;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: -1px 2px 3px rgb(0 0 0 / 45%);
+    font-size: 1.2em;
+    background-color: #f9f9f9;
+    animation-name: slideInUp;
+    animation-fill-mode: both;
+}
+#mobile-menu {
+    position: fixed;
+    bottom: 4.8em;
+    right: 1.5em;
+    padding: 0.6em 1.8em;
+    z-index: 1;
+    -webkit-border-radius: 15px;
+    border-radius: 15px;
+    -moz-border-radius: 5px;
+    box-sizing: border-box;
+    box-shadow: -1px -2px 3px 0 rgb(0 0 0 / 45%);
+    background-color: #F9FAFC;
+}
+.hdr-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5em 0;
+    font-size: 0.8rem;
+}
+.section-inner {
+    margin: 0 auto;
+    max-width: 1000px;
+    width: 93%;
+}
+.hdr-wrapper .site-branding {
+    display: inline-block;
+    margin-right: 0.8em;
+    font-size: 1.2em;
+}
+a {
+    width: 100%;
+    color: #3b3e48;
+    text-decoration: none;
+    border: none;
+    transition-property: color;
+    transition-duration: .4s;
+    transition-timing-function: ease-out;
+}
+
+.box {
+    height: 100%;
+    background-color: aliceblue;
+}
+
+.card-box {
+    padding: 20px;
+    /*box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 0px 0 rgba(0, 0, 0, 0.02);*/
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    background-clip: padding-box;
+    margin-bottom: 20px;
+    background-color: #F9FAFC;
+    margin: 140px auto;
+    width: 400px;
+   /* border: 2px solid #8492A6;*/
+}
+
+.formLogin-title {
+    text-align: center;
+    font-size: 28px;
+}
+.formLogin-title h3{
+    font-size: 18px;
+}
+.login-no-bottom {
+    margin-bottom: 10px;
+}
+.article {
+    display: block;
+    text-align: left;
+}
+.post-page {
+    text-align: left;
+}
+.post-header {
+    margin-top: 1.2em;
+    line-height: normal;
+}
+.posts-group {
+    display: flex;
+    margin-bottom: 1.9em;
+    line-height: normal;
+}
+.posts-group .posts-chepter {
+    padding-top: 6px;
+    margin-right: 1.8em;
+    font-size: 1.6em;
+    opacity: .6;
+}
+.posts-group .post-item a {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 0;
+}
+.posts-group .posts-list {
+    flex-grow: 1;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.posts-group .post-item {
+    width: 100%;
+    border-bottom: 1px #7d828a dashed;
+}
+.posts-item .post-title {
+    flex-shrink: 0;
+    margin-left: 1em;
+    opacity: .6;
+}
+.posts-item .post-day {
+    flex-shrink: 0;
+    margin-right: 1em;
+    opacity: .6;
+}
+.menus {
+    display: block;
+    max-width: 1000px;
+    margin: auto;
+    color: #3b3e48;
+    letter-spacing: .05em;
+    -webkit-text-size-adjust: 100%;
+    font-family: trebuchet ms,Verdana,verdana ref,segoe ui,Candara,lucida grande,lucida sans unicode,lucida sans,Tahoma,sans-serif;
+}
