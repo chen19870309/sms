@@ -10,3 +10,7 @@ init:
 	@if [ -f ${MODFILE} ] ; then rm ${MODFILE} ; fi
 	@go mod init
 	echo "package main\n\nconst version = \"${VERSION}\"\nconst tag = \"${DATETIME}\"\n" > ./cmd/version.go
+
+build:
+	go build -o blog  ./cmd
+	upx blog
