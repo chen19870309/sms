@@ -20,10 +20,16 @@ var app = &cli.App{
 			Usage:   "开启debug",
 		},
 		&cli.StringFlag{
-			Name:        "port",
-			Aliases:     []string{"p"},
-			DefaultText: ":8088",
-			Usage:       "http listen port",
+			Name:    "address",
+			Aliases: []string{"a"},
+			Value:   ":8088",
+			Usage:   "http listen address",
+		},
+		&cli.StringFlag{
+			Name:    "conf",
+			Aliases: []string{"c"},
+			Value:   "./config.json",
+			Usage:   "config file path",
 		},
 		&cli.StringFlag{
 			Name:        "log-level",

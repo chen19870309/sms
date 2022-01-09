@@ -1,0 +1,23 @@
+{
+    "db": {
+        "host": "127.0.0.1",
+        "port": 3306,
+        "username": "root",
+        "password": "mac2022",
+        "dbname": "test",
+        "driver": "mysql"
+    },
+    "site": {
+        "id":1,
+        "Code": "0001",
+        "Name": "SMS_Blog",
+        "Domain": "localhost",
+        "beian": ""
+    },
+    "app": {
+        "listen-port": 8082,
+        "log-level": "debug",
+        "base-path": "/tmp/blog",
+        "static-path": "/tmp/blog/static"
+    }
+}

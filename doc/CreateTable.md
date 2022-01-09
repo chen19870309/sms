@@ -7,6 +7,7 @@ id | code | create_time | update_time | author_id | title | tags | sum | content
 serial | varchar(8) | timestamp | timestamp | integer|varchar(128)|varchar(128)|varchar(128)|text|smallint
 
 ```
+--postgres
 create table tb_blog_ctx(
     id serial primary key,
     code varchar(8),
@@ -19,6 +20,20 @@ create table tb_blog_ctx(
     content text,
     status smallint
 );
+--mysql
+create table tb_blog_ctx(
+    id bigint(20) not null auto_increment,
+    code varchar(8),
+    create_time datetime,
+    update_time datetime,
+    author_id integer,
+    title varchar(128),
+    tags varchar(128),
+    sum varchar(128),
+    content text,
+    status integer,
+    primary key(id)
+);
 ```
 
 ## 2.用户信息表
@@ -29,6 +44,7 @@ id | code | create_time | update_time | username | nickname | secret | icon | re
 serial | varchar(8) | timestamp | timestamp | varchar(64)|varchar(128)|varchar(128)|varchar(128)|text|smallint|smallint
 
 ```
+--postgres
 create table tb_sms_user(
     id serial primary key,
     code varchar(8),
@@ -41,5 +57,20 @@ create table tb_sms_user(
     remark text,
     level smallint,
     status smallint
+);
+--mysql
+create table tb_sms_user(
+    id bigint(20) not null auto_increment,
+    code varchar(8),
+    create_time datetime,
+    update_time datetime,
+    username varchar(64),
+    nickname varchar(128),
+    secret varchar(128),
+    icon varchar(128),
+    remark text,
+    level integer,
+    status integer,
+    primary key(id)
 );
 ```

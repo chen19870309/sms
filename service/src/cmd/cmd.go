@@ -1,7 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"sms/service/src/config"
+	"strconv"
+	"strings"
 	"sync"
 
 	"sms/service/src/api"
@@ -12,11 +16,17 @@ import (
 
 type program struct {
 	once sync.Once
-	blog *api.BlogS
+	blog *api.WebS
 	ctx  *cli.Context
 }
 
 func (p *program) Init(env svc.Environment) error {
+	config.InitConf(p.ctx.String("conf"))
+	if config.App.ListenPort == 0 {
+		addr := p.ctx.String("address")
+		addrs := strings.Split(addr, ":")
+		config.App.ListenPort, _ = strconv.ParseInt(addrs[1], 10, 64)
+	}
 	blog, err := api.NewBlog()
 	if err != nil {
 		return err
@@ -26,7 +36,9 @@ func (p *program) Init(env svc.Environment) error {
 }
 
 func (p *program) Start() error {
-	go p.blog.Serv.Run(p.ctx.String("port"))
+	addr := fmt.Sprintf(":%d", config.App.ListenPort)
+	log.Println("Address:", addr)
+	go p.blog.Serv.Run(addr)
 	return nil
 }
 
