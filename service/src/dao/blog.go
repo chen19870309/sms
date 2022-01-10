@@ -32,6 +32,20 @@ func TestBlog() error {
 	return nil
 }
 
+func AutoSaveBlog(code, theme, data string, authorid uint) error {
+	blog := &model.BlogCtx{
+		Content:    data,
+		UpdateTime: time.Now(),
+		Title:      utils.GetMdTitle(data),
+		Tags:       utils.GetMdTags(data, theme),
+	}
+	result := database.Debug().Table(TB_BLOG).Where("code = ? and author_id = ?", code, authorid).Update(blog)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
 func SaveBlog(ctx *model.BlogCtx) error {
 	result := database.Table(TB_BLOG).Save(ctx)
 	if result.Error != nil {
@@ -44,6 +58,33 @@ func SaveBlog(ctx *model.BlogCtx) error {
 		}
 	}
 	return nil
+}
+
+func NewBlog(authorId uint) (*model.BlogCtx, error) {
+	blog := &model.BlogCtx{
+		CreateTime: time.Now(),
+		UpdateTime: time.Now(),
+		AuthorId:   authorId,
+		Status:     0,
+		Content:    "#  New Edit!\n@create time:" + time.Now().Format("2006-01-02 15:04:05") + "\n",
+	}
+	for {
+		code := utils.Gen8RCode()
+		result := database.Table(TB_BLOG).Where("code = ?", code).First(blog)
+		if result.Error != nil {
+			if result.Error.Error() != "record not found" {
+				return nil, result.Error
+			} else {
+				blog.Code = code
+				break
+			}
+		}
+	}
+	result := database.Table(TB_BLOG).Create(blog)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return blog, nil
 }
 
 func QueryBlog(id int64, code string) *model.BlogCtx {

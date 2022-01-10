@@ -74,3 +74,27 @@ create table tb_sms_user(
     primary key(id)
 ) default charset=utf8;
 ```
+
+## 3.书页菜单表
+id | pid | create_time | update_time | name | sum | code | pic | remark | day | status 
+---|---|---|---|---|---|---|---|---|---|--
+自增主键(菜单ID) | 父菜单ID |创建时间|更新时间|菜单名称|摘要|访问码|刊页图片|备注状态|发布日期|状态
+serial | bigint(20) | timestamp | timestamp | varchar(64)|varchar(128)|varchar(8)|varchar(128)|text|varchar(32)|smallint
+
+```
+--mysql
+create table tb_book_menu(
+    id bigint(20) not null auto_increment,
+    pid bigint(20),
+    create_time datetime,
+    update_time datetime,
+    name varchar(64),
+    sum varchar(128),
+    code varchar(8),
+    pic varchar(128),
+    remark text,
+    day varchar(32),
+    status integer,
+    primary key(id)
+) default charset=utf8;
+```

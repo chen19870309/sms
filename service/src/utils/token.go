@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -28,4 +29,18 @@ func Gen8RCode() string {
 		r = r + RCode[k:k+1]
 	}
 	return r
+}
+
+func GetMdTitle(data string) string {
+	ls := strings.Split(data, "\n")
+	for _, item := range ls {
+		if strings.HasPrefix(item, "#  ") {
+			return item[3:]
+		}
+	}
+	return "undefined"
+}
+
+func GetMdTags(data, theme string) string {
+	return ""
 }

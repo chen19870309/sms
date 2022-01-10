@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"sms/service/src/api/model"
@@ -30,7 +31,7 @@ func (web *WebS) Close() {
 	dao.CloseDB()
 }
 
-func NewBlog() (w *WebS, err error) {
+func NewBlogService() (w *WebS, err error) {
 	dao.InitDB()
 	err = dao.TestUser()
 	if err != nil {
@@ -44,8 +45,9 @@ func NewBlog() (w *WebS, err error) {
 	blog.GET("/ping", Pong)
 	blog.POST("/login", LoginBlog)
 	blog.POST("/user/edit", EditUser)
+	blog.GET("/newblog", NewBlogPage)
 	blog.POST("/save/:code", SaveBlog)
-	blog.POST("/posts/:code", GetPosts)
+	blog.GET("/posts/:code", GetPosts)
 	return service, nil
 }
 
@@ -90,11 +92,35 @@ func Pong(c *gin.Context) {
 	c.JSON(200, "pong!")
 }
 
+func ParseData(c *gin.Context, obj interface{}) error {
+	data, err := c.GetRawData()
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(data, obj)
+	return err
+}
+
 func SaveBlog(c *gin.Context) {
 	res := model.Response{
 		Code:    0,
 		Success: true,
 		Message: "ok",
+	}
+	code := c.Param("code")
+	b := &model.BlogAutoSave{}
+	err := ParseData(c, b)
+	if err != nil {
+		res.Code = -1
+		res.Success = false
+		res.Message = err.Error()
+	} else {
+		err = dao.AutoSaveBlog(code, b.Theme, b.Data, b.AuthorId)
+		if err != nil {
+			res.Code = -2
+			res.Success = false
+			res.Message = err.Error()
+		}
 	}
 	c.JSONP(200, res)
 }
@@ -104,12 +130,59 @@ func LoginBlog(c *gin.Context) {
 		Code:    0,
 		Success: true,
 		Message: "ok",
-		Data:    dao.QueryUser(1, ""),
+	}
+	req := &model.UserLogin{}
+	err := ParseData(c, req)
+	if err != nil {
+		res.Code = -1
+		res.Success = false
+		res.Message = err.Error()
+	} else {
+		user, err := dao.AuthUser(req.Username, req.Password)
+		if err != nil {
+			res.Code = -1
+			res.Success = false
+			res.Message = "用户名或密码错误!"
+		} else {
+			res.Data = user
+		}
+	}
+	c.JSONP(200, res)
+}
+
+func NewBlogPage(c *gin.Context) {
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+	}
+	blog, err := dao.NewBlog(1)
+	if err != nil {
+		res.Code = -1
+		res.Success = false
+		res.Message = err.Error()
+	} else {
+		res.Data = blog
 	}
 	c.JSONP(200, res)
 }
 
 func GetPosts(c *gin.Context) {
+	code := c.Param("code")
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+	}
+	blog := dao.QueryBlog(0, code)
+	if blog == nil {
+		res.Code = -1
+		res.Success = false
+		res.Message = "wrong posts code!"
+	} else {
+		res.Data = blog
+	}
+	c.JSONP(200, res)
 }
 
 func EditUser(c *gin.Context) {

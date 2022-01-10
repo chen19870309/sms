@@ -27,7 +27,7 @@ func (p *program) Init(env svc.Environment) error {
 		addrs := strings.Split(addr, ":")
 		config.App.ListenPort, _ = strconv.ParseInt(addrs[1], 10, 64)
 	}
-	blog, err := api.NewBlog()
+	blog, err := api.NewBlogService()
 	if err != nil {
 		return err
 	}

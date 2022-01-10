@@ -12,8 +12,8 @@
                         下拉菜单
                     </a>
                     <DropdownMenu slot="list">
-                        <DropdownItem>驴打滚</DropdownItem>
-                        <DropdownItem>炸酱面</DropdownItem>
+                        <DropdownItem><router-link to="/menu">文章目录</router-link></DropdownItem>
+                        <DropdownItem><a href="#" @click.prevent="newblog" >新建文章</a></DropdownItem>
                         <DropdownItem disabled>豆汁儿</DropdownItem>
                         <DropdownItem>冰糖葫芦</DropdownItem>
                         <DropdownItem divided>北京烤鸭</DropdownItem>
@@ -30,7 +30,7 @@
                         <DropdownItem>炸酱面</DropdownItem>
                         <DropdownItem disabled>豆汁儿</DropdownItem>
                         <DropdownItem>冰糖葫芦</DropdownItem>
-                        <DropdownItem divided>北京烤鸭</DropdownItem>
+                        <DropdownItem divided>退出账号</DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
             </div>
@@ -39,7 +39,21 @@
 </template>
 
 <script>
+import NetWorking from '@/utils/networking'
+import * as API from '@/utils/api'
 export default {
+    name: "site-header",
+    methods: {
+      newblog () {
+        NetWorking.doGet(API.newblog).then(response => {
+            let data = response.data
+            this.$store.dispatch('createBlog', data)
+            this.$router.push({ path: '/editer/' + data.Code })
+        }, (message) => {
+            this.$Message.error('Auto New MarkDown Failed!' + message)
+        })
+    },
+    }
 
 }
 </script>
