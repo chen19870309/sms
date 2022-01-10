@@ -2,6 +2,7 @@ package dao
 
 import (
 	"sms/service/src/dao/model"
+	"sms/service/src/utils"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -16,7 +17,7 @@ func TestBlog() error {
 		return result.Error
 	}
 	if blog.Code == "" {
-		blog.Code = "Test1234"
+		blog.Code = utils.Gen8RCode()
 		blog.CreateTime = time.Now()
 		blog.UpdateTime = time.Now()
 		blog.AuthorId = 1

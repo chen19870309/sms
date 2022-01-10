@@ -11,6 +11,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "axios": "^0.18.1",
     "iview": "^3.5.4",
     "vue": "^2.5.2",
     "vue-markdown": "^2.1.0",

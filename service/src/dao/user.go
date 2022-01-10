@@ -18,7 +18,7 @@ func TestUser() error {
 		return result.Error
 	}
 	if user.Code == "" {
-		user.Code = "Admin123"
+		user.Code = utils.Gen8RCode()
 		user.CreateTime = time.Now()
 		user.UpdateTime = time.Now()
 		user.Level = 1

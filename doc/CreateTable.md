@@ -33,7 +33,7 @@ create table tb_blog_ctx(
     content text,
     status integer,
     primary key(id)
-);
+) default charset=utf8;
 ```
 
 ## 2.用户信息表
@@ -72,5 +72,5 @@ create table tb_sms_user(
     level integer,
     status integer,
     primary key(id)
-);
+) default charset=utf8;
 ```

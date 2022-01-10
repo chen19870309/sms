@@ -1,34 +1,23 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
-import Login from '@/components/Login'
-import Editer from '@/components/BlogEditer'
-import Page from '@/components/BlogPage'
-import Menu from '@/components/BookMenu'
+import routes from './routers.js'
+import store from '@/store'
+
 Vue.use(Router)
 
-export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
-    },
-    {
-      path: '/login',
-      component: Login
-    },
-    {
-      path: '/editer',
-      component: Editer
-    },
-    {
-      path: '/page/:id',
-      component: Page
-    },
-    {
-      path: '/menu',
-      component: Menu
-    }
-  ]
+const router = new Router({
+  routes
 })
+
+router.beforeEach((to, from, next) => {
+  // if user not exist, then go to login
+  if (to.name !== 'login') {
+    let user = store.getters.currentUser
+    if (user === null || user.id === null) {
+      router.replace({name: 'login'})
+    }
+  }
+  next()
+})
+
+export default router

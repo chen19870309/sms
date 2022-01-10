@@ -25,7 +25,7 @@
         <Form-item class="login-no-bottom">
             <Row >
                 <i-col :xs="{ span: 4, offset: 6 }" >
-                    <i-button type="primary" @click="handleSubmit('formLogin')">登录</i-button>
+                    <i-button type="primary" @click="handleSubmit('formLogin')" :disabled="disabled">登录</i-button>
                 </i-col>
                 <i-col :xs="{ span: 4, offset: 6 }">
                     <i-button  type="primary" @click="formLoginReset('formLogin')">重置</i-button>
@@ -39,6 +39,8 @@
 </template>
 
 <script>
+import NetWorking from '@/utils/networking'
+import * as API from '@/utils/api'
 import SiteHeader from '@/components/global/SiteHeader'
 import SiteFooter from '@/components/global/SiteFooter'
 export default {
@@ -57,16 +59,28 @@ export default {
           { required: true, message: '请填写密码', trigger: 'blur' },
           { type: 'string', min: 6, message: '密码长度不能小于6位', trigger: 'blur' }
         ]
-      }
+      },
+      disabled: false
     }
   },
   methods: {
     handleSubmit (name) {
       this.$refs[name].validate((valid) => {
-        sessionStorage.setItem('user', JSON.stringify(this.formLogin.username))
+        sessionStorage.setItem('username', JSON.stringify(this.formLogin.username))
         if (valid) {
-          this.$Message.success('提交成功!')
-          this.$router.push({ path: '/menu' })
+          // this.$Message.success('提交成功!')
+          // this.$router.push({ path: '/menu' })
+          console.log(this.formLogin)
+          this.disabled = true
+          NetWorking.doPost(API.login, null, this.formLogin).then(response => {
+            this.disabled = false
+            let user = response.data
+            this.$store.dispatch('createUser', user)
+            this.$router.push({ path: '/menu' })
+          }, (message) => {
+            this.disabled = false
+            this.$Message.error('Login Failed!' + message)
+          })
         } else {
           this.$Message.error('表单验证失败!')
         }
@@ -80,6 +94,7 @@ export default {
       })
     },
     formLoginReset (name) {
+      this.disabled = false
       this.$refs[name].resetFields()
     }
   },
