@@ -41,13 +41,19 @@ func NewBlogService() (w *WebS, err error) {
 	if err != nil {
 		utils.Log.Errorf("TestBlog Failed![%v]", err)
 	}
+	err = dao.TestMenu()
+	if err != nil {
+		utils.Log.Errorf("TestMenu Failed![%v]", err)
+	}
 	blog := service.Serv.Group("blog")
 	blog.GET("/ping", Pong)
+	blog.GET("/menu", GetMenu)
 	blog.POST("/login", LoginBlog)
 	blog.POST("/user/edit", EditUser)
 	blog.GET("/newblog", NewBlogPage)
 	blog.POST("/save/:code", SaveBlog)
 	blog.GET("/posts/:code", GetPosts)
+	blog.PUT("/posts/:code", PutPosts)
 	return service, nil
 }
 
@@ -183,6 +189,75 @@ func GetPosts(c *gin.Context) {
 		res.Data = blog
 	}
 	c.JSONP(200, res)
+}
+
+func PutPosts(c *gin.Context) {
+	code := c.Param("code")
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+	}
+	blog := dao.PutBlog(code)
+	if blog == nil {
+		res.Code = -1
+		res.Success = false
+		res.Message = "wrong posts code!"
+	} else {
+		res.Data = blog
+	}
+	c.JSONP(200, res)
+
+}
+
+func GetMenu(c *gin.Context) {
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+	}
+	menu := &model.BookMenu{}
+	ms := dao.QueryMenus(0)
+	if ms == nil {
+		res.Code = -1
+		res.Success = false
+		res.Message = "get empty menu!"
+	} else {
+		menu.Id = ms[0].Id
+		menu.Name = ms[0].Name
+		menu.Chepters = getChapters(menu.Id)
+		res.Data = menu
+	}
+	c.JSONP(200, res)
+}
+
+func getChapters(pid int64) []model.BookChapter {
+	chapters := []model.BookChapter{}
+	ms := dao.QueryMenus(pid)
+	for _, item := range ms {
+		chapter := model.BookChapter{
+			Id:    item.Id,
+			Name:  item.Name,
+			Books: getBooks(item.Id),
+		}
+		chapters = append(chapters, chapter)
+	}
+	return chapters
+}
+
+func getBooks(pid int64) []model.BookItem {
+	books := []model.BookItem{}
+	ms := dao.QueryMenus(pid)
+	for _, item := range ms {
+		book := model.BookItem{
+			Id:    item.Id,
+			Title: item.Name,
+			Url:   "#/page/" + item.Code,
+			Day:   item.CreateTime.Format("01,02,2006"),
+		}
+		books = append(books, book)
+	}
+	return books
 }
 
 func EditUser(c *gin.Context) {

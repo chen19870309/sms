@@ -29,7 +29,7 @@ type BookItem struct {
 }
 
 type BookChapter struct {
-	Id    int        `json:"id"`
+	Id    int64      `json:"id"`
 	Name  string     `json:"name"`
 	Sum   string     `json:"sum"`
 	Pic   string     `json:"pic"`
@@ -37,7 +37,7 @@ type BookChapter struct {
 }
 
 type BookMenu struct {
-	Id       int           `json:"id"`
+	Id       int64         `json:"id"`
 	Name     string        `json:"name"`
 	Chepters []BookChapter `json:"chepters"`
 }

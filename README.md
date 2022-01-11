@@ -7,3 +7,5 @@
 
 3. 项目文档doc
 
+4. 腾讯云官方文档 https://cloud.tencent.com/developer/doc/1158
+

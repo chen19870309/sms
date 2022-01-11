@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import NetWorking from '@/utils/networking'
+import * as API from '@/utils/api'
 import SiteHeader from '@/components/global/SiteHeader'
 import SiteFooter from '@/components/global/SiteFooter'
 import BookGroup from '@/components/global/BookGroup'
@@ -22,83 +24,16 @@ export default {
   },
   data () {
     return {
-      menu: {
-        chepters: [
-          {
-            id: 1,
-            name: 'chapter1',
-            books: [
-              {
-                id: 1,
-                url: '#/page/1',
-                title: '我爱踢足球',
-                day: 'Sep,7,2021'
-              },
-              {
-                id: 2,
-                url: '#2',
-                title: '我爱踢足球',
-                day: 'Sep,8,2021'
-              },
-              {
-                id: 3,
-                url: '#3',
-                title: '我爱踢足球',
-                day: 'Sep,9,2021'
-              },
-              {
-                id: 4,
-                url: '#4',
-                title: '我爱踢足球',
-                day: 'Sep,10,2021'
-              },
-              {
-                id: 5,
-                url: '#5',
-                title: '我爱踢足球',
-                day: 'Sep,11,2021'
-              }
-            ]
-          },
-          {
-            id: 2,
-            name: 'chapter2',
-            books: [
-              {
-                id: 6,
-                url: '#1',
-                title: '我爱踢足球',
-                day: 'Sep,7,2021'
-              },
-              {
-                id: 7,
-                url: '#2',
-                title: '我爱踢足球',
-                day: 'Sep,8,2021'
-              },
-              {
-                id: 8,
-                url: '#3',
-                title: '我爱踢足球',
-                day: 'Sep,9,2021'
-              },
-              {
-                id: 9,
-                url: '#4',
-                title: '我爱踢足球',
-                day: 'Sep,10,2021'
-              },
-              {
-                id: 10,
-                url: '#5',
-                title: '我爱踢足球',
-                day: 'Sep,11,2021'
-              }
-            ]
-          }
-        ]
-      }
+      menu: {}
     }
+  },
+  created () {
+    NetWorking.doGet(API.menu).then(response => {
+      console.log(response.data)
+      this.menu = response.data
+    }, (message) => {
+      this.$Message.error('Load Menu Failed!' + message)
+    })
   }
 }
 </script>

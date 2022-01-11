@@ -79,7 +79,11 @@ export default {
             this.$router.push({ path: '/menu' })
           }, (message) => {
             this.disabled = false
-            this.$Message.error('Login Failed!' + message)
+            // this.$Message.error('Login Failed!' + message)
+            this.$Notice.error({
+              title: 'Login Failed!',
+              desc: message
+            })
           })
         } else {
           this.$Message.error('表单验证失败!')

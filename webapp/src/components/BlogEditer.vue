@@ -23,10 +23,14 @@ export default {
   },
   methods: {
     gohome () {
-      this.$router.push({ path: '/'})
+      this.$router.push({path: '/'})
     },
     newpush () {
-      this.$router.push({ path: '/page/' + this.blog.Code })
+      NetWorking.doPut(API.posts + this.blog.Code).then(response => {
+        this.$router.push({ path: '/page/' + this.blog.Code })
+      }, (message) => {
+        this.$Message.error('Put MarkDown Failed!' + message)
+      })
     },
     newblog () {
       NetWorking.doGet(API.newblog).then(response => {
@@ -44,19 +48,22 @@ export default {
       let params = {
         data: value,
         theme: theme,
-        author_id: 1,
+        author_id: 1
       }
       NetWorking.doPost(API.save + this.blog.Code, null, params).then(response => {
         this.disabled = false
       }, (message) => {
         this.disabled = false
-        this.$Message.error('Auto Save MarkDown Failed!' + message)
+        this.$Notice.error({
+          title: '自动保存失败',
+          desc: 'Auto Save MarkDown Failed!' + message
+        })
       })
     }
   },
   data () {
     return {
-      theme: 'oneDark',
+      theme: 'oneDark'
     }
   },
   created () {

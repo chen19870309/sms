@@ -12,7 +12,7 @@ const TB_BLOG = "tb_blog_ctx"
 
 func TestBlog() error {
 	blog := &model.BlogCtx{}
-	result := database.Debug().Table(TB_BLOG).First(blog)
+	result := database.Table(TB_BLOG).First(blog)
 	if result.Error != nil && result.Error.Error() != "record not found" {
 		return result.Error
 	}
@@ -24,7 +24,7 @@ func TestBlog() error {
 		blog.Status = 1
 		blog.Title = "Welcome !"
 		blog.Content = "#  使用介绍\n"
-		result = database.Debug().Table(TB_BLOG).Create(blog)
+		result = database.Table(TB_BLOG).Create(blog)
 		if result.Error != nil {
 			return result.Error
 		}
@@ -47,12 +47,13 @@ func AutoSaveBlog(code, theme, data string, authorid uint) error {
 }
 
 func SaveBlog(ctx *model.BlogCtx) error {
-	result := database.Table(TB_BLOG).Save(ctx)
-	if result.Error != nil {
-		return result.Error
-	}
-	if result.RowsAffected == 0 {
-		result = database.Table(TB_BLOG).Create(ctx)
+	if ctx.Id != 0 {
+		result := database.Table(TB_BLOG).Save(ctx)
+		if result.Error != nil {
+			return result.Error
+		}
+	} else {
+		result := database.Table(TB_BLOG).Create(ctx)
 		if result.Error != nil {
 			return result.Error
 		}
@@ -100,6 +101,25 @@ func QueryBlog(id int64, code string) *model.BlogCtx {
 	}
 	if result.Error != nil {
 		return nil
+	}
+	return blog
+}
+
+// 发布文章
+func PutBlog(code string) *model.BlogCtx {
+	blog := QueryBlog(0, code)
+	if blog != nil {
+		pid, err := CreateMonthMenu()
+		if err != nil {
+			utils.Log.Errorf("CreateMonthMenu failed![%v]", err)
+			return nil
+		} else {
+			err = CreateBookMenu(pid, blog)
+			if err != nil {
+				utils.Log.Errorf("CreateBookMenu failed![%v]", err)
+				return nil
+			}
+		}
 	}
 	return blog
 }

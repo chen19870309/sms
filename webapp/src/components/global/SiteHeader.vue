@@ -14,8 +14,6 @@
                     <DropdownMenu slot="list">
                         <DropdownItem><router-link to="/menu">文章目录</router-link></DropdownItem>
                         <DropdownItem><a href="#" @click.prevent="newblog" >新建文章</a></DropdownItem>
-                        <DropdownItem disabled>豆汁儿</DropdownItem>
-                        <DropdownItem>冰糖葫芦</DropdownItem>
                         <DropdownItem divided>北京烤鸭</DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
@@ -26,7 +24,7 @@
                         <Icon type="ios-arrow-down"></Icon>
                     </a>
                     <DropdownMenu slot="list">
-                        <DropdownItem>驴打滚</DropdownItem>
+                        <DropdownItem><router-link to="/login">账号登陆</router-link></DropdownItem>
                         <DropdownItem>炸酱面</DropdownItem>
                         <DropdownItem disabled>豆汁儿</DropdownItem>
                         <DropdownItem>冰糖葫芦</DropdownItem>
@@ -42,18 +40,17 @@
 import NetWorking from '@/utils/networking'
 import * as API from '@/utils/api'
 export default {
-    name: "site-header",
-    methods: {
-      newblog () {
-        NetWorking.doGet(API.newblog).then(response => {
-            let data = response.data
-            this.$store.dispatch('createBlog', data)
-            this.$router.push({ path: '/editer/' + data.Code })
-        }, (message) => {
-            this.$Message.error('Auto New MarkDown Failed!' + message)
-        })
-    },
+  name: 'site-header',
+  methods: {
+    newblog () {
+      NetWorking.doGet(API.newblog).then(response => {
+        let data = response.data
+        this.$store.dispatch('createBlog', data)
+        this.$router.push({ path: '/editer/' + data.Code })
+      }, (message) => {
+        this.$Message.error('Auto New MarkDown Failed!' + message)
+      })
     }
-
+  }
 }
 </script>

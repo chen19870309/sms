@@ -10,6 +10,13 @@
     <markdown-preview :initialValue="blog.Content" :theme="mdtheme"></markdown-preview>
   </div>
   <blog-footer></blog-footer>
+   <div id="mobile-menu" class="animated fast">
+      <ul>
+        <li><a href="#" @click.prevent="newblog" >新建</a></li>
+        <li><a href="#" @click.prevent="editblog" >编辑</a></li>
+        <li><a href="#" @click.prevent="gohome">返回</a></li>
+      </ul>
+    </div>
 </div>
 </template>
 
@@ -23,7 +30,7 @@ import BlogFooter from '@/components/global/SiteFooter'
 export default {
   data () {
     return {
-      mdtheme: 'oneDark',
+      mdtheme: 'oneDark'
     }
   },
   created () {
@@ -32,8 +39,29 @@ export default {
       let data = response.data
       this.$store.dispatch('createBlog', data)
     }, (message) => {
-      this.$Message.error('Load MarkDown Failed!' + message)
+     this.$Message.error('Load  MarkDown Failed!' + message)
+     this.$router.push({ path: '/404' })
     })
+  },
+  methods: {
+    gohome () {
+      this.$router.push({path: '/'})
+    },
+    newblog () {
+      NetWorking.doGet(API.newblog).then(response => {
+        let data = response.data
+        this.$store.dispatch('createBlog', data)
+        this.$router.push({ path: '/editer/' + data.Code })
+      }, (message) => {
+        this.$Notice.error({
+          title: '新建文章失败',
+          desc: 'Auto New MarkDown Failed!' + message
+          })
+      })
+    },
+    editblog () {
+      this.$router.push({ path: '/editer/' + this.blog.Code })
+    }
   },
   computed: {
     ...mapGetters({
