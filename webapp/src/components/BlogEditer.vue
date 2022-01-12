@@ -1,6 +1,6 @@
 <template>
   <div class="article">
-    <MarkdownPro :height="800" :autoSave=true @on-save="handleOnSave" :theme="theme" :value="blog.Content" :interval="60000"></MarkdownPro>
+    <Markdown :height="800" :autoSave=true @on-save="handleOnSave" :theme="theme" :value="blog.Content" :interval="60000"></Markdown>
     <div id="mobile-menu" class="animated fast">
       <ul>
         <li><a href="#" @click.prevent="newblog" >新建</a></li>
@@ -15,18 +15,23 @@
 import { mapGetters } from 'vuex'
 import NetWorking from '@/utils/networking'
 import * as API from '@/utils/api'
-import MarkdownPro from 'vue-meditor'
+import Markdown from 'vue-meditor'
 export default {
   name: 'markdown',
   components: {
-    MarkdownPro
+    Markdown
   },
   methods: {
     gohome () {
       this.$router.push({path: '/'})
     },
     newpush () {
-      NetWorking.doPut(API.posts + this.blog.Code).then(response => {
+      let params = {
+        data: this.blog.Content,
+        theme: this.theme,
+        author_id: 1
+      }
+      NetWorking.doPut(API.posts + this.blog.Code,null,params).then(response => {
         this.$router.push({ path: '/page/' + this.blog.Code })
       }, (message) => {
         this.$Message.error('Put MarkDown Failed!' + message)
@@ -43,6 +48,7 @@ export default {
     },
     handleOnSave ({value, theme}) {
       console.log(value, theme)
+      this.blog.Content = value
       this.$store.dispatch('createBlog', this.blog)
       this.theme = theme
       let params = {

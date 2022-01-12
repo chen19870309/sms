@@ -24,6 +24,7 @@ func init() {
 	service.Serv.Use(Cors())
 	service.Serv.Use(BlogAuth())
 	service.Serv.StaticFS("/static", http.Dir("/Users/chenchunjiang/go/src/sms/webapp/dist/static"))
+	// service.Serv.StaticFile("/", "/Users/chenchunjiang/go/src/sms/webapp/dist/index.html")
 	service.Serv.StaticFile("/", "/Users/chenchunjiang/go/src/sms/webapp/dist/index.html")
 }
 
@@ -51,6 +52,7 @@ func NewBlogService() (w *WebS, err error) {
 	blog.POST("/login", LoginBlog)
 	blog.POST("/user/edit", EditUser)
 	blog.GET("/newblog", NewBlogPage)
+	blog.GET("/blogcaches", BlogCaches)
 	blog.POST("/save/:code", SaveBlog)
 	blog.GET("/posts/:code", GetPosts)
 	blog.PUT("/posts/:code", PutPosts)
@@ -198,13 +200,21 @@ func PutPosts(c *gin.Context) {
 		Success: true,
 		Message: "ok",
 	}
-	blog := dao.PutBlog(code)
-	if blog == nil {
+	b := &model.BlogAutoSave{}
+	err := ParseData(c, b)
+	if err != nil {
 		res.Code = -1
 		res.Success = false
-		res.Message = "wrong posts code!"
+		res.Message = err.Error()
 	} else {
-		res.Data = blog
+		blog := dao.PutBlog(code, b.Data)
+		if blog == nil {
+			res.Code = -1
+			res.Success = false
+			res.Message = "wrong posts code!"
+		} else {
+			res.Data = blog
+		}
 	}
 	c.JSONP(200, res)
 
@@ -252,12 +262,22 @@ func getBooks(pid int64) []model.BookItem {
 		book := model.BookItem{
 			Id:    item.Id,
 			Title: item.Name,
-			Url:   "#/page/" + item.Code,
+			Url:   "/page/" + item.Code,
 			Day:   item.CreateTime.Format("01,02,2006"),
 		}
 		books = append(books, book)
 	}
 	return books
+}
+
+func BlogCaches(c *gin.Context) {
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+		Data:    dao.QueryBlogCaches(1),
+	}
+	c.JSONP(200, res)
 }
 
 func EditUser(c *gin.Context) {

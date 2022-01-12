@@ -1,6 +1,7 @@
 import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/Login'
 import Editer from '@/components/BlogEditer'
+import BlogCache from '@/components/BlogCache'
 import Page from '@/components/BlogPage'
 import Menu from '@/components/BookMenu'
 import P401 from '@/components/error/401'
@@ -15,19 +16,28 @@ export default[
   },
   {
     path: '/login',
+    name: 'login',
     component: Login
   },
   {
     path: '/editer/:code',
+    name: 'editer',
     component: Editer
   },
   {
     path: '/page/:code',
+    name: 'page',
     component: Page
   },
   {
     path: '/menu',
+    name: 'menu',
     component: Menu
+  },
+  {
+    path: '/cache',
+    name: 'cache',
+    component: BlogCache
   },
   {
     path: '/401',

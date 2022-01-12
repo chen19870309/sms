@@ -34,8 +34,8 @@ func Gen8RCode() string {
 func GetMdTitle(data string) string {
 	ls := strings.Split(data, "\n")
 	for _, item := range ls {
-		if strings.HasPrefix(item, "#  ") {
-			return item[3:]
+		if strings.HasPrefix(item, "# ") {
+			return item[2:]
 		}
 	}
 	return "undefined"

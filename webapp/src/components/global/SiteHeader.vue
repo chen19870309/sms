@@ -14,7 +14,7 @@
                     <DropdownMenu slot="list">
                         <DropdownItem><router-link to="/menu">文章目录</router-link></DropdownItem>
                         <DropdownItem><a href="#" @click.prevent="newblog" >新建文章</a></DropdownItem>
-                        <DropdownItem divided>北京烤鸭</DropdownItem>
+                        <DropdownItem ><router-link to="/cache">草稿箱</router-link></DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
                 <Divider type="vertical" />
@@ -46,7 +46,9 @@ export default {
       NetWorking.doGet(API.newblog).then(response => {
         let data = response.data
         this.$store.dispatch('createBlog', data)
-        this.$router.push({ path: '/editer/' + data.Code })
+        this.$router.push({ path: '/editer/' + data.Code }).catch(err => {
+            this.$Message.error('Auto New MarkDown Failed!' + err)
+        })
       }, (message) => {
         this.$Message.error('Auto New MarkDown Failed!' + message)
       })

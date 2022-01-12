@@ -70,7 +70,7 @@ func AuthUser(username, password string) (*model.SmsUser, error) {
 		return nil, errors.New("username & password cant be nil!")
 	}
 	user := &model.SmsUser{}
-	result := database.Table(TB_USER).Where("username = ? and password = ? and status in (0,1,2)", username, password).First(user)
+	result := database.Table(TB_USER).Where("username = ? and secret = ? and status in (0,1,2)", username, password).First(user)
 	if result.Error != nil {
 		return nil, result.Error
 	}

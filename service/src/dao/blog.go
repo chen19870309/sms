@@ -106,9 +106,14 @@ func QueryBlog(id int64, code string) *model.BlogCtx {
 }
 
 // 发布文章
-func PutBlog(code string) *model.BlogCtx {
+func PutBlog(code, data string) *model.BlogCtx {
 	blog := QueryBlog(0, code)
 	if blog != nil {
+		blog.Content = data
+		blog.Title = utils.GetMdTitle(data)
+		blog.Tags = utils.GetMdTags(data, "")
+		blog.Status = 1
+		SaveBlog(blog)
 		pid, err := CreateMonthMenu()
 		if err != nil {
 			utils.Log.Errorf("CreateMonthMenu failed![%v]", err)
@@ -124,7 +129,20 @@ func PutBlog(code string) *model.BlogCtx {
 	return blog
 }
 
+func QueryBlogCaches(auther_id int) []*model.BlogCtx {
+	blogs := []*model.BlogCtx{}
+	result := database.Table(TB_BLOG).Where("status = 0 and author_id = ?", auther_id).Find(&blogs)
+	if result.Error != nil {
+		return nil
+	}
+	return blogs
+}
+
 func ListBlogs(page, size int, authorIds []int, tags []string) []*model.BlogCtx {
 	blogs := []*model.BlogCtx{}
+	result := database.Table(TB_BLOG).Where("status = 0").Find(&blogs)
+	if result.Error != nil {
+		return nil
+	}
 	return blogs
 }

@@ -47,6 +47,9 @@ func CreateMonthMenu() (int64, error) {
 
 func CreateBookMenu(pid int64, blog *model.BlogCtx) error {
 	menu := QueryMenu(pid, blog.Code)
+	if menu == nil {
+		menu = &model.BookMenu{}
+	}
 	menu.Pid = pid
 	menu.Name = blog.Title
 	menu.Sum = blog.Sum

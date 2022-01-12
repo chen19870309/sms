@@ -3,8 +3,8 @@
   <BlogHeader></BlogHeader>
   <div class="post-page thin body">
     <header class="post-header">
-      <div class="post-meta"><span>Sep 17, 2021</span></div>
-      <span>Go 数组比切片好在哪？--by 煎鱼</span>
+      <div class="post-meta"><span>{{ blog.CreateTime }}</span></div>
+      <span>Go 数组比切片好在哪？[{{ blog.Title }}]--by 煎鱼[{{ blog.Code }}]</span>
     </header>
     <hr>
     <markdown-preview :initialValue="blog.Content" :theme="mdtheme"></markdown-preview>
