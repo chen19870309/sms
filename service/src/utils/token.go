@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
 	"strconv"
 	"strings"
@@ -39,6 +41,12 @@ func GetMdTitle(data string) string {
 		}
 	}
 	return "undefined"
+}
+
+func SHA1(s string) string {
+	o := sha1.New()
+	o.Write([]byte(s))
+	return hex.EncodeToString(o.Sum(nil))
 }
 
 func GetMdTags(data, theme string) string {

@@ -8,18 +8,22 @@ import (
 	"sms/service/src/api/model"
 	"sms/service/src/dao"
 	"sms/service/src/utils"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 type WebS struct {
-	Serv *gin.Engine
+	Serv     *gin.Engine
+	SecCache map[string]int64
 }
 
 var service *WebS
 
 func init() {
-	service = &WebS{}
+	service = &WebS{
+		SecCache: make(map[string]int64),
+	}
 	service.Serv = gin.Default()
 	service.Serv.Use(Cors())
 	service.Serv.Use(BlogAuth())
@@ -83,15 +87,32 @@ func BlogAuth() gin.HandlerFunc {
 			utils.Log.Infof("req=[%v]", string(data))
 			c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(data)) // 关键点
 		}
-
-		auth := c.GetHeader("Auth-Token")
+		ok := true
+		auth, err := c.Cookie("auth_token")
 		ip := c.ClientIP()
-		utils.Log.Infof("auth=%v ip=%v url=[%v]", auth, ip, c.Request.URL)
-		utils.Log.Infof("Params:%v", c.Params)
+		url := c.Request.URL.String()
+		if strings.Contains(url, "newblog") || strings.Contains(url, "save") || strings.Contains(url, "blogcaches") {
+			userid := service.SecCache[auth]
+			utils.Log.Infof("auth=%v ip=%v url=[%v] userid=[%d]", auth, ip, c.Request.URL, userid)
+			utils.Log.Infof("Params:%v", c.Params)
+			if userid == 0 {
+				ok = false
+				res := model.Response{
+					Code:    401,
+					Success: false,
+					Message: "auth failed!",
+				}
+				c.JSONP(200, res)
+				c.AbortWithStatus(401)
+			}
+			c.Set("USERID", userid)
+		}
 		// m := make(map[string]interface{})
 		// c.BindJSON(&m)
 		// log.Println(m)
-		c.Next()
+		if ok {
+			c.Next()
+		}
 	}
 }
 
@@ -154,6 +175,7 @@ func LoginBlog(c *gin.Context) {
 			res.Message = "用户名或密码错误!"
 		} else {
 			res.Data = user
+			service.SecCache[user.Secret] = user.Id
 		}
 	}
 	c.JSONP(200, res)

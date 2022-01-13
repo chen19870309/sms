@@ -87,6 +87,7 @@ export default {
         title: '草稿箱信息获取失败',
         desc: 'Get Cache Box Failed!' + message
       })
+      this.$store.dispatch('deleteUser')
     })
   },
   methods: {

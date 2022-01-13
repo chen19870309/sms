@@ -10,7 +10,8 @@ const state = {
 // getters
 const getters = {
   currentUser: state => state.userinfo,
-  nextUrl: state => state.nextUrl
+  nextUrl: state => state.nextUrl,
+  authToken: state => state.Token
 }
 // actions
 const actions = {
@@ -23,7 +24,7 @@ const actions = {
   createUser ({commit}, user) {
     console.log('in create user')
     commit('setHasGetInfo', true)
-    commit('setToken', user.Code)
+    commit('setToken', user.Secret)
     commit(types.CREATE_USER, user)
   },
   fetchUser ({commit}) {
@@ -45,6 +46,7 @@ const mutations = {
   },
   setToken (state, token) {
     state.token = token
+    storage.set('auth_token', token)
   },
   [types.CREATE_USER] (state, user) {
     state.userinfo = user

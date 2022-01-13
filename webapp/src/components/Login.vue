@@ -34,15 +34,14 @@
         </Form-item>
     </Form>
     </Card>
-    <site-footer></site-footer>
     </div>
 </template>
 
 <script>
 import NetWorking from '@/utils/networking'
 import * as API from '@/utils/api'
+import Cookie from 'js-cookie'
 import SiteHeader from '@/components/global/SiteHeader'
-import SiteFooter from '@/components/global/SiteFooter'
 export default {
   data () {
     return {
@@ -75,6 +74,7 @@ export default {
           NetWorking.doPost(API.login, null, this.formLogin).then(response => {
             this.disabled = false
             let user = response.data
+            Cookie.set('auth_token', user.Secret)
             this.$store.dispatch('createUser', user)
             this.$router.push({ path: this.$store.getters.nextUrl }).catch(err => {})
           }, (message) => {
@@ -111,8 +111,7 @@ export default {
     }
   },
   components: {
-    SiteHeader,
-    SiteFooter
+    SiteHeader
   }
 }
 </script>

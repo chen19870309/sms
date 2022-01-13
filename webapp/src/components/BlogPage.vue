@@ -58,7 +58,8 @@ export default {
         this.$Notice.error({
           title: '新建文章失败',
           desc: 'Auto New MarkDown Failed!' + message
-          })
+        })
+        this.$store.dispatch('deleteUser')
       })
     },
     editblog () {

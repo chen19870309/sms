@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import Cookie from 'js-cookie'
 import { mapGetters } from 'vuex'
 import NetWorking from '@/utils/networking'
 import * as API from '@/utils/api'
@@ -44,6 +45,7 @@ export default {
         this.$router.push({ path: '/editer/' + data.Code })
       }, (message) => {
         this.$Message.error('Auto New MarkDown Failed!' + message)
+        this.$store.dispatch('deleteUser')
       })
     },
     handleOnSave ({value, theme}) {
@@ -52,16 +54,15 @@ export default {
       let params = {
         data: value,
         theme: theme,
-        author_id: 1
+        author_id: this.user.Id
       }
       NetWorking.doPost(API.save + this.blog.Code, null, params).then(response => {
-        this.disabled = false
       }, (message) => {
-        this.disabled = false
         this.$Notice.error({
           title: '自动保存失败',
           desc: 'Auto Save MarkDown Failed!' + message
         })
+        this.$store.dispatch('deleteUser')
       })
     }
   },
@@ -72,17 +73,17 @@ export default {
   },
   created () {
     NetWorking.doGet(API.posts + this.$route.params.code).then(response => {
-      console.log(response.data)
       let data = response.data
       this.$store.dispatch('createBlog', data)
-      this.$router.push({ path: '/editer/' + data.Code })
+      this.$router.push({ path: '/editer/' + data.Code }).catch(err => {})
     }, (message) => {
       this.$Message.error('Load MarkDown Failed!' + message)
     })
   },
   computed: {
     ...mapGetters({
-      blog: 'currentBlog'
+      blog: 'currentBlog',
+      user: 'currentUser'
     })
   }
 }

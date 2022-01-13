@@ -24,10 +24,10 @@
                         <Icon type="ios-arrow-down"></Icon>
                     </a>
                     <DropdownMenu slot="list">
-                        <DropdownItem>冰糖葫芦</DropdownItem>
+                        <DropdownItem v-show='user.Id != undefined'><a href="#" @click.prevent="showUser">{{ user.Nickname }}</a></DropdownItem>
                         <DropdownItem><router-link to="/login">账号登陆</router-link></DropdownItem>
                         <DropdownItem><router-link to="/regist" disabled>注册账号</router-link></DropdownItem>
-                        <DropdownItem divided><a href="#" @click.prevent="logout" >退出账号</a></DropdownItem>
+                        <DropdownItem v-show='user.Id != undefined' divided><a href="#" @click.prevent="logout">退出账号</a></DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
             </div>
@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import NetWorking from '@/utils/networking'
 import * as API from '@/utils/api'
 export default {
@@ -56,7 +57,18 @@ export default {
         this.$store.dispatch('deleteUser')
         this.$store.dispatch('deleteBlog')
         this.$router.push({ path: '/menu' })
+    },
+    showUser () {
+      this.$Modal.info({
+        title: 'User Info',
+        content: `Name：${this.user.Nickname}<br>Secret: ${this.user.Secret}<br>CreateTime：${this.user.Createtime}`
+      })
     }
+  },
+  computed: {
+    ...mapGetters({
+      user: 'currentUser'
+    })
   }
 }
 </script>

@@ -73,6 +73,10 @@ func AuthUser(username, password string) (*model.SmsUser, error) {
 	result := database.Table(TB_USER).Where("username = ? and secret = ? and status in (0,1,2)", username, password).First(user)
 	if result.Error != nil {
 		return nil, result.Error
+	} else {
+		user.UpdateTime = time.Now()
+		database.Table(TB_USER).Save(user)
+		user.Secret = utils.SHA1(utils.Gen8RCode())
 	}
 	return user, nil
 }

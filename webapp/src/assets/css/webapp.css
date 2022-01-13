@@ -83,6 +83,7 @@ a {
 
 .box {
     height: 100%;
+    padding: 0.1px;
     background-color: aliceblue;
 }
 
