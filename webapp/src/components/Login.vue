@@ -76,7 +76,7 @@ export default {
             this.disabled = false
             let user = response.data
             this.$store.dispatch('createUser', user)
-            this.$router.push({ path: '/menu' })
+            this.$router.push({ path: this.$store.getters.nextUrl }).catch(err => {})
           }, (message) => {
             this.disabled = false
             // this.$Message.error('Login Failed!' + message)

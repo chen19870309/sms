@@ -1,9 +1,9 @@
 <template>
   <li class="post-item">
-    <a :href="book.url">
+    <router-link :to=book.url>
       <span class="post-title">{{ book.title }}</span>
       <span class="post-day">{{ book.day }}</span>
-    </a>
+    </router-link>
   </li>
 </template>
 

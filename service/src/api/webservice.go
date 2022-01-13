@@ -146,7 +146,8 @@ func LoginBlog(c *gin.Context) {
 		res.Success = false
 		res.Message = err.Error()
 	} else {
-		user, err := dao.AuthUser(req.Username, req.Password)
+		secure, _ := utils.EnPwdCode([]byte(req.Password))
+		user, err := dao.AuthUser(req.Username, secure)
 		if err != nil {
 			res.Code = -1
 			res.Success = false

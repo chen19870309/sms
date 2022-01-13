@@ -5,7 +5,7 @@
       <ul>
         <li><a href="#" @click.prevent="newblog" >新建</a></li>
         <li><a href="#" @click.prevent="newpush" >发布</a></li>
-        <li><a href="#" @click.prevent="gohome">返回</a></li>
+        <li><a href="#" @click.prevent="goback">返回</a></li>
       </ul>
     </div>
   </div>
@@ -22,8 +22,8 @@ export default {
     Markdown
   },
   methods: {
-    gohome () {
-      this.$router.push({path: '/'})
+    goback () {
+      this.$router.go(-1)
     },
     newpush () {
       let params = {
@@ -47,9 +47,7 @@ export default {
       })
     },
     handleOnSave ({value, theme}) {
-      console.log(value, theme)
-      this.blog.Content = value
-      this.$store.dispatch('createBlog', this.blog)
+      this.$store.dispatch('updateBlog', value)
       this.theme = theme
       let params = {
         data: value,

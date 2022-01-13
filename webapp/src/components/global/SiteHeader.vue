@@ -24,11 +24,10 @@
                         <Icon type="ios-arrow-down"></Icon>
                     </a>
                     <DropdownMenu slot="list">
-                        <DropdownItem><router-link to="/login">账号登陆</router-link></DropdownItem>
-                        <DropdownItem>炸酱面</DropdownItem>
-                        <DropdownItem disabled>豆汁儿</DropdownItem>
                         <DropdownItem>冰糖葫芦</DropdownItem>
-                        <DropdownItem divided>退出账号</DropdownItem>
+                        <DropdownItem><router-link to="/login">账号登陆</router-link></DropdownItem>
+                        <DropdownItem><router-link to="/regist" disabled>注册账号</router-link></DropdownItem>
+                        <DropdownItem divided><a href="#" @click.prevent="logout" >退出账号</a></DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
             </div>
@@ -52,6 +51,11 @@ export default {
       }, (message) => {
         this.$Message.error('Auto New MarkDown Failed!' + message)
       })
+    },
+    logout () {
+        this.$store.dispatch('deleteUser')
+        this.$store.dispatch('deleteBlog')
+        this.$router.push({ path: '/menu' })
     }
   }
 }

@@ -12,14 +12,13 @@ const router = new Router({
 })
 router.beforeEach((to, from, next) => {
   iView.LoadingBar.start()
-  console.log('beforeEach')
+  console.log('beforeEach:' + store.state.currentUser.hasGetInfo)
   // if user not exist, then go to login
-  console.log(to)
-  if (to.name === 'editer') {
-    let user = store.getters.currentUser
-    console.log(user)
-    if (user === undefined || user.Id === undefined) {
-      // router.replace({name: 'login'})
+  console.log(to.path)
+  if (to.name === 'editer' || to.name === 'cache') {
+    if (!store.state.currentUser.hasGetInfo) {
+      store.commit('setNext', to.path)
+      router.replace({name: 'login'})
     }
   }
   next()

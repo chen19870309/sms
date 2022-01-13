@@ -14,7 +14,7 @@
       <ul>
         <li><a href="#" @click.prevent="newblog" >新建</a></li>
         <li><a href="#" @click.prevent="editblog" >编辑</a></li>
-        <li><a href="#" @click.prevent="gohome">返回</a></li>
+        <li><a href="#" @click.prevent="gomenu">返回</a></li>
       </ul>
     </div>
 </div>
@@ -44,14 +44,16 @@ export default {
     })
   },
   methods: {
-    gohome () {
-      this.$router.push({path: '/'})
+    gomenu () {
+      this.$router.push({path: '/menu'})
     },
     newblog () {
       NetWorking.doGet(API.newblog).then(response => {
         let data = response.data
         this.$store.dispatch('createBlog', data)
-        this.$router.push({ path: '/editer/' + data.Code })
+        this.$router.push({ path: '/editer/' + data.Code }).catch(err => {
+          console.log('pass router')
+        })
       }, (message) => {
         this.$Notice.error({
           title: '新建文章失败',
@@ -60,7 +62,9 @@ export default {
       })
     },
     editblog () {
-      this.$router.push({ path: '/editer/' + this.blog.Code })
+      this.$router.push({ path: '/editer/' + this.blog.Code }).catch(err => {
+        console.log("edit blog:" + this.blog.Code)
+      })
     }
   },
   computed: {

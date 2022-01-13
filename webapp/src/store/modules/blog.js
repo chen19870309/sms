@@ -10,6 +10,9 @@ const getters = {
 }
 // actions
 const actions = {
+  updateBlog ({commit}, data) {
+    commit('updateBlogCtx', data)
+  },
   createBlog ({commit}, blog) {
     commit(types.CREATE_BLOG, blog)
   },
@@ -32,6 +35,10 @@ const mutations = {
   [types.DELETE_BLOG] (state) {
     storage.remove('current_blog')
     state.bloginfo = {}
+  },
+  updateBlogCtx (state, value) {
+    state.bloginfo.Content = value
+    storage.set('current_blog', state.bloginfo)
   }
 }
 
