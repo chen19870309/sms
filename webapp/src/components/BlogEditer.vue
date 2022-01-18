@@ -1,6 +1,6 @@
 <template>
   <div class="article">
-    <Markdown :height="800" :autoSave=true @on-save="handleOnSave" :theme="theme" :value="blog.Content" :interval="60000"></Markdown>
+    <Markdown :height="800" :autoSave=true @on-save="handleOnSave" @on-upload-image="handleUploadImage" :theme="theme" :value="blog.Content" :interval="60000"></Markdown>
     <div id="mobile-menu" class="animated fast">
       <ul>
         <li><a href="#" @click.prevent="newblog" >新建</a></li>
@@ -64,6 +64,9 @@ export default {
         })
         this.$store.dispatch('deleteUser')
       })
+    },
+    handleUploadImage (file) {
+      console.log("deal upload :",file)
     }
   },
   data () {

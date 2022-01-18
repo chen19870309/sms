@@ -1,5 +1,7 @@
 <template>
-    <div class="box">
+    <div class="box" >
+    <!-- 粒子背景 -->
+    <vue-particles></vue-particles>
     <site-header></site-header>
     <Card class="card-box">
     <Form ref="formLogin" :model="formLogin" :rules="formLoginRules" >

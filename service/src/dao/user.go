@@ -65,7 +65,7 @@ func QueryUser(id int64, code string) *model.SmsUser {
 	return user
 }
 
-func AuthUser(username, password string) (*model.SmsUser, error) {
+func AuthUser(username, password, ip string) (*model.SmsUser, error) {
 	if username == "" || password == "" {
 		return nil, errors.New("username & password cant be nil!")
 	}
@@ -75,6 +75,7 @@ func AuthUser(username, password string) (*model.SmsUser, error) {
 		return nil, result.Error
 	} else {
 		user.UpdateTime = time.Now()
+		user.LoginIp = ip
 		database.Table(TB_USER).Save(user)
 		user.Secret = utils.SHA1(utils.Gen8RCode())
 	}

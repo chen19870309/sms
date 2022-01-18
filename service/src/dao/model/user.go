@@ -16,4 +16,5 @@ type SmsUser struct {
 	Remark     string
 	Level      uint
 	Status     uint
+	LoginIp    string
 }

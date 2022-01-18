@@ -45,7 +45,7 @@ func CreateMonthMenu() (int64, error) {
 	return menu.Id, result.Error
 }
 
-func CreateBookMenu(pid int64, blog *model.BlogCtx) error {
+func CreateBookMenu(pid int64, userid uint, blog *model.BlogCtx) error {
 	menu := QueryMenu(pid, blog.Code)
 	if menu == nil {
 		menu = &model.BookMenu{}
@@ -56,8 +56,10 @@ func CreateBookMenu(pid int64, blog *model.BlogCtx) error {
 	menu.Code = blog.Code
 	menu.Remark = blog.Tags
 	menu.Status = 1
+	menu.Day = blog.CreateTime.Format("01M/02D,2006")
 	menu.CreateTime = blog.CreateTime
 	menu.UpdateTime = time.Now()
+	menu.AuthorId = userid
 	return SaveMenu(menu)
 }
 
@@ -86,10 +88,10 @@ func QueryMenu(pid int64, code string) *model.BookMenu {
 	return menu
 }
 
-func QueryMenus(pid int64) []*model.BookMenu {
+func QueryMenus(pid int64, userid int) []*model.BookMenu {
 	menus := []*model.BookMenu{}
 	var result *gorm.DB
-	result = database.Table(TB_MENU).Where("pid = ?", pid).Find(&menus)
+	result = database.Table(TB_MENU).Where("pid = ? and author_id in (0,?)", pid, userid).Find(&menus)
 	if result.Error != nil {
 		return nil
 	}

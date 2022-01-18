@@ -12,6 +12,9 @@ import 'iview/dist/styles/iview.css'
 
 import './assets/css/webapp.css'
 
+import VueParticles from 'vue-particles'
+Vue.use(VueParticles)
+
 Vue.use(iView)
 Vue.use(less)
 

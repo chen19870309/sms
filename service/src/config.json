@@ -9,15 +9,20 @@
     },
     "site": {
         "id":1,
-        "Code": "0001",
-        "Name": "SMS_Blog",
-        "Domain": "localhost",
+        "code": "0001",
+        "name": "SMS_Blog",
+        "domain": "localhost",
         "beian": ""
     },
     "app": {
-        "listen-port": 8082,
+        "listen-port": 8088,
         "log-level": "debug",
         "base-path": "/tmp/blog",
         "static-path": "/tmp/blog/static"
+    },
+    "qiniu": {
+        "ak":     "03ZfXEI4E6G6RWLFhEoQAiRN698wKwDh_CxTbC1n",
+		"sk":     "x-PS8ecXATWGUGBctR_l2LKi_Ic4tZkg1XwxOwlE",
+		"bucket": "sp2022"
     }
 }

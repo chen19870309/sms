@@ -3,6 +3,7 @@ package dao
 import (
 	"sms/service/src/dao/model"
 	"sms/service/src/utils"
+	"strings"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -23,7 +24,7 @@ func TestBlog() error {
 		blog.AuthorId = 1
 		blog.Status = 1
 		blog.Title = "Welcome !"
-		blog.Content = "#  使用介绍\n"
+		blog.Content = "#  使用介绍\n@create time:" + time.Now().Format("2006-01-02 15:04:05") + "\n"
 		result = database.Table(TB_BLOG).Create(blog)
 		if result.Error != nil {
 			return result.Error
@@ -67,7 +68,7 @@ func NewBlog(authorId uint) (*model.BlogCtx, error) {
 		UpdateTime: time.Now(),
 		AuthorId:   authorId,
 		Status:     0,
-		Content:    "#  New Edit!\n@create time:" + time.Now().Format("2006-01-02 15:04:05") + "\n",
+		Content:    "#  New Edit!\n@create time:" + time.Now().Format("2006-01-02 15:04:05") + "\n@private\n",
 	}
 	for {
 		code := utils.Gen8RCode()
@@ -112,14 +113,22 @@ func PutBlog(code, data string) *model.BlogCtx {
 		blog.Content = data
 		blog.Title = utils.GetMdTitle(data)
 		blog.Tags = utils.GetMdTags(data, "")
-		blog.Status = 1
+		if strings.Contains(blog.Tags, "private") {
+			blog.Status = 2 //私有blog
+		} else {
+			blog.Status = 1 //公开blog
+		}
 		SaveBlog(blog)
 		pid, err := CreateMonthMenu()
 		if err != nil {
 			utils.Log.Errorf("CreateMonthMenu failed![%v]", err)
 			return nil
 		} else {
-			err = CreateBookMenu(pid, blog)
+			var userid uint
+			if blog.Status == 2 {
+				userid = blog.AuthorId
+			}
+			err = CreateBookMenu(pid, userid, blog)
 			if err != nil {
 				utils.Log.Errorf("CreateBookMenu failed![%v]", err)
 				return nil

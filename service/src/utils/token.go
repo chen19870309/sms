@@ -50,5 +50,20 @@ func SHA1(s string) string {
 }
 
 func GetMdTags(data, theme string) string {
-	return ""
+	tags := ""
+	ls := strings.Split(data, "\n")
+	for _, item := range ls {
+		tag := ""
+		if item == "@private" {
+			tag = "private,"
+		} else if strings.HasPrefix(item, "@tag:") {
+			tag = item[5:] + ","
+		}
+		if tags == "" {
+			tags = tag
+		} else {
+			tags += tag
+		}
+	}
+	return tags
 }

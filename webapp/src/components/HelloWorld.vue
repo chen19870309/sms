@@ -11,7 +11,7 @@
             </Sider>
             <Content>
               <Table border :columns="columns7" :data="data6"></Table>
-              <markdown></markdown>
+              <MarkdownPro @on-upload-image="handleUploadImage"></MarkdownPro>
             </Content>
         </Layout>
       </div>
@@ -22,7 +22,7 @@
 <script>
 import SiteFooter from '@/components/global/SiteFooter'
 import SiteHeader from '@/components/global/SiteHeader'
-import Markdown from 'vue-meditor'
+import { MarkdownPro } from 'vue-meditor'
 export default {
   name: 'HelloWorld',
   data () {
@@ -38,7 +38,7 @@ export default {
                                 expand: true,
                                 children: [
                                     {
-                                        title: 'leaf 1-1-1------------------------------88888888'
+                                        title: 'leaf 1-1-188888888'
                                     },
                                     {
                                         title: 'leaf 1-1-2'
@@ -146,7 +146,7 @@ export default {
   components: {
     SiteHeader,
     SiteFooter,
-    Markdown
+    MarkdownPro
   },
   methods: {
             show (index) {
@@ -157,6 +157,9 @@ export default {
             },
             remove (index) {
                 this.data6.splice(index, 1);
+            },
+            handleUploadImage (file) {
+                console.log("upload :",file)
             }
         }
 }

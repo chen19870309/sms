@@ -1,7 +1,11 @@
 import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/Login'
+import Regist from '@/components/Regist'
 import Editer from '@/components/BlogEditer'
 import BlogCache from '@/components/BlogCache'
+import BlogIndex from '@/components/layout/BlogIndex'
+import Personal from '@/components/layout/Personal2'
+import UploadImage from '@/components/UploadImage'
 import Page from '@/components/BlogPage'
 import Menu from '@/components/BookMenu'
 import P401 from '@/components/error/401'
@@ -11,13 +15,30 @@ import P500 from '@/components/error/500'
 export default[
   {
     path: '/',
-    name: 'HelloWorld',
+    name: 'index',
+    component: BlogIndex
+  },
+  {
+    path: '/user',
+    component: Personal
+  },
+  {
+    path: '/hello',
     component: HelloWorld
+  },
+  {
+    path: '/upload',
+    component: UploadImage
   },
   {
     path: '/login',
     name: 'login',
     component: Login
+  },
+  {
+    path: '/regist',
+    name: 'regist',
+    component: Regist
   },
   {
     path: '/editer/:code',

@@ -14,3 +14,8 @@ init:
 build:
 	go build -o blog  ./cmd
 	upx blog
+
+linux:
+	GOOS=linux GOARCH=amd64 go build  -ldflags '-s -w' -o blog  ./cmd
+	upx blog
+

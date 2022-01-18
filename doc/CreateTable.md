@@ -8,17 +8,18 @@ serial | varchar(8) | timestamp | timestamp | integer|varchar(128)|varchar(128)|
 
 ```
 --postgres
+drop table tb_blog_ctx;
 create table tb_blog_ctx(
     id serial primary key,
-    code varchar(8),
-    create_time timestamp,
-    update_time timestamp,
-    author_id integer,
-    title varchar(128),
-    tags varchar(128),
-    sum varchar(128),
+    code varchar(8) default '',
+    create_time timestamp default CURRENT_TIMESTAMP,
+    update_time timestamp default CURRENT_TIMESTAMP,
+    author_id integer default 0,
+    title varchar(128) default '',
+    tags varchar(128) default 'private',
+    sum varchar(128) default '',
     content text,
-    status smallint
+    status smallint default 0
 );
 --mysql
 create table tb_blog_ctx(
@@ -45,18 +46,21 @@ serial | varchar(8) | timestamp | timestamp | varchar(64)|varchar(128)|varchar(1
 
 ```
 --postgres
+drop table tb_sms_user;
 create table tb_sms_user(
     id serial primary key,
-    code varchar(8),
-    create_time timestamp,
-    update_time timestamp,
-    username varchar(64),
-    nickname varchar(128),
-    secret varchar(128),
-    icon varchar(128),
-    remark text,
-    level smallint,
-    status smallint
+    code varchar(8) default '',
+    create_time timestamp default CURRENT_TIMESTAMP,
+    update_time timestamp default CURRENT_TIMESTAMP,
+    username varchar(64) not null,
+    nickname varchar(128) not null default '<nil>',
+    secret varchar(128) not null,
+    icon varchar(128) default '',
+    remark text ,
+    level smallint default 0,
+    status smallint default 0,
+    email varchar(64) default '',
+    login_ip varchar(20) default ''
 );
 --mysql
 create table tb_sms_user(
@@ -71,6 +75,8 @@ create table tb_sms_user(
     remark text,
     level integer,
     status integer,
+    email varchar(64),
+    login_ip varchar(20) default '',
     primary key(id)
 ) default charset=utf8;
 ```
@@ -95,6 +101,22 @@ create table tb_book_menu(
     remark text,
     day varchar(32),
     status integer,
+    author_id integer,
     primary key(id)
 ) default charset=utf8;
+--postgres
+create table tb_book_menu(
+    id serial primary key,
+    pid integer default 0,
+    create_time timestamp default CURRENT_TIMESTAMP ,
+    update_time timestamp default CURRENT_TIMESTAMP,
+    name varchar(64) not null,
+    sum varchar(128) default '',
+    code varchar(8) default '',
+    pic varchar(128) default '',
+    remark text,
+    day varchar(32) default '',
+    status integer default 0,
+    author_id integer default 0
+);
 ```

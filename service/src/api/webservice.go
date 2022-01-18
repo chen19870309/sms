@@ -27,9 +27,9 @@ func init() {
 	service.Serv = gin.Default()
 	service.Serv.Use(Cors())
 	service.Serv.Use(BlogAuth())
-	service.Serv.StaticFS("/static", http.Dir("/Users/chenchunjiang/go/src/sms/webapp/dist/static"))
-	// service.Serv.StaticFile("/", "/Users/chenchunjiang/go/src/sms/webapp/dist/index.html")
-	service.Serv.StaticFile("/", "/Users/chenchunjiang/go/src/sms/webapp/dist/index.html")
+	//service.Serv.StaticFS("/static", http.Dir("/Users/chenchunjiang/go/src/sms/webapp/dist/static"))
+	//service.Serv.StaticFile("/", "/Users/chenchunjiang/go/src/sms/webapp/dist/index.html")
+	//service.Serv.StaticFile("/", "/Users/chenchunjiang/go/src/sms/webapp/dist/index.html")
 }
 
 func (web *WebS) Close() {
@@ -144,6 +144,7 @@ func SaveBlog(c *gin.Context) {
 		res.Success = false
 		res.Message = err.Error()
 	} else {
+		b.AuthorId = uint(c.GetInt("USERID"))
 		err = dao.AutoSaveBlog(code, b.Theme, b.Data, b.AuthorId)
 		if err != nil {
 			res.Code = -2
@@ -168,7 +169,7 @@ func LoginBlog(c *gin.Context) {
 		res.Message = err.Error()
 	} else {
 		secure, _ := utils.EnPwdCode([]byte(req.Password))
-		user, err := dao.AuthUser(req.Username, secure)
+		user, err := dao.AuthUser(req.Username, secure, c.ClientIP())
 		if err != nil {
 			res.Code = -1
 			res.Success = false
@@ -187,7 +188,7 @@ func NewBlogPage(c *gin.Context) {
 		Success: true,
 		Message: "ok",
 	}
-	blog, err := dao.NewBlog(1)
+	blog, err := dao.NewBlog(uint(c.GetInt("USERID")))
 	if err != nil {
 		res.Code = -1
 		res.Success = false
@@ -250,7 +251,7 @@ func GetMenu(c *gin.Context) {
 		Message: "ok",
 	}
 	menu := &model.BookMenu{}
-	ms := dao.QueryMenus(0)
+	ms := dao.QueryMenus(0, c.GetInt("USERID"))
 	if ms == nil {
 		res.Code = -1
 		res.Success = false
@@ -258,29 +259,29 @@ func GetMenu(c *gin.Context) {
 	} else {
 		menu.Id = ms[0].Id
 		menu.Name = ms[0].Name
-		menu.Chepters = getChapters(menu.Id)
+		menu.Chepters = getChapters(menu.Id, c.GetInt("USERID"))
 		res.Data = menu
 	}
 	c.JSONP(200, res)
 }
 
-func getChapters(pid int64) []model.BookChapter {
+func getChapters(pid int64, userid int) []model.BookChapter {
 	chapters := []model.BookChapter{}
-	ms := dao.QueryMenus(pid)
+	ms := dao.QueryMenus(pid, userid)
 	for _, item := range ms {
 		chapter := model.BookChapter{
 			Id:    item.Id,
 			Name:  item.Name,
-			Books: getBooks(item.Id),
+			Books: getBooks(item.Id, userid),
 		}
 		chapters = append(chapters, chapter)
 	}
 	return chapters
 }
 
-func getBooks(pid int64) []model.BookItem {
+func getBooks(pid int64, userid int) []model.BookItem {
 	books := []model.BookItem{}
-	ms := dao.QueryMenus(pid)
+	ms := dao.QueryMenus(pid, userid)
 	for _, item := range ms {
 		book := model.BookItem{
 			Id:    item.Id,
@@ -298,7 +299,7 @@ func BlogCaches(c *gin.Context) {
 		Code:    0,
 		Success: true,
 		Message: "ok",
-		Data:    dao.QueryBlogCaches(1),
+		Data:    dao.QueryBlogCaches(c.GetInt("USERID")),
 	}
 	c.JSONP(200, res)
 }

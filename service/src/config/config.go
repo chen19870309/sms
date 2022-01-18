@@ -4,16 +4,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
+
+	"github.com/qiniu/go-sdk/v7/auth/qbox"
+	"github.com/qiniu/go-sdk/v7/storage"
 )
 
 var DB database
 var Site site
 var App app
 
+var Qiniu qiniu
+
 type Conf struct {
-	Db   database `json:"db"`
-	Site site     `json:"site"`
-	App  app      `json:"app"`
+	Db    database `json:"db"`
+	Site  site     `json:"site"`
+	App   app      `json:"app"`
+	Qiniu qiniu    `json:"qiniu"`
 }
 
 type database struct {
@@ -38,6 +45,13 @@ type app struct {
 	LogLevel   string `json:"log-level"`
 	BasePath   string `json:"base-path"`
 	StaticPath string `json:"static-path"`
+}
+
+type qiniu struct {
+	Ak     string `json:"ak"`
+	Sk     string `json:"sk"`
+	Cb     string `json:"cb"`
+	Bucket string `json:"bucket"`
 }
 
 func InitApp(port int64, level, base, static string) {
@@ -101,6 +115,7 @@ func GetConnArgs() string {
 		conn = fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local", DB.UserName, DB.PassWord, DB.Host, DB.Port, DB.DbName)
 		break
 	case "postgres":
+		conn = fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s sslmode=disable", DB.Host, DB.Port, DB.DbName, DB.UserName, DB.PassWord)
 		break
 	default:
 	}
@@ -110,15 +125,32 @@ func GetConnArgs() string {
 func InitConf(conf string) error {
 	b, e := ioutil.ReadFile(conf)
 	if e != nil {
+		log.Panic(e)
 		return e
 	}
 	config := &Conf{}
 	e = json.Unmarshal(b, config)
 	if e != nil {
+		log.Panic(e)
 		return e
 	}
 	DB = config.Db
 	Site = config.Site
 	App = config.App
+	Qiniu = config.Qiniu
 	return nil
+}
+
+func GetSimpleUpToken() string {
+	putPolicy := storage.PutPolicy{
+		Scope: Qiniu.Bucket,
+		//CallbackURL:      qiniu.cb,
+		CallbackBodyType: "application/json",
+		ReturnBody:       `{"key":"$(key)","hash":"$(etag)","fsize":$(fsize),"bucket":"$(bucket)","name":"$(x:name)"}`,
+	}
+	if Qiniu.Cb != "" {
+		putPolicy.CallbackURL = Qiniu.Cb
+	}
+	mac := qbox.NewMac(Qiniu.Ak, Qiniu.Sk)
+	return putPolicy.UploadToken(mac)
 }

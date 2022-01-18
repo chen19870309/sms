@@ -9,7 +9,7 @@ export default {
     DELETE: 'delete'
   },
   instance: axios.create({
-    baseURL: 'http://localhost:8082/blog/',
+    baseURL: '/blog',
     timeout: 10000
   }),
 

@@ -16,4 +16,5 @@ type BookMenu struct {
 	Remark     string
 	Day        string
 	Status     uint
+	AuthorId   uint
 }
