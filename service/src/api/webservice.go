@@ -54,12 +54,16 @@ func NewBlogService() (w *WebS, err error) {
 	blog.GET("/ping", Pong)
 	blog.GET("/menu", GetMenu)
 	blog.POST("/login", LoginBlog)
-	blog.POST("/user/edit", EditUser)
+	blog.POST("/edituser", EditUser)
+	blog.POST("/editpwd", EditPwd)
 	blog.GET("/newblog", NewBlogPage)
 	blog.GET("/blogcaches", BlogCaches)
 	blog.POST("/save/:code", SaveBlog)
 	blog.GET("/posts/:code", GetPosts)
 	blog.PUT("/posts/:code", PutPosts)
+	blog.GET("/index", IndexBlog)
+	blog.GET("/more", MoreBlog)
+	blog.GET("/search/:data", SearchBlog)
 	return service, nil
 }
 
@@ -91,7 +95,7 @@ func BlogAuth() gin.HandlerFunc {
 		auth, err := c.Cookie("auth_token")
 		ip := c.ClientIP()
 		url := c.Request.URL.String()
-		if strings.Contains(url, "newblog") || strings.Contains(url, "save") || strings.Contains(url, "blogcaches") {
+		if strings.Contains(url, "newblog") || strings.Contains(url, "save") || strings.Contains(url, "blogcaches") || strings.Contains(url, "edit") {
 			userid := service.SecCache[auth]
 			utils.Log.Infof("auth=%v ip=%v url=[%v] userid=[%d]", auth, ip, c.Request.URL, userid)
 			utils.Log.Infof("Params:%v", c.Params)
@@ -168,7 +172,7 @@ func LoginBlog(c *gin.Context) {
 		res.Success = false
 		res.Message = err.Error()
 	} else {
-		secure, _ := utils.EnPwdCode([]byte(req.Password))
+		secure, _ := utils.PwdCode(req.Password)
 		user, err := dao.AuthUser(req.Username, secure, c.ClientIP())
 		if err != nil {
 			res.Code = -1
@@ -304,6 +308,97 @@ func BlogCaches(c *gin.Context) {
 	c.JSONP(200, res)
 }
 
-func EditUser(c *gin.Context) {
+func EditPwd(c *gin.Context) {
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+	}
+	b := &model.UserData{}
+	err := ParseData(c, b)
+	if err != nil {
+		res.Code = -1
+		res.Success = false
+		res.Message = err.Error()
+	} else {
+		op, _ := utils.PwdCode(b.OP)
+		np, _ := utils.PwdCode(b.NP)
+		_, err = dao.ExchangeUserPwd(op, np, c.GetInt("USERID"))
+		if err != nil {
+			res.Code = -2
+			res.Success = false
+			res.Message = err.Error()
+		}
+	}
+	c.JSONP(200, res)
+}
 
+func EditUser(c *gin.Context) {
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+	}
+	b := &model.UserData{}
+	err := ParseData(c, b)
+	if err != nil {
+		res.Code = -1
+		res.Success = false
+		res.Message = err.Error()
+	} else {
+		nickname := ""
+		remark := ""
+		_, err = dao.UpdateUserInfo(nickname, remark, c.GetInt("USERID"))
+		if err != nil {
+			res.Code = -2
+			res.Success = false
+			res.Message = err.Error()
+		}
+	}
+	c.JSONP(200, res)
+}
+
+func SearchBlog(c *gin.Context) {
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+	}
+	data := c.Param("data")
+	ls, err := Search(data)
+	if err != nil {
+		res.Code = -1
+		res.Success = false
+		res.Message = err.Error()
+	} else {
+		rs := []*model.BookItem{}
+		for _, id := range ls {
+			item := dao.QueryBlog(int64(id), "")
+			if item != nil {
+				data := model.BookItem{
+					Id:    item.Id,
+					Code:  item.Code,
+					Title: item.Title,
+					Sum:   item.Sum,
+					Pic:   "",
+					Url:   "",
+				}
+				rs = append(rs, &data)
+			}
+		}
+		res.Data = rs
+	}
+}
+
+func IndexBlog(c *gin.Context) {
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+		Data:    dao.GetUserBlogs(0, 1, 8),
+	}
+	c.JSONP(200, res)
+}
+
+func MoreBlog(c *gin.Context) {
 }

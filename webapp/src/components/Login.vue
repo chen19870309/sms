@@ -73,7 +73,11 @@ export default {
           // this.$router.push({ path: '/menu' })
           console.log(this.formLogin)
           this.disabled = true
-          NetWorking.doPost(API.login, null, this.formLogin).then(response => {
+          let data = {
+            username: this.formLogin.username,
+            password: this.$md5(this.formLogin.password)
+          }
+          NetWorking.doPost(API.login, null, data).then(response => {
             this.disabled = false
             let user = response.data
             Cookie.set('auth_token', user.Secret)

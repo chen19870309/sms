@@ -3,13 +3,13 @@
         <div class="hdr-wrapper section-inner">
             <div class="hdr-left">
                 <div class="site-branding">
-                    <a href="#">Hola-CosMos</a>
+                    <a href="/">Hola-CosMos</a>
                 </div>
             </div>
             <div class="hdr-right">
                 <Dropdown>
                     <a href="javascript:void(0)">
-                        下拉菜单
+                        写文章
                     </a>
                     <DropdownMenu slot="list">
                         <DropdownItem><router-link to="/menu">文章目录</router-link></DropdownItem>
@@ -20,7 +20,7 @@
                 <Divider type="vertical" />
                 <Dropdown>
                     <a href="javascript:void(0)">
-                        theme
+                        账号
                         <Icon type="ios-arrow-down"></Icon>
                     </a>
                     <DropdownMenu slot="list">

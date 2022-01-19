@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"crypto/md5"
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
@@ -45,6 +46,12 @@ func GetMdTitle(data string) string {
 
 func SHA1(s string) string {
 	o := sha1.New()
+	o.Write([]byte(s))
+	return hex.EncodeToString(o.Sum(nil))
+}
+
+func MD5(s string) string {
+	o := md5.New()
 	o.Write([]byte(s))
 	return hex.EncodeToString(o.Sum(nil))
 }

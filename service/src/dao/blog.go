@@ -106,6 +106,34 @@ func QueryBlog(id int64, code string) *model.BlogCtx {
 	return blog
 }
 
+func CountUserBlogs(userid int) int {
+	var total int
+	if userid > 0 {
+		database.Table(TB_BLOG).Where("author_id = ?", userid).Count(&total)
+	} else {
+		database.Table(TB_BLOG).Count(&total)
+	}
+
+	return total
+}
+
+func GetUserBlogs(userid, page, pageSize int) []*model.BlogCtx {
+	if page <= 0 {
+		page = 1
+	}
+	blogs := []*model.BlogCtx{}
+	var result *gorm.DB
+	if userid > 0 {
+		result = database.Table(TB_BLOG).Limit(pageSize).Offset((page-1)*pageSize).Where("author_id = ?", userid).Find(&blogs).Order("update_time desc")
+	} else { //查询公开的blog
+		result = database.Table(TB_BLOG).Limit(pageSize).Offset((page - 1) * pageSize).Where("status = 1").Find(&blogs).Order("update_time desc")
+	}
+	if result.Error != nil {
+		return nil
+	}
+	return blogs
+}
+
 // 发布文章
 func PutBlog(code, data string) *model.BlogCtx {
 	blog := QueryBlog(0, code)
@@ -147,9 +175,9 @@ func QueryBlogCaches(auther_id int) []*model.BlogCtx {
 	return blogs
 }
 
-func ListBlogs(page, size int, authorIds []int, tags []string) []*model.BlogCtx {
+func AllOpenBlogs() []*model.BlogCtx {
 	blogs := []*model.BlogCtx{}
-	result := database.Table(TB_BLOG).Where("status = 0").Find(&blogs)
+	result := database.Table(TB_BLOG).Where("status = 1").Find(&blogs)
 	if result.Error != nil {
 		return nil
 	}

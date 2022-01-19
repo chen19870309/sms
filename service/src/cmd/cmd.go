@@ -46,6 +46,7 @@ func (p *program) Stop() error {
 	p.once.Do(func() {
 		// exit
 		log.Println("call stop!")
+		api.CloseEngine()
 	})
 	return nil
 }

@@ -5,7 +5,7 @@
       <h1>Menus</h1>
       <book-group v-for="chepter in menu.chepters" :key="chepter.id" :chepter="chepter"></book-group>
     </div>
-    <site-footer></site-footer>
+    <blog-footer></blog-footer>
   </div>
 </template>
 
@@ -13,14 +13,14 @@
 import NetWorking from '@/utils/networking'
 import * as API from '@/utils/api'
 import SiteHeader from '@/components/global/SiteHeader'
-import SiteFooter from '@/components/global/SiteFooter'
+import BlogFooter from '@/components/layout/BlogFooter'
 import BookGroup from '@/components/global/BookGroup'
 export default {
   name: 'book-menu',
   components: {
     BookGroup,
     SiteHeader,
-    SiteFooter
+    BlogFooter
   },
   data () {
     return {

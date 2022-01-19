@@ -4,7 +4,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import store from '@/store'
-
+import md5 from 'js-md5'
 import less from 'less'
 
 import iView from 'iview'
@@ -19,6 +19,7 @@ Vue.use(iView)
 Vue.use(less)
 
 Vue.config.productionTip = false
+Vue.prototype.$md5 = md5
 
 /* eslint-disable no-new */
 new Vue({

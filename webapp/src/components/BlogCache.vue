@@ -13,7 +13,7 @@
 import NetWorking from '@/utils/networking'
 import * as API from '@/utils/api'
 import BlogHeader from '@/components/global/SiteHeader'
-import BlogFooter from '@/components/global/SiteFooter'
+import BlogFooter from '@/components/layout/BlogFooter'
 export default {
   data () {
     return {
@@ -28,8 +28,8 @@ export default {
                   type: 'person'
                 }
               }),
-              h('strong', params.row.Title+'|'+params.row.Code )
-            ]);
+              h('strong', params.row.Title + '|' + params.row.Code)
+            ])
           }
         },
         {
@@ -69,10 +69,10 @@ export default {
                 on: {
                   click: () => {
                     this.remove(params.index)
+                  }
                 }
-              }
-            }, 'Delete')
-          ])
+              }, 'Delete')
+            ])
           }
         }
       ],

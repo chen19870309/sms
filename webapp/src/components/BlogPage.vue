@@ -4,12 +4,11 @@
   <div class="post-page thin body">
     <header class="post-header">
       <div class="post-meta"><span>{{ blog.CreateTime }}</span></div>
-      <span>Go 数组比切片好在哪？[{{ blog.Title }}]--by 煎鱼[{{ blog.Code }}]</span>
+      <span>{{ blog.Title }}--by [{{ blog.Code }}]</span>
     </header>
     <hr>
     <markdown-preview :initialValue="blog.Content" :theme="mdtheme"></markdown-preview>
-  </div>
-  <blog-footer></blog-footer>
+  </div> 
    <div id="mobile-menu" class="animated fast">
       <ul>
         <li><a href="#" @click.prevent="newblog" >新建</a></li>
@@ -17,6 +16,7 @@
         <li><a href="#" @click.prevent="gomenu">返回</a></li>
       </ul>
     </div>
+  <blog-footer></blog-footer>
 </div>
 </template>
 
@@ -26,7 +26,7 @@ import { MarkdownPreview } from 'vue-meditor'
 import NetWorking from '@/utils/networking'
 import * as API from '@/utils/api'
 import BlogHeader from '@/components/global/SiteHeader'
-import BlogFooter from '@/components/global/SiteFooter'
+import BlogFooter from '@/components/layout/BlogFooter'
 export default {
   data () {
     return {

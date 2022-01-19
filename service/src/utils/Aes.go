@@ -76,9 +76,16 @@ func AesDeCrypt(cypted []byte, key []byte) ([]byte, error) {
 	return origData, err
 }
 
-//加密base64
-func EnPwdCode(pwd []byte) (string, error) {
-	result, err := AesEcrypt(pwd, PwdKey)
+func PwdCode(pwd string) (string, error) {
+	result, err := AesEcrypt([]byte(pwd), PwdKey)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(result), err
+}
+
+func EnPwdCode(pwd string) (string, error) {
+	result, err := AesEcrypt([]byte(MD5(pwd)), PwdKey)
 	if err != nil {
 		return "", err
 	}

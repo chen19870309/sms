@@ -12,7 +12,6 @@
 </template>
 
 <script>
-import Cookie from 'js-cookie'
 import { mapGetters } from 'vuex'
 import NetWorking from '@/utils/networking'
 import * as API from '@/utils/api'
