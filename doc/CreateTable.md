@@ -121,8 +121,11 @@ create table tb_book_menu(
 );
 ```
 
-## 4.文件外链表
+## 4.资源外链表
 
 ```
-
+create table tb_resource(
+  id serial primary key,
+  
+}
 ```
