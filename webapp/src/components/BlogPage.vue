@@ -1,15 +1,10 @@
 <template>
   <div>
-  <BlogHeader></BlogHeader>
+  <BlogHeader class="header-fixed-top"></BlogHeader>
   <div class="post-page thin body">
-    <header class="post-header">
-      <div class="post-meta"><span>{{ blog.CreateTime }}</span></div>
-      <span>{{ blog.Title }}--by [{{ blog.Code }}]</span>
-    </header>
-    <hr>
     <markdown-preview :initialValue="blog.Content" :theme="mdtheme"></markdown-preview>
-  </div> 
-   <div id="mobile-menu" class="animated fast">
+  </div>
+   <div id="mobile-menu" class="animated fast" v-show='user.Id != undefined'>
       <ul>
         <li><a href="#" @click.prevent="newblog" >新建</a></li>
         <li><a href="#" @click.prevent="editblog" >编辑</a></li>
@@ -39,8 +34,8 @@ export default {
       let data = response.data
       this.$store.dispatch('createBlog', data)
     }, (message) => {
-     this.$Message.error('Load  MarkDown Failed!' + message)
-     this.$router.push({ path: '/404' })
+      this.$Message.error('Load  MarkDown Failed!' + message)
+      this.$router.push({ path: '/404' })
     })
   },
   methods: {
@@ -51,7 +46,7 @@ export default {
       NetWorking.doGet(API.newblog).then(response => {
         let data = response.data
         this.$store.dispatch('createBlog', data)
-        this.$router.push({ path: '/editer/' + data.Code }).catch(err => {
+        this.$router.push({path: '/editer/' + data.Code}).catch( err => {
           console.log('pass router')
         })
       }, (message) => {
@@ -64,13 +59,14 @@ export default {
     },
     editblog () {
       this.$router.push({ path: '/editer/' + this.blog.Code }).catch(err => {
-        console.log("edit blog:" + this.blog.Code)
+        console.log('edit blog:' + this.blog.Code)
       })
     }
   },
   computed: {
     ...mapGetters({
-      blog: 'currentBlog'
+      blog: 'currentBlog',
+      user: 'currentUser'
     })
   },
   components: {

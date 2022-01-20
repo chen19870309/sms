@@ -3,11 +3,13 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"sms/service/src/api/model"
 	"sms/service/src/dao"
 	"sms/service/src/utils"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -15,21 +17,22 @@ import (
 
 type WebS struct {
 	Serv     *gin.Engine
-	SecCache map[string]int64
+	SecCache map[string]*model.UserData
 }
+
+const _USERDATA = "_USERDATA_"
 
 var service *WebS
 
 func init() {
 	service = &WebS{
-		SecCache: make(map[string]int64),
+		SecCache: make(map[string]*model.UserData),
 	}
 	service.Serv = gin.Default()
 	service.Serv.Use(Cors())
 	service.Serv.Use(BlogAuth())
-	//service.Serv.StaticFS("/static", http.Dir("/Users/chenchunjiang/go/src/sms/webapp/dist/static"))
-	//service.Serv.StaticFile("/", "/Users/chenchunjiang/go/src/sms/webapp/dist/index.html")
-	//service.Serv.StaticFile("/", "/Users/chenchunjiang/go/src/sms/webapp/dist/index.html")
+	service.Serv.StaticFS("/static", http.Dir("/Users/chenchunjiang/go/src/sms/webapp/dist/static"))
+	service.Serv.StaticFile("/", "/Users/chenchunjiang/go/src/sms/webapp/dist/index.html")
 }
 
 func (web *WebS) Close() {
@@ -50,20 +53,23 @@ func NewBlogService() (w *WebS, err error) {
 	if err != nil {
 		utils.Log.Errorf("TestMenu Failed![%v]", err)
 	}
+	InitEngine()
 	blog := service.Serv.Group("blog")
 	blog.GET("/ping", Pong)
 	blog.GET("/menu", GetMenu)
 	blog.POST("/login", LoginBlog)
 	blog.POST("/edituser", EditUser)
 	blog.POST("/editpwd", EditPwd)
+	blog.GET("/uptoken", QiniuUpToken)
 	blog.GET("/newblog", NewBlogPage)
 	blog.GET("/blogcaches", BlogCaches)
 	blog.POST("/save/:code", SaveBlog)
 	blog.GET("/posts/:code", GetPosts)
 	blog.PUT("/posts/:code", PutPosts)
-	blog.GET("/index", IndexBlog)
+	blog.GET("/mainindex", IndexBlog)
+	blog.GET("/usereditindex", IndexUserEdit)
 	blog.GET("/more", MoreBlog)
-	blog.GET("/search/:data", SearchBlog)
+	blog.POST("/search", SearchBlog)
 	return service, nil
 }
 
@@ -96,10 +102,12 @@ func BlogAuth() gin.HandlerFunc {
 		ip := c.ClientIP()
 		url := c.Request.URL.String()
 		if strings.Contains(url, "newblog") || strings.Contains(url, "save") || strings.Contains(url, "blogcaches") || strings.Contains(url, "edit") {
-			userid := service.SecCache[auth]
-			utils.Log.Infof("auth=%v ip=%v url=[%v] userid=[%d]", auth, ip, c.Request.URL, userid)
-			utils.Log.Infof("Params:%v", c.Params)
-			if userid == 0 {
+			user := service.SecCache[auth]
+			if user != nil {
+				utils.Log.Infof("auth=%v ip=%v url=[%v] userid=[%d]", auth, ip, c.Request.URL, user.Id)
+				utils.Log.Infof("Params:%v", c.Params)
+			}
+			if user == nil || user.Id == 0 {
 				ok = false
 				res := model.Response{
 					Code:    401,
@@ -108,8 +116,11 @@ func BlogAuth() gin.HandlerFunc {
 				}
 				c.JSONP(200, res)
 				c.AbortWithStatus(401)
+			} else {
+				c.Set(_USERDATA, user)
+				d, e := c.Get(_USERDATA)
+				utils.Log.Info("USER=", d, e)
 			}
-			c.Set("USERID", userid)
 		}
 		// m := make(map[string]interface{})
 		// c.BindJSON(&m)
@@ -140,6 +151,7 @@ func SaveBlog(c *gin.Context) {
 		Success: true,
 		Message: "ok",
 	}
+
 	code := c.Param("code")
 	b := &model.BlogAutoSave{}
 	err := ParseData(c, b)
@@ -148,8 +160,13 @@ func SaveBlog(c *gin.Context) {
 		res.Success = false
 		res.Message = err.Error()
 	} else {
-		b.AuthorId = uint(c.GetInt("USERID"))
-		err = dao.AutoSaveBlog(code, b.Theme, b.Data, b.AuthorId)
+		user, ok := c.Get(_USERDATA)
+		if ok {
+			b.AuthorId = uint(user.(*model.UserData).Id)
+			err = dao.AutoSaveBlog(code, b.Theme, b.Data, b.AuthorId)
+		} else {
+			err = errors.New("用户授权信息已过期")
+		}
 		if err != nil {
 			res.Code = -2
 			res.Success = false
@@ -180,7 +197,12 @@ func LoginBlog(c *gin.Context) {
 			res.Message = "用户名或密码错误!"
 		} else {
 			res.Data = user
-			service.SecCache[user.Secret] = user.Id
+			service.SecCache[user.Secret] = &model.UserData{
+				Id:       user.Id,
+				Username: user.Username,
+				Nickname: user.Nickname,
+				Remark:   user.Remark,
+			}
 		}
 	}
 	c.JSONP(200, res)
@@ -192,13 +214,17 @@ func NewBlogPage(c *gin.Context) {
 		Success: true,
 		Message: "ok",
 	}
-	blog, err := dao.NewBlog(uint(c.GetInt("USERID")))
+	user, ok := c.Get(_USERDATA)
+	var err error
+	if ok {
+		res.Data, err = dao.NewBlog(uint(user.(*model.UserData).Id))
+	} else {
+		err = errors.New("用户授权已过期")
+	}
 	if err != nil {
 		res.Code = -1
 		res.Success = false
 		res.Message = err.Error()
-	} else {
-		res.Data = blog
 	}
 	c.JSONP(200, res)
 }
@@ -255,7 +281,12 @@ func GetMenu(c *gin.Context) {
 		Message: "ok",
 	}
 	menu := &model.BookMenu{}
-	ms := dao.QueryMenus(0, c.GetInt("USERID"))
+	userid := 0
+	user, ok := c.Get(_USERDATA)
+	if ok {
+		userid = int(user.(*model.UserData).Id)
+	}
+	ms := dao.QueryMenus(0, userid)
 	if ms == nil {
 		res.Code = -1
 		res.Success = false
@@ -263,7 +294,7 @@ func GetMenu(c *gin.Context) {
 	} else {
 		menu.Id = ms[0].Id
 		menu.Name = ms[0].Name
-		menu.Chepters = getChapters(menu.Id, c.GetInt("USERID"))
+		menu.Chepters = getChapters(menu.Id, userid)
 		res.Data = menu
 	}
 	c.JSONP(200, res)
@@ -299,11 +330,16 @@ func getBooks(pid int64, userid int) []model.BookItem {
 }
 
 func BlogCaches(c *gin.Context) {
+	userid := 0
+	user, ok := c.Get(_USERDATA)
+	if ok {
+		userid = int(user.(*model.UserData).Id)
+	}
 	res := model.Response{
 		Code:    0,
 		Success: true,
 		Message: "ok",
-		Data:    dao.QueryBlogCaches(c.GetInt("USERID")),
+		Data:    dao.QueryBlogCaches(userid),
 	}
 	c.JSONP(200, res)
 }
@@ -315,6 +351,11 @@ func EditPwd(c *gin.Context) {
 		Message: "ok",
 	}
 	b := &model.UserData{}
+	userid := 0
+	user, ok := c.Get(_USERDATA)
+	if ok {
+		userid = int(user.(*model.UserData).Id)
+	}
 	err := ParseData(c, b)
 	if err != nil {
 		res.Code = -1
@@ -323,7 +364,8 @@ func EditPwd(c *gin.Context) {
 	} else {
 		op, _ := utils.PwdCode(b.OP)
 		np, _ := utils.PwdCode(b.NP)
-		_, err = dao.ExchangeUserPwd(op, np, c.GetInt("USERID"))
+		utils.Log.Info("ExchangeUserPwd by user:", userid)
+		_, err = dao.ExchangeUserPwd(op, np, userid)
 		if err != nil {
 			res.Code = -2
 			res.Success = false
@@ -340,15 +382,18 @@ func EditUser(c *gin.Context) {
 		Message: "ok",
 	}
 	b := &model.UserData{}
+	userid := 0
+	user, ok := c.Get(_USERDATA)
+	if ok {
+		userid = int(user.(*model.UserData).Id)
+	}
 	err := ParseData(c, b)
 	if err != nil {
 		res.Code = -1
 		res.Success = false
 		res.Message = err.Error()
 	} else {
-		nickname := ""
-		remark := ""
-		_, err = dao.UpdateUserInfo(nickname, remark, c.GetInt("USERID"))
+		_, err = dao.UpdateUserInfo(b.Icon, b.Nickname, b.Remark, userid)
 		if err != nil {
 			res.Code = -2
 			res.Success = false
@@ -364,8 +409,9 @@ func SearchBlog(c *gin.Context) {
 		Success: true,
 		Message: "ok",
 	}
-	data := c.Param("data")
-	ls, err := Search(data)
+	b := &model.SearchReq{}
+	ParseData(c, b)
+	ls, err := Search(b.Text)
 	if err != nil {
 		res.Code = -1
 		res.Success = false
@@ -388,6 +434,24 @@ func SearchBlog(c *gin.Context) {
 		}
 		res.Data = rs
 	}
+	c.JSONP(200, res)
+}
+
+func WaperBlogs(userid, page, pageSize int) []*model.BookItem {
+	utils.Log.Infof("WaperBlogs(%d,%d,%d)", userid, page, pageSize)
+	rs := []*model.BookItem{}
+	for _, item := range dao.GetUserBlogs(userid, page, pageSize) {
+		rs = append(rs, &model.BookItem{
+			Id:    item.Id,
+			Code:  item.Code,
+			Title: item.Title,
+			Sum:   item.Sum,
+			Pic:   "http://r5uiv7l5f.hd-bkt.clouddn.com/bj1.jpeg",
+			Url:   "",
+			Day:   "",
+		})
+	}
+	return rs
 }
 
 func IndexBlog(c *gin.Context) {
@@ -395,7 +459,29 @@ func IndexBlog(c *gin.Context) {
 		Code:    0,
 		Success: true,
 		Message: "ok",
-		Data:    dao.GetUserBlogs(0, 1, 8),
+		Data:    WaperBlogs(0, 1, 8),
+	}
+	c.JSONP(200, res)
+}
+
+func IndexUserEdit(c *gin.Context) {
+	index := 1
+	page_index, err := c.Cookie("user_page_index")
+	utils.Log.Info("IndexUserEdit:", page_index, err)
+	if page_index != "" {
+		index, _ = strconv.Atoi(page_index)
+	}
+	userid := 0
+	user, ok := c.Get(_USERDATA)
+	if ok {
+		userid = int(user.(*model.UserData).Id)
+	}
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+		Data:    WaperBlogs(userid, index, 10),
+		Count:   dao.CountUserBlogs(userid),
 	}
 	c.JSONP(200, res)
 }

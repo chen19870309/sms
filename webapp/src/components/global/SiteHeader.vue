@@ -29,7 +29,7 @@
                             <user-center></user-center>
                           </router-link></DropdownItem>
                         <DropdownItem><router-link to="/login">账号登陆</router-link></DropdownItem>
-                        <DropdownItem><router-link to="/regist">注册账号</router-link></DropdownItem>
+                        <DropdownItem disabled><router-link to="/regist">注册账号</router-link></DropdownItem>
                         <DropdownItem v-show='user.Id != undefined' divided><a href="#" @click.prevent="logout">退出账号</a></DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
@@ -43,8 +43,18 @@ import { mapGetters } from 'vuex'
 import UserCenter from '@/components/layout/UserCenter'
 import NetWorking from '@/utils/networking'
 import * as API from '@/utils/api'
+import Cookie from 'js-cookie'
 export default {
   name: 'site-header',
+  monted () {
+    if (this.user.Id === undefined) {
+      let u = Cookie.get('user')
+      if (u != undefined) {
+        console.log("header:",u)
+        this.$store.dispatch('createUser', u)
+      }
+    }
+  },
   methods: {
     newblog () {
       NetWorking.doGet(API.newblog).then(response => {
@@ -60,6 +70,8 @@ export default {
     logout () {
         this.$store.dispatch('deleteUser')
         this.$store.dispatch('deleteBlog')
+        Cookie.remove('user')
+        Cookie.remove('auth_token')
         this.$router.push({ path: '/menu' })
     },
     showUser () {

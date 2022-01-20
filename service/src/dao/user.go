@@ -103,10 +103,7 @@ func ExchangeUserPwd(op, np string, userid int) (*model.SmsUser, error) {
 	return user, nil
 }
 
-func UpdateUserInfo(nickname, remark string, userid int) (*model.SmsUser, error) {
-	if nickname == "" || remark == "" {
-		return nil, errors.New(" cant update nil data!")
-	}
+func UpdateUserInfo(icon, nickname, remark string, userid int) (*model.SmsUser, error) {
 	user := &model.SmsUser{}
 	result := database.Table(TB_USER).Where("id = ? and status in (0,1,2)", userid).First(user)
 	if result.Error != nil {
@@ -116,6 +113,9 @@ func UpdateUserInfo(nickname, remark string, userid int) (*model.SmsUser, error)
 		user.UpdateTime = time.Now()
 		user.Nickname = nickname
 		user.Remark = remark
+		if icon != "" {
+			user.Icon = icon
+		}
 		result = database.Table(TB_USER).Save(user)
 		if result.Error != nil {
 			return nil, result.Error

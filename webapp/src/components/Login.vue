@@ -80,7 +80,8 @@ export default {
           NetWorking.doPost(API.login, null, data).then(response => {
             this.disabled = false
             let user = response.data
-            Cookie.set('auth_token', user.Secret)
+            Cookie.set('auth_token', user.Secret,{ expires: 1})
+            Cookie.set('user', user,{ expires: 1})
             this.$store.dispatch('createUser', user)
             this.$router.push({ path: this.$store.getters.nextUrl }).catch(err => {})
           }, (message) => {

@@ -5,7 +5,6 @@ import Editer from '@/components/BlogEditer'
 import BlogCache from '@/components/BlogCache'
 import BlogIndex from '@/components/layout/BlogIndex'
 import Personal from '@/components/layout/Personal2'
-import UploadImage from '@/components/UploadImage'
 import Page from '@/components/BlogPage'
 import Menu from '@/components/BookMenu'
 import P401 from '@/components/error/401'
@@ -25,10 +24,6 @@ export default[
   {
     path: '/hello',
     component: HelloWorld
-  },
-  {
-    path: '/upload',
-    component: UploadImage
   },
   {
     path: '/login',

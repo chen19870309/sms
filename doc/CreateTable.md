@@ -120,3 +120,9 @@ create table tb_book_menu(
     author_id integer default 0
 );
 ```
+
+## 4.文件外链表
+
+```
+
+```

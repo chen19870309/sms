@@ -4,7 +4,7 @@ const state = {
   userinfo: {},
   hasGetInfo: false,
   token: '',
-  nextUrl: '/'
+  nextUrl: '/user'
 }
 
 // getters

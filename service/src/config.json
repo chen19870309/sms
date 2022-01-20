@@ -17,8 +17,8 @@
     "app": {
         "listen-port": 8088,
         "log-level": "debug",
-        "base-path": "/tmp/blog",
-        "static-path": "/tmp/blog/static"
+        "base-path": "/Users/chenchunjiang/go/src/sms/webapp/dist/",
+        "static-path": "/Users/chenchunjiang/go/src/sms/webapp/dist/static/"
     },
     "qiniu": {
         "ak":     "03ZfXEI4E6G6RWLFhEoQAiRN698wKwDh_CxTbC1n",

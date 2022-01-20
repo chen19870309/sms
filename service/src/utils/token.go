@@ -74,3 +74,7 @@ func GetMdTags(data, theme string) string {
 	}
 	return tags
 }
+
+func GetStdTime() string {
+	return time.Now().Format(time.RFC3339)
+}

@@ -5,6 +5,11 @@ type Response struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
+	Count   int         `json:"count"`
+}
+
+type SearchReq struct {
+	Text string `json:"text"`
 }
 
 type BlogAutoSave struct {

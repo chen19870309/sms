@@ -16,6 +16,7 @@
     "js-cookie": "^3.0.1",
     "js-md5": "^0.7.3",
     "less": "^2.7.3",
+    "qiniu-upload-vue": "^1.0.0",
     "vue": "^2.5.2",
     "vue-markdown": "^2.1.0",
     "vue-meditor": "^2.1.1",
