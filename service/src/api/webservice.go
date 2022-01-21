@@ -21,6 +21,7 @@ type WebS struct {
 }
 
 const _USERDATA = "_USERDATA_"
+const def = "http://r5uiv7l5f.hd-bkt.clouddn.com/bj1.jpeg"
 
 var service *WebS
 
@@ -58,6 +59,8 @@ func NewBlogService() (w *WebS, err error) {
 	blog.GET("/ping", Pong)
 	blog.GET("/menu", GetMenu)
 	blog.POST("/login", LoginBlog)
+	blog.POST("/checkemail", CheckEmail)
+	blog.POST("/regist", RegistBlog)
 	blog.POST("/edituser", EditUser)
 	blog.POST("/editpwd", EditPwd)
 	blog.GET("/uptoken", QiniuUpToken)
@@ -268,6 +271,7 @@ func PutPosts(c *gin.Context) {
 			res.Message = "wrong posts code!"
 		} else {
 			res.Data = blog
+			go AddIndex(blog) //刷新索引
 		}
 	}
 	c.JSONP(200, res)
@@ -425,9 +429,9 @@ func SearchBlog(c *gin.Context) {
 					Id:    item.Id,
 					Code:  item.Code,
 					Title: item.Title,
-					Sum:   item.Sum,
-					Pic:   "",
-					Url:   "",
+					Sum:   utils.GetSum(item.Content),
+					Pic:   utils.GetPic(item.Content, def),
+					Url:   utils.GetBookUrl(item.Code),
 				}
 				rs = append(rs, &data)
 			}
@@ -445,9 +449,9 @@ func WaperBlogs(userid, page, pageSize int) []*model.BookItem {
 			Id:    item.Id,
 			Code:  item.Code,
 			Title: item.Title,
-			Sum:   item.Sum,
-			Pic:   "http://r5uiv7l5f.hd-bkt.clouddn.com/bj1.jpeg",
-			Url:   "",
+			Sum:   utils.GetSum(item.Content),
+			Pic:   utils.GetPic(item.Content, def),
+			Url:   utils.GetBookUrl(item.Code),
 			Day:   "",
 		})
 	}
@@ -482,6 +486,65 @@ func IndexUserEdit(c *gin.Context) {
 		Message: "ok",
 		Data:    WaperBlogs(userid, index, 10),
 		Count:   dao.CountUserBlogs(userid),
+	}
+	c.JSONP(200, res)
+}
+
+func RegistBlog(c *gin.Context) {
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+	}
+	b := &model.RegistData{}
+	err := ParseData(c, b)
+	if err != nil {
+		res.Code = -1
+		res.Success = false
+		res.Message = err.Error()
+	} else {
+		secure, _ := utils.PwdCode(b.Password)
+		user, err := dao.RegistUser(b.Username, secure, b.Email, b.Code, c.ClientIP())
+		if err != nil {
+			res.Code = -1
+			res.Success = false
+			res.Message = err.Error()
+		} else {
+			res.Data = user
+			service.SecCache[user.Secret] = &model.UserData{
+				Id:       user.Id,
+				Username: user.Username,
+				Nickname: user.Nickname,
+				Remark:   user.Remark,
+			}
+		}
+	}
+	c.JSONP(200, res)
+}
+
+func CheckEmail(c *gin.Context) {
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+	}
+	b := &model.RegistData{}
+	err := ParseData(c, b)
+	if err != nil {
+		res.Code = -1
+		res.Success = false
+		res.Message = err.Error()
+	} else {
+		code, err := dao.GenEmailCode(b.Email)
+		if err != nil {
+			res.Code = -1
+			res.Success = false
+			res.Message = err.Error()
+		} else {
+			//发送邮件 b.Email
+			utils.Log.Info("Email:", code)
+			//utils.SendMailWithCode(b.Email, code)
+		}
 	}
 	c.JSONP(200, res)
 }

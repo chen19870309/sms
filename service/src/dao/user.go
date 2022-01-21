@@ -123,3 +123,39 @@ func UpdateUserInfo(icon, nickname, remark string, userid int) (*model.SmsUser, 
 	}
 	return user, nil
 }
+
+func RegistUser(username, password, email, code, ip string) (*model.SmsUser, error) {
+	// 查验email和code
+	err := CheckEmailCode(email, code)
+	if err != nil {
+		return nil, err
+	}
+	// 查验账号密码
+	user := &model.SmsUser{}
+	result := database.Table(TB_USER).Where("username = ? and secret = ? and status in (0,1,2)", username, password).First(user)
+	if result != nil && result.Error.Error() != "record not found" {
+		return nil, result.Error
+	}
+	if user.Id > 0 {
+		return nil, errors.New("用户已存在")
+	}
+	// 创建账号密码
+	user = &model.SmsUser{
+		Code:       utils.Gen8RCode(),
+		CreateTime: time.Now(),
+		UpdateTime: time.Now(),
+		Level:      2,
+		Status:     1,
+		Icon:       "",
+		Nickname:   "新来的:" + username,
+		Username:   username,
+		Secret:     password,
+		Email:      email,
+		LoginIp:    ip,
+	}
+	result = database.Debug().Table(TB_USER).Create(user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return user, nil
+}

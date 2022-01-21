@@ -36,3 +36,14 @@ func TestCode(t *testing.T) {
 func TestMarkdown(t *testing.T) {
 	t.Error(TemplateMarkDown(mdata))
 }
+
+func TestRand(t *testing.T) {
+	t.Error(GetRandNum(6))
+	t.Error(GetRandNum(8))
+	t.Error(GetRandNum(9))
+}
+
+func TestPic(t *testing.T) {
+	text := "![Image](http://www.baidu.com/a.png)"
+	t.Error(GetPic(text, "null"))
+}

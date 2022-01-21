@@ -5,6 +5,8 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
+	"math/rand"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -56,6 +58,29 @@ func MD5(s string) string {
 	return hex.EncodeToString(o.Sum(nil))
 }
 
+func GetSum(markd string) string {
+	ls := strings.Split(markd, "\n")
+	for _, item := range ls {
+		if strings.HasPrefix(item, "@sum:") {
+			return item[5:]
+		}
+	}
+	return GetMdTitle(markd)
+}
+
+func GetPic(markd, def string) string {
+	ls := strings.Split(markd, "\n")
+	reg1 := regexp.MustCompile("http.*[a-z]")
+	for _, item := range ls {
+		ok, _ := regexp.Match("^!.*\\(.*\\)$", []byte(item))
+		if ok {
+			res := reg1.FindAllStringSubmatch(item, -1)
+			return res[0][0]
+		}
+	}
+	return def
+}
+
 func GetMdTags(data, theme string) string {
 	tags := ""
 	ls := strings.Split(data, "\n")
@@ -77,4 +102,23 @@ func GetMdTags(data, theme string) string {
 
 func GetStdTime() string {
 	return time.Now().Format(time.RFC3339)
+}
+
+func GetRandNum(length int) string {
+	var code string
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	if length%2 == 0 {
+		for i := 0; i < length; i += 2 {
+			code += fmt.Sprintf("%02d", r.Intn(99))
+		}
+	} else {
+		for i := 0; i < length; i++ {
+			code += fmt.Sprintf("%d", r.Intn(9))
+		}
+	}
+	return code
+}
+
+func GetBookUrl(code string) string {
+	return "/blog/page/" + code
 }

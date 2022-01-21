@@ -9,3 +9,10 @@ type UserData struct {
 	Nickname string `json:"nickname"`
 	Remark   string `json:"remark"`
 }
+
+type RegistData struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Code     string `json:"code"`
+	Email    string `json:"email"`
+}

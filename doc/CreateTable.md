@@ -124,8 +124,23 @@ create table tb_book_menu(
 ## 4.资源外链表
 
 ```
+--mysql
+create table tb_resource(
+    id bigint(20) not null auto_increment,
+    res_type varchar(64) not null default 'pic',
+    uri varchar(128) not null default '',
+    res_val varchar(64) not null default '',
+    create_time datetime default CURRENT_TIMESTAMP ,
+    expire_time datetime default CURRENT_TIMESTAMP,
+    primary key(id)
+) default charset=utf8;
+--postgres
 create table tb_resource(
   id serial primary key,
-  
-}
+  res_type varchar(64) not null default 'pic',
+  uri varchar(128) not null default '',
+  res_val varchar(64) not null default '',
+  create_time timestamp default CURRENT_TIMESTAMP ,
+  expire_time timestamp default CURRENT_TIMESTAMP
+);
 ```

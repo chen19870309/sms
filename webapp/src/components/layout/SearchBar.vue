@@ -40,6 +40,7 @@ export default {
         this.done()
       },(message) => {
           this.$Message.error('Search Doc Failed!' + message)
+          this.done()
       })
     },
     done () {

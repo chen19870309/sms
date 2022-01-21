@@ -17,4 +17,5 @@ type SmsUser struct {
 	Level      uint
 	Status     uint
 	LoginIp    string
+	Email      string
 }
