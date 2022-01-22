@@ -41,8 +41,8 @@ func NewEmailCode(id int64, email, code string) error {
 func GenEmailCode(email string) (string, error) {
 	res := &model.Resource{}
 	code := utils.GetRandNum(6)
-	result := database.Table(TB_RESOURCE).Where("res_type = 'email' uri = ? and res_val = ?", email, code).First(res)
-	if result != nil {
+	result := database.Table(TB_RESOURCE).Where("res_type = 'email' and uri = ?", email).First(res)
+	if result.Error != nil {
 		if result.Error.Error() != "record not found" {
 			return "", result.Error
 		}
@@ -52,8 +52,8 @@ func GenEmailCode(email string) (string, error) {
 
 func CheckEmailCode(email, code string) error {
 	res := &model.Resource{}
-	result := database.Table(TB_RESOURCE).Where("res_type = 'email' uri = ? and res_val = ?", email, code).First(res)
-	if result != nil {
+	result := database.Table(TB_RESOURCE).Where("res_type = 'email' and uri = ? and res_val = ?", email, code).First(res)
+	if result.Error != nil {
 		if result.Error.Error() == "record not found" {
 			return errors.New("无效的校验码")
 		} else {

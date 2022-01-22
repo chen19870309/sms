@@ -133,7 +133,7 @@ func RegistUser(username, password, email, code, ip string) (*model.SmsUser, err
 	// 查验账号密码
 	user := &model.SmsUser{}
 	result := database.Table(TB_USER).Where("username = ? and secret = ? and status in (0,1,2)", username, password).First(user)
-	if result != nil && result.Error.Error() != "record not found" {
+	if result.Error != nil && result.Error.Error() != "record not found" {
 		return nil, result.Error
 	}
 	if user.Id > 0 {

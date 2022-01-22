@@ -7,7 +7,7 @@
    <div id="mobile-menu" class="animated fast" v-show='user.Id != undefined'>
       <ul>
         <li><a href="#" @click.prevent="newblog" >新建</a></li>
-        <li><a href="#" @click.prevent="editblog" >编辑</a></li>
+        <li v-show='user.Id == blog.AuthorId'><a href="#" @click.prevent="editblog" >编辑</a></li>
         <li><a href="#" @click.prevent="gomenu">返回</a></li>
       </ul>
     </div>

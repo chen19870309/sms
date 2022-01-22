@@ -63,7 +63,7 @@ export default {
       let params = {
         data: this.blog.Content,
         theme: this.theme,
-        author_id: 1
+        author_id: this.user.Id
       }
       NetWorking.doPut(API.posts + this.blog.Code,null,params).then(response => {
         this.$router.push({ path: '/page/' + this.blog.Code })

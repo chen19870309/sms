@@ -29,7 +29,7 @@
                             <user-center></user-center>
                           </router-link></DropdownItem>
                         <DropdownItem><router-link to="/login">账号登陆</router-link></DropdownItem>
-                        <DropdownItem disabled><router-link to="/regist">注册账号</router-link></DropdownItem>
+                        <DropdownItem><router-link to="/regist" disabled>注册账号</router-link></DropdownItem>
                         <DropdownItem v-show='user.Id != undefined' divided><a href="#" @click.prevent="logout">退出账号</a></DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
@@ -46,12 +46,12 @@ import * as API from '@/utils/api'
 import Cookie from 'js-cookie'
 export default {
   name: 'site-header',
-  monted () {
+  mounted () {
     if (this.user.Id === undefined) {
       let u = Cookie.get('user')
+      console.log("header:",u)
       if (u != undefined) {
-        console.log("header:",u)
-        this.$store.dispatch('createUser', u)
+        this.$store.dispatch('createUser', JSON.parse(u))
       }
     }
   },

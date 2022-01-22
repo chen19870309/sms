@@ -264,11 +264,11 @@ func PutPosts(c *gin.Context) {
 		res.Success = false
 		res.Message = err.Error()
 	} else {
-		blog := dao.PutBlog(code, b.Data)
+		blog := dao.PutBlog(code, b.Data, b.AuthorId)
 		if blog == nil {
 			res.Code = -1
 			res.Success = false
-			res.Message = "wrong posts code!"
+			res.Message = "wrong posts code!(文章发布失败)"
 		} else {
 			res.Data = blog
 			go AddIndex(blog) //刷新索引

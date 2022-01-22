@@ -138,9 +138,12 @@ func GetUserBlogs(userid, page, pageSize int) []*model.BlogCtx {
 }
 
 // 发布文章
-func PutBlog(code, data string) *model.BlogCtx {
+func PutBlog(code, data string, userid uint) *model.BlogCtx {
 	blog := QueryBlog(0, code)
 	if blog != nil {
+		if blog.AuthorId != userid {
+			return nil
+		}
 		blog.Content = data
 		blog.Title = utils.GetMdTitle(data)
 		blog.Tags = utils.GetMdTags(data, "")
@@ -171,7 +174,7 @@ func PutBlog(code, data string) *model.BlogCtx {
 
 func QueryBlogCaches(auther_id int) []*model.BlogCtx {
 	blogs := []*model.BlogCtx{}
-	result := database.Table(TB_BLOG).Where("status = 0 and author_id = ?", auther_id).Find(&blogs)
+	result := database.Table(TB_BLOG).Where("status = 0 and author_id = ?", auther_id).Order("update_time desc").Find(&blogs)
 	if result.Error != nil {
 		return nil
 	}
@@ -180,7 +183,7 @@ func QueryBlogCaches(auther_id int) []*model.BlogCtx {
 
 func AllOpenBlogs() []*model.BlogCtx {
 	blogs := []*model.BlogCtx{}
-	result := database.Table(TB_BLOG).Where("status = 1").Find(&blogs)
+	result := database.Table(TB_BLOG).Where("status = 1").Order("update_time desc").Find(&blogs)
 	if result.Error != nil {
 		return nil
 	}

@@ -75,7 +75,11 @@ func GetPic(markd, def string) string {
 		ok, _ := regexp.Match("^!.*\\(.*\\)$", []byte(item))
 		if ok {
 			res := reg1.FindAllStringSubmatch(item, -1)
-			return res[0][0]
+			if len(res) > 0 && len(res[0]) > 0 {
+				return res[0][0]
+			} else {
+				return def
+			}
 		}
 	}
 	return def
@@ -120,5 +124,5 @@ func GetRandNum(length int) string {
 }
 
 func GetBookUrl(code string) string {
-	return "/blog/page/" + code
+	return "/page/" + code
 }
