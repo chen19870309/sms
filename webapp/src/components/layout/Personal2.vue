@@ -16,10 +16,13 @@
             </div>
             <div class="user-left-n clearfix">
                 <div class="alert alert-warning">
-                    <i class="fa fa-lightbulb-o"></i>&nbsp;修改个人资料功能未完善<br>
-                    <i class="fa fa-lightbulb-o"></i>&nbsp;暂时不能查看关注我的用户<br>
-                    <i class="fa fa-lightbulb-o"></i>&nbsp;暂时不能修改个人头像<br><br>
-                    <p>请用户耐心等待技术人员的修复，一旦修复完成我们将发送邮件到您的注册邮箱</p>
+                    <i class="fa fa-lightbulb-o"></i>&nbsp;明日复明如<br>
+                    <p>很多人接受现实的荒野</p>
+                    <p>不知不觉已垂暮之年</p>
+                    <p>一年十年就在一辈子之间</p>
+                    <p>忘记了要去寻找你的世界</p>
+                    <p>生活不止眼前的苟且</p>
+                    <p>还有诗和远方的田野</p>
                 </div>
             </div>
             <div class="user-left-n clearfix">

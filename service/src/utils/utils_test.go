@@ -44,6 +44,7 @@ func TestRand(t *testing.T) {
 }
 
 func TestPic(t *testing.T) {
-	text := "![Image](http://www.baidu.com/a.png)"
+	text := "# 正则表达式简明教程\n@sum:介绍regexp的使用方法和作用\n![image](http://r5uiv7l5f.hd-bkt.clouddn.com/testregexp.webp)\n\n## 1.Regexp是什么？"
 	t.Error(GetPic(text, "null"))
+	t.Error(GetSum(text))
 }

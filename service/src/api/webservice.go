@@ -4,15 +4,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"sms/service/src/api/model"
+	"sms/service/src/config"
 	"sms/service/src/dao"
 	"sms/service/src/utils"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	gomail "github.com/go-mail/gomail"
 )
 
 type WebS struct {
@@ -137,6 +140,25 @@ func BlogAuth() gin.HandlerFunc {
 func Pong(c *gin.Context) {
 	utils.Log.Info("got pong!")
 	c.JSON(200, "pong!")
+}
+
+func SendMail(email, subject, body string) error {
+	m := gomail.NewMessage()
+	m.SetHeader("From", m.FormatAddress(config.Mail.FromEmail, config.Mail.FromName)) //这种方式可以添加别名，即“XX官方”
+	//说明：如果是用网易邮箱账号发送，以下方法别名可以是中文，如果是qq企业邮箱，以下方法用中文别名，会报错，需要用上面此方法转码
+	//m.SetHeader("From", "FB Sample"+"<"+mailConn["user"]+">") //这种方式可以添加别名，即“FB Sample”， 也可以直接用<code>m.SetHeader("From",mailConn["user"])</code> 读者可以自行实验下效果
+	//m.SetHeader("From", mailConn["user"])
+	mailTo := []string{email}
+	m.SetHeader("To", mailTo...) //发送给多个用户
+	m.SetHeader("Subject", subject)
+	m.SetBody("text/html", body)
+	r := gomail.NewPlainDialer(config.Mail.Smtp, config.Mail.SmtpPort, config.Mail.FromEmail, config.Mail.FromSec)
+	return r.DialAndSend(m)
+}
+
+func SendMailWithCode(email, code string) error {
+	body := fmt.Sprintf("欢迎注册:%s\n 请使用[%s]验证邮箱，验证码10分钟内有效\n如非本人请忽略此邮件^_^\n", config.Mail.FromName, code)
+	return SendMail(email, "账号邮箱激活码", body)
 }
 
 func ParseData(c *gin.Context, obj interface{}) error {
@@ -543,7 +565,12 @@ func CheckEmail(c *gin.Context) {
 		} else {
 			//发送邮件 b.Email
 			utils.Log.Info("Email:", code)
-			//utils.SendMailWithCode(b.Email, code)
+			err := SendMailWithCode(b.Email, code)
+			if err != nil {
+				res.Code = -1
+				res.Success = false
+				res.Message = err.Error()
+			}
 		}
 	}
 	c.JSONP(200, res)

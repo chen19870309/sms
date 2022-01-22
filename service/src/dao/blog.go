@@ -131,9 +131,6 @@ func GetUserBlogs(userid, page, pageSize int) []*model.BlogCtx {
 	if result.Error != nil {
 		return nil
 	}
-	for _, item := range blogs {
-		item.Content = "" //不传递文章内容
-	}
 	return blogs
 }
 

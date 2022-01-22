@@ -15,12 +15,14 @@ var Site site
 var App app
 
 var Qiniu qiniu
+var Mail mail
 
 type Conf struct {
 	Db    database `json:"db"`
 	Site  site     `json:"site"`
 	App   app      `json:"app"`
 	Qiniu qiniu    `json:"qiniu"`
+	Mail  mail     `json:"mail"`
 }
 
 type database struct {
@@ -52,6 +54,14 @@ type qiniu struct {
 	Sk     string `json:"sk"`
 	Cb     string `json:"cb"`
 	Bucket string `json:"bucket"`
+}
+
+type mail struct {
+	FromName  string `json:"from-name"`
+	FromEmail string `json:"from-email"`
+	FromSec   string `json:"from-sec"`
+	Smtp      string `json:"smtp"`
+	SmtpPort  int    `json:"smtp-port"`
 }
 
 func InitApp(port int64, level, base, static string) {
@@ -138,6 +148,7 @@ func InitConf(conf string) error {
 	Site = config.Site
 	App = config.App
 	Qiniu = config.Qiniu
+	Mail = config.Mail
 	return nil
 }
 

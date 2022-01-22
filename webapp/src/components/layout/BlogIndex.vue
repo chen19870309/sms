@@ -10,12 +10,8 @@
 
 <div class="wrap container-fluid">
     <div class="container wrap-cont">
-        <a class="nzz" href="https://www.17sucai.com/preview/462257/2016-09-28/myProject_2016-09/index.html#"><span class="sort"><i class="fa fa-paint-brush"></i> &nbsp;UI <i class="fa fa-angle-down"></i></span></a>|
-        <a class="nzz" href="https://www.17sucai.com/preview/462257/2016-09-28/myProject_2016-09/index.html#"><span class="sort"><i class="fa fa-keyboard-o"></i> &nbsp;输入 <i class="fa fa-angle-down"></i></span></a>|
-        <a class="nzz" href="https://www.17sucai.com/preview/462257/2016-09-28/myProject_2016-09/index.html#"><span class="sort"><i class="fa fa-film"></i> &nbsp;媒体 <i class="fa fa-angle-down"></i></span></a>|
         <a class="nzz" href="https://www.17sucai.com/preview/462257/2016-09-28/myProject_2016-09/index.html#"><span class="sort "><i class="fa fa-paper-plane-o"></i> &nbsp;导航 <i class="fa fa-angle-down"></i></span></a>|
         <a class="nzz" href="https://www.17sucai.com/preview/462257/2016-09-28/myProject_2016-09/index.html#"><span class="sort"><i class="fa fa-dropbox"></i> &nbsp;其他 <i class="fa fa-angle-down"></i></span></a>|
-        <a href="https://www.17sucai.com/preview/462257/2016-09-28/myProject_2016-09/index.html#"><span class="sort"><i class="fa fa-code"></i> &nbsp;在线代码</span></a>|
         <a href="https://www.17sucai.com/preview/462257/2016-09-28/myProject_2016-09/index.html#"><span class="sort">JSON在线工具</span></a>
     </div>
     <div class="container-fluid"></div>
