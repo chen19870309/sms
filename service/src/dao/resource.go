@@ -2,8 +2,10 @@ package dao
 
 import (
 	"errors"
+	"fmt"
 	"sms/service/src/dao/model"
 	"sms/service/src/utils"
+	"strconv"
 	"time"
 )
 
@@ -21,6 +23,49 @@ func SaveResource(ctx *model.Resource) error {
 		}
 	}
 	return nil
+}
+
+//记录用户授权码
+func NewAuthCode(userid int64, code string) error {
+	d, _ := time.ParseDuration("24h")
+	uri := fmt.Sprintf("userid:%d", userid)
+	res := &model.Resource{}
+	result := database.Table(TB_RESOURCE).Where("res_type = 'account' and uri = ?", uri).First(res)
+	if result.Error != nil {
+		if result.Error.Error() == "record not found" {
+			res = &model.Resource{
+				ResType:    "account",
+				Uri:        uri,
+				ResVal:     code,
+				CreateTime: time.Now(),
+				ExpireTime: time.Now().Add(d),
+			}
+		} else {
+			return result.Error
+		}
+	} else {
+		res.CreateTime = time.Now()
+		res.ExpireTime = time.Now().Add(d)
+		res.ResVal = code
+	}
+	return SaveResource(res)
+}
+
+func CheckAuthCode(code string) *model.SmsUser {
+	res := &model.Resource{}
+	result := database.Table(TB_RESOURCE).Where("res_type = 'account' and res_val = ?", code).First(res)
+	if result.Error != nil {
+		return nil
+	}
+	if res.ExpireTime.Before(time.Now()) {
+		return nil
+	}
+	userid, err := strconv.ParseInt(res.Uri[7:], 10, 32)
+	if err != nil {
+		return nil
+	} else {
+		return QueryUser(userid, "")
+	}
 }
 
 func NewEmailCode(id int64, email, code string) error {

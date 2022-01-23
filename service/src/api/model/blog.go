@@ -24,13 +24,14 @@ type UserLogin struct {
 }
 
 type BookItem struct {
-	Id    int64  `json:"id"`
-	Code  string `json:"code"`
-	Url   string `json:"url"`
-	Title string `json:"title"`
-	Day   string `json:"day"`
-	Sum   string `json:"sum"`
-	Pic   string `json:"pic"`
+	Id     int64  `json:"id"`
+	Code   string `json:"code"`
+	Url    string `json:"url"`
+	Title  string `json:"title"`
+	Day    string `json:"day"`
+	Sum    string `json:"sum"`
+	Pic    string `json:"pic"`
+	Author string `json:"author"`
 }
 
 type BookChapter struct {

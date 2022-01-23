@@ -38,7 +38,7 @@ func AutoSaveBlog(code, theme, data string, authorid uint) error {
 		Content:    data,
 		UpdateTime: time.Now(),
 		Title:      utils.GetMdTitle(data),
-		Tags:       utils.GetMdTags(data, theme),
+		Tags:       utils.GetMdTags(data),
 	}
 	result := database.Debug().Table(TB_BLOG).Where("code = ? and author_id = ?", code, authorid).Update(blog)
 	if result.Error != nil {
@@ -143,7 +143,7 @@ func PutBlog(code, data string, userid uint) *model.BlogCtx {
 		}
 		blog.Content = data
 		blog.Title = utils.GetMdTitle(data)
-		blog.Tags = utils.GetMdTags(data, "")
+		blog.Tags = utils.GetMdTags(data)
 		if strings.Contains(blog.Tags, "private") {
 			blog.Status = 2 //私有blog
 		} else {
@@ -155,11 +155,7 @@ func PutBlog(code, data string, userid uint) *model.BlogCtx {
 			utils.Log.Errorf("CreateMonthMenu failed![%v]", err)
 			return nil
 		} else {
-			var userid uint
-			if blog.Status == 2 {
-				userid = blog.AuthorId
-			}
-			err = CreateBookMenu(pid, userid, blog)
+			err = CreateBookMenu(pid, blog)
 			if err != nil {
 				utils.Log.Errorf("CreateBookMenu failed![%v]", err)
 				return nil

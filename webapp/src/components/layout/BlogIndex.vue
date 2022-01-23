@@ -10,9 +10,9 @@
 
 <div class="wrap container-fluid">
     <div class="container wrap-cont">
-        <a class="nzz" href="https://www.17sucai.com/preview/462257/2016-09-28/myProject_2016-09/index.html#"><span class="sort "><i class="fa fa-paper-plane-o"></i> &nbsp;导航 <i class="fa fa-angle-down"></i></span></a>|
-        <a class="nzz" href="https://www.17sucai.com/preview/462257/2016-09-28/myProject_2016-09/index.html#"><span class="sort"><i class="fa fa-dropbox"></i> &nbsp;其他 <i class="fa fa-angle-down"></i></span></a>|
-        <a href="https://www.17sucai.com/preview/462257/2016-09-28/myProject_2016-09/index.html#"><span class="sort">JSON在线工具</span></a>
+        <router-link to="/menu"><Icon type="ios-menu" /> &nbsp;导航 </router-link> <Divider type="vertical" />
+        <router-link to="#"> <Icon type="ios-apps" /> &nbsp;其他  </router-link> <Divider type="vertical" />
+        <a href="https://www.bejson.com/"><Icon type="logo-nodejs" /> &nbsp;JSON在线工具</a>
     </div>
     <div class="container-fluid"></div>
 </div>

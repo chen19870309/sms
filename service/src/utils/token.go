@@ -85,14 +85,14 @@ func GetPic(markd, def string) string {
 	return def
 }
 
-func GetMdTags(data, theme string) string {
+func GetMdTags(data string) string {
 	tags := ""
 	ls := strings.Split(data, "\n")
 	for _, item := range ls {
 		tag := ""
 		if item == "@private" {
 			tag = "private,"
-		} else if strings.HasPrefix(item, "@tag:") {
+		} else if strings.HasPrefix(item, "@tag:") || strings.HasPrefix(item, "@tags:") {
 			tag = item[5:] + ","
 		}
 		if tags == "" {

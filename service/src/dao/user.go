@@ -2,6 +2,7 @@ package dao
 
 import (
 	"errors"
+	"fmt"
 	"sms/service/src/dao/model"
 	"sms/service/src/utils"
 	"time"
@@ -48,11 +49,27 @@ func SaveUser(ctx *model.SmsUser) error {
 	return nil
 }
 
+func QueryUserEmail(email string) *model.SmsUser {
+	user := &model.SmsUser{}
+	result := database.Table(TB_USER).Where("email = ?", email).First(user)
+	if result.Error != nil && result.Error.Error() == "record not found" {
+		return nil
+	}
+	return user
+}
+
 func QueryUser(id int64, code string) *model.SmsUser {
 	if id == 0 && code == "" {
 		return nil
 	}
 	user := &model.SmsUser{}
+	key := fmt.Sprintf("%d:%s", id, code)
+	t, b := utils.GetCache(key)
+	if b {
+		utils.Log.Infof("GetCache(%s)=%v", key, t)
+		user = t.(*model.SmsUser)
+		return user
+	}
 	var result *gorm.DB
 	if id != 0 {
 		result = database.Table(TB_USER).Where("id = ?", id).First(user)
@@ -62,6 +79,7 @@ func QueryUser(id int64, code string) *model.SmsUser {
 	if result.Error != nil {
 		return nil
 	}
+	utils.SetCache(key, user, 2*time.Minute)
 	return user
 }
 

@@ -28,8 +28,8 @@
                           <router-link to="/user">
                             <user-center></user-center>
                           </router-link></DropdownItem>
-                        <DropdownItem><router-link to="/login">账号登陆</router-link></DropdownItem>
-                        <DropdownItem><router-link to="/regist" disabled>注册账号</router-link></DropdownItem>
+                        <DropdownItem v-show='user.Id == undefined'><router-link to="/login">账号登陆</router-link></DropdownItem>
+                        <DropdownItem><router-link to="/regist">注册账号</router-link></DropdownItem>
                         <DropdownItem v-show='user.Id != undefined' divided><a href="#" @click.prevent="logout">退出账号</a></DropdownItem>
                     </DropdownMenu>
                 </Dropdown>

@@ -69,6 +69,8 @@ export default {
         this.$router.push({ path: '/page/' + this.blog.Code })
       }, (message) => {
         this.$Message.error('Put MarkDown Failed!' + message)
+        this.$store.dispatch('deleteUser')
+        this.$router.push({ path: '/login' })
       })
     },
     newblog () {
@@ -79,6 +81,7 @@ export default {
       }, (message) => {
         this.$Message.error('Auto New MarkDown Failed!' + message)
         this.$store.dispatch('deleteUser')
+        this.$router.push({ path: '/login' })
       })
     },
     handleOnSave ({value, theme}) {
@@ -96,6 +99,7 @@ export default {
           desc: 'Auto Save MarkDown Failed!' + message
         })
         this.$store.dispatch('deleteUser')
+        this.$router.push({ path: '/login' })
       })
     },
   },

@@ -114,19 +114,28 @@ func BlogAuth() gin.HandlerFunc {
 				utils.Log.Infof("Params:%v", c.Params)
 			}
 			if user == nil || user.Id == 0 {
-				ok = false
-				res := model.Response{
-					Code:    401,
-					Success: false,
-					Message: "auth failed!",
+				u := dao.CheckAuthCode(auth)
+				if user != nil {
+					ok = false
+					res := model.Response{
+						Code:    401,
+						Success: false,
+						Message: "auth failed!",
+					}
+					c.JSONP(200, res)
+					c.AbortWithStatus(401)
+				} else {
+					service.SecCache[auth] = &model.UserData{
+						Id:       u.Id,
+						Username: u.Username,
+						Nickname: u.Nickname,
+						Remark:   u.Remark,
+					}
 				}
-				c.JSONP(200, res)
-				c.AbortWithStatus(401)
-			} else {
-				c.Set(_USERDATA, user)
-				d, e := c.Get(_USERDATA)
-				utils.Log.Info("USER=", d, e)
 			}
+			c.Set(_USERDATA, user)
+			d, e := c.Get(_USERDATA)
+			utils.Log.Info("USER=", d, e)
 		}
 		// m := make(map[string]interface{})
 		// c.BindJSON(&m)
@@ -157,7 +166,7 @@ func SendMail(email, subject, body string) error {
 }
 
 func SendMailWithCode(email, code string) error {
-	body := fmt.Sprintf("欢迎注册:%s\n 请使用[%s]验证邮箱，验证码10分钟内有效\n如非本人请忽略此邮件^_^\n", config.Mail.FromName, code)
+	body := fmt.Sprintf("欢迎注册:%s<br /> 请使用<strong><font color=\"#A52A2A\">%s</font></strong>验证邮箱，验证码10分钟内有效<br />如非本人操作请忽略此邮件^_^<br />", config.Mail.FromName, code)
 	return SendMail(email, "账号邮箱激活码", body)
 }
 
@@ -227,6 +236,10 @@ func LoginBlog(c *gin.Context) {
 				Username: user.Username,
 				Nickname: user.Nickname,
 				Remark:   user.Remark,
+			}
+			err = dao.NewAuthCode(user.Id, user.Secret)
+			if err != nil {
+				utils.Log.Errorf("NewAuthCode(%d,%s) => %v", user.Id, user.Secret, err)
 			}
 		}
 	}
@@ -344,11 +357,19 @@ func getBooks(pid int64, userid int) []model.BookItem {
 	books := []model.BookItem{}
 	ms := dao.QueryMenus(pid, userid)
 	for _, item := range ms {
+		if strings.Contains(item.Remark, "private") {
+			continue
+		}
+		user := dao.QueryUser(int64(item.AuthorId), "")
+		utils.Log.Info(item.AuthorId, user)
 		book := model.BookItem{
 			Id:    item.Id,
 			Title: item.Name,
 			Url:   "/page/" + item.Code,
 			Day:   item.CreateTime.Format("01,02,2006"),
+		}
+		if user != nil {
+			book.Author = user.Nickname
 		}
 		books = append(books, book)
 	}
@@ -474,7 +495,7 @@ func WaperBlogs(userid, page, pageSize int) []*model.BookItem {
 			Sum:   utils.GetSum(item.Content),
 			Pic:   utils.GetPic(item.Content, def),
 			Url:   utils.GetBookUrl(item.Code),
-			Day:   "",
+			Day:   utils.GetMdTags(item.Content),
 		})
 	}
 	return rs
@@ -557,19 +578,26 @@ func CheckEmail(c *gin.Context) {
 		res.Success = false
 		res.Message = err.Error()
 	} else {
-		code, err := dao.GenEmailCode(b.Email)
-		if err != nil {
+		user := dao.QueryUserEmail(b.Email)
+		if user != nil {
 			res.Code = -1
 			res.Success = false
-			res.Message = err.Error()
+			res.Message = "此邮箱已经注册过账号,不能重复使用!"
 		} else {
-			//发送邮件 b.Email
-			utils.Log.Info("Email:", code)
-			err := SendMailWithCode(b.Email, code)
+			code, err := dao.GenEmailCode(b.Email)
 			if err != nil {
 				res.Code = -1
 				res.Success = false
 				res.Message = err.Error()
+			} else {
+				//发送邮件 b.Email
+				utils.Log.Info("Email:", code)
+				err := SendMailWithCode(b.Email, code)
+				if err != nil {
+					res.Code = -1
+					res.Success = false
+					res.Message = err.Error()
+				}
 			}
 		}
 	}
