@@ -115,7 +115,7 @@ func BlogAuth() gin.HandlerFunc {
 			}
 			if user == nil || user.Id == 0 {
 				u := dao.CheckAuthCode(auth)
-				if user != nil {
+				if u == nil {
 					ok = false
 					res := model.Response{
 						Code:    401,
@@ -274,12 +274,22 @@ func GetPosts(c *gin.Context) {
 		Success: true,
 		Message: "ok",
 	}
+	userid := 0
+	user, ok := c.Get(_USERDATA)
+	if ok {
+		userid = int(user.(*model.UserData).Id)
+	}
 	blog := dao.QueryBlog(0, code)
 	if blog == nil {
 		res.Code = -1
 		res.Success = false
-		res.Message = "wrong posts code!"
+		res.Message = "无效的链接!"
 	} else {
+		if strings.Contains(blog.Tags, "private") && userid != int(blog.AuthorId) {
+			res.Code = -1
+			res.Success = false
+			res.Message = "私有文章，授权失败!"
+		}
 		res.Data = blog
 	}
 	c.JSONP(200, res)
@@ -366,7 +376,7 @@ func getBooks(pid int64, userid int) []model.BookItem {
 			Id:    item.Id,
 			Title: item.Name,
 			Url:   "/page/" + item.Code,
-			Day:   item.CreateTime.Format("01,02,2006"),
+			Day:   item.CreateTime.Format("2006-01-02"),
 		}
 		if user != nil {
 			book.Author = user.Nickname
@@ -489,13 +499,15 @@ func WaperBlogs(userid, page, pageSize int) []*model.BookItem {
 	rs := []*model.BookItem{}
 	for _, item := range dao.GetUserBlogs(userid, page, pageSize) {
 		rs = append(rs, &model.BookItem{
-			Id:    item.Id,
-			Code:  item.Code,
-			Title: item.Title,
-			Sum:   utils.GetSum(item.Content),
-			Pic:   utils.GetPic(item.Content, def),
-			Url:   utils.GetBookUrl(item.Code),
-			Day:   utils.GetMdTags(item.Content),
+			Id:         item.Id,
+			Code:       item.Code,
+			Title:      item.Title,
+			Sum:        utils.GetSum(item.Content),
+			Pic:        utils.GetPic(item.Content, def),
+			Url:        utils.GetBookUrl(item.Code),
+			Day:        utils.GetMdTags(item.Content),
+			UpdateTime: item.UpdateTime.Format("2006-01-02"),
+			Status:     item.Status,
 		})
 	}
 	return rs

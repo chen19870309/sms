@@ -1,6 +1,6 @@
 <template>
   <div  class="col-lg-4 col-md-3 col-sm-4">
-    <a :href="''+doc.url"><img :src="''+doc.pic" alt="" :title="doc.title"></a>
+    <a :href="''+doc.url"><img :src="''+doc.pic" alt="" :title="doc.title" height="180"></a>
     <div class="art-info">
       <h4><a :href="''+doc.url">{{ doc.title }}</a></h4>
       <small>{{ doc.sum }}</small>

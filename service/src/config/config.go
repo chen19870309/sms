@@ -17,12 +17,15 @@ var App app
 var Qiniu qiniu
 var Mail mail
 
+var WX weixin
+
 type Conf struct {
-	Db    database `json:"db"`
-	Site  site     `json:"site"`
-	App   app      `json:"app"`
-	Qiniu qiniu    `json:"qiniu"`
-	Mail  mail     `json:"mail"`
+	Db     database `json:"db"`
+	Site   site     `json:"site"`
+	App    app      `json:"app"`
+	Qiniu  qiniu    `json:"qiniu"`
+	Mail   mail     `json:"mail"`
+	Weixin weixin   `json:"weixin"`
 }
 
 type database struct {
@@ -62,6 +65,14 @@ type mail struct {
 	FromSec   string `json:"from-sec"`
 	Smtp      string `json:"smtp"`
 	SmtpPort  int    `json:"smtp-port"`
+}
+
+type weixin struct {
+	OrignId        string `json:"origin-id"`
+	AppId          string `json:"app-id"`
+	AppSecret      string `json:"app-secret"`
+	Token          string `json:"token"`
+	EncodingAeskey string `json:"encoding-aeskey"`
 }
 
 func InitApp(port int64, level, base, static string) {
@@ -149,6 +160,7 @@ func InitConf(conf string) error {
 	App = config.App
 	Qiniu = config.Qiniu
 	Mail = config.Mail
+	WX = config.Weixin
 	return nil
 }
 

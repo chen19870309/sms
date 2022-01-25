@@ -36,7 +36,9 @@
                     <TabPane id="user-article" label="我的文章">
                         <List header="文章列表" border size="small">
                           <ListItem v-for="mk in markds" :key="mk.id">
-                              <a href="#" @click.prevent="editblog(mk.code)">#[{{ mk.id }}].[{{ mk.title }}]</a></ListItem>
+                              <Icon type="md-eye" v-show="mk.status == 1" />
+                              <Icon type="ios-person" v-show="mk.status == 2" />
+                              <a href="#" @click.prevent="editblog(mk.code)">#[{{ mk.id }}]|{{mk.updatetime}}|.[{{ mk.title }}]</a></ListItem>
                         </List>
                         <Page id="user-article-page" :total="page.total" :current="page.index" @on-change="indexpage" />
                     </TabPane>

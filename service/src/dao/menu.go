@@ -56,7 +56,7 @@ func CreateBookMenu(pid int64, blog *model.BlogCtx) error {
 	menu.Code = blog.Code
 	menu.Remark = blog.Tags
 	menu.Status = blog.Status
-	menu.Day = blog.CreateTime.Format("01M/02D,2006")
+	menu.Day = blog.CreateTime.Format("2006-01-02")
 	menu.CreateTime = blog.CreateTime
 	menu.UpdateTime = time.Now()
 	menu.AuthorId = blog.AuthorId
