@@ -105,37 +105,38 @@ func BlogAuth() gin.HandlerFunc {
 		}
 		ok := true
 		auth, err := c.Cookie("auth_token")
+		user := service.SecCache[auth]
+		if user == nil || user.Id == 0 {
+			u := dao.CheckAuthCode(auth)
+			if u != nil {
+				service.SecCache[auth] = &model.UserData{
+					Id:       u.Id,
+					Username: u.Username,
+					Nickname: u.Nickname,
+					Remark:   u.Remark,
+				}
+			}
+		}
+		if user != nil {
+			c.Set(_USERDATA, user)
+		}
 		ip := c.ClientIP()
 		url := c.Request.URL.String()
 		if strings.Contains(url, "newblog") || strings.Contains(url, "save") || strings.Contains(url, "blogcaches") || strings.Contains(url, "edit") {
-			user := service.SecCache[auth]
 			if user != nil {
 				utils.Log.Infof("auth=%v ip=%v url=[%v] userid=[%d]", auth, ip, c.Request.URL, user.Id)
 				utils.Log.Infof("Params:%v", c.Params)
 			}
-			if user == nil || user.Id == 0 {
-				u := dao.CheckAuthCode(auth)
-				if u == nil {
-					ok = false
-					res := model.Response{
-						Code:    401,
-						Success: false,
-						Message: "auth failed!",
-					}
-					c.JSONP(200, res)
-					c.AbortWithStatus(401)
-				} else {
-					service.SecCache[auth] = &model.UserData{
-						Id:       u.Id,
-						Username: u.Username,
-						Nickname: u.Nickname,
-						Remark:   u.Remark,
-					}
+			if user == nil {
+				ok = false
+				res := model.Response{
+					Code:    401,
+					Success: false,
+					Message: "auth failed!",
 				}
+				c.JSONP(200, res)
+				c.AbortWithStatus(401)
 			}
-			c.Set(_USERDATA, user)
-			d, e := c.Get(_USERDATA)
-			utils.Log.Info("USER=", d, e)
 		}
 		// m := make(map[string]interface{})
 		// c.BindJSON(&m)
@@ -514,11 +515,17 @@ func WaperBlogs(userid, page, pageSize int) []*model.BookItem {
 }
 
 func IndexBlog(c *gin.Context) {
+	more := c.Query("more")
+	size := 8
+	if more != "" {
+		size, _ = strconv.Atoi(more)
+	}
 	res := model.Response{
 		Code:    0,
 		Success: true,
 		Message: "ok",
-		Data:    WaperBlogs(0, 1, 8),
+		Data:    WaperBlogs(0, 1, size),
+		Count:   dao.CountUserBlogs(0),
 	}
 	c.JSONP(200, res)
 }

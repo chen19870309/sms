@@ -16,7 +16,7 @@
             </div>
             <div class="user-left-n clearfix">
                 <div class="alert alert-warning">
-                    <i class="fa fa-lightbulb-o"></i>&nbsp;明日复明如<br>
+                    <i class="fa fa-lightbulb-o"></i>&nbsp;<strong>明日复明日</strong><br>
                     <p>很多人接受现实的荒野</p>
                     <p>不知不觉已垂暮之年</p>
                     <p>一年十年就在一辈子之间</p>

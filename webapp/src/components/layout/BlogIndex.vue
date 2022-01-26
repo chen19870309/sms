@@ -12,7 +12,7 @@
     <div class="container wrap-cont">
         <router-link to="/menu"><Icon type="ios-menu" /> &nbsp;导航 </router-link> <Divider type="vertical" />
         <router-link to="#"> <Icon type="ios-apps" /> &nbsp;其他  </router-link> <Divider type="vertical" />
-        <a href="https://www.bejson.com/"><Icon type="logo-nodejs" /> &nbsp;JSON在线工具</a>
+        <router-link to="/tools"> <Icon type="logo-nodejs" /> &nbsp;JSON在线工具 </router-link>
     </div>
     <div class="container-fluid"></div>
 </div>
@@ -23,7 +23,10 @@
             <doc-tab v-for="doc in docs" :key="doc.Id" :doc=doc></doc-tab>
         </div>
         <div class="view-more">
-            <button type="button" id="view-more" class="btn btn-primary center-block">加载更多</button>
+            <Button type="success" v-show="total > more"  :loading="loading"  @click="moreindex" >
+              <span v-if="!loading">加载更多...</span>
+              <span v-else>Loading...</span>
+            </Button>
         </div>
     </div>
 </div>
@@ -43,18 +46,36 @@ export default {
   data() {
     return {
       login: false,
-      docs: []
+      docs: [],
+      more: 8,
+      total: 0,
+      loading: false
     }
   },
   methods: {
     query (data) {
       this.docs = data
+    },
+    moreindex () {
+      this.more = this.more + 4
+      this.loading = true
+      NetWorking.doGet(API.mainindex + '?more=' + this.more).then(response => {
+        console.log(response.data)
+        this.docs = response.data
+        this.total = response.count
+        this.loading = false
+      },(message) => {
+        this.loading = false
+        this.$Message.error('Load More Failed!' + message)
+        this.$router.push({ path: '/404' })
+      })
     }
   },
   created() {
     NetWorking.doGet(API.mainindex).then(response => {
       console.log(response.data)
       this.docs = response.data
+      this.total = response.count
     }, (message) => {
       this.$Message.error('Load Main Failed!' + message)
       this.$router.push({ path: '/404' })

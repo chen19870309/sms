@@ -31,7 +31,9 @@ func (p *program) Init(env svc.Environment) error {
 	if err != nil {
 		return err
 	}
-	api.InitWeixinService(blog)
+	if config.WX.OrignId != "" {
+		api.InitWeixinService(blog)
+	}
 	p.blog = blog
 	return nil
 }

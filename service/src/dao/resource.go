@@ -3,6 +3,7 @@ package dao
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"sms/service/src/dao/model"
 	"sms/service/src/utils"
 	"strconv"
@@ -69,6 +70,10 @@ func CheckAuthCode(code string) *model.SmsUser {
 }
 
 func NewEmailCode(id int64, email, code string) error {
+	ok, _ := regexp.Match("^\\w+@\\w+\\.\\w+$", []byte(email))
+	if !ok {
+		return errors.New("无效的Email地址:" + email)
+	}
 	d, _ := time.ParseDuration("10m")
 	res := &model.Resource{
 		ResType:    "email",

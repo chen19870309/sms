@@ -11,6 +11,8 @@ import P401 from '@/components/error/401'
 import P404 from '@/components/error/404'
 import P500 from '@/components/error/500'
 
+import JsonTool from '../views/WebTool'
+
 export default[
   {
     path: '/',
@@ -24,6 +26,10 @@ export default[
   {
     path: '/hello',
     component: HelloWorld
+  },
+  {
+    path: '/tools',
+    component: JsonTool
   },
   {
     path: '/login',

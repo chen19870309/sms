@@ -68,7 +68,7 @@ func NewBlog(authorId uint) (*model.BlogCtx, error) {
 		UpdateTime: time.Now(),
 		AuthorId:   authorId,
 		Status:     0,
-		Content:    "#  New Edit!\n@create time:" + time.Now().Format("2006-01-02 15:04:05") + "\n@private\n",
+		Content:    "# New Edit!\n@create time:" + time.Now().Format("2006-01-02 15:04:05") + "\n@private\n",
 	}
 	for {
 		code := utils.Gen8RCode()
@@ -111,7 +111,7 @@ func CountUserBlogs(userid int) int {
 	if userid > 0 {
 		database.Table(TB_BLOG).Where("author_id = ?", userid).Count(&total)
 	} else {
-		database.Table(TB_BLOG).Count(&total)
+		database.Table(TB_BLOG).Where("status = 1").Count(&total) //公开的blog
 	}
 
 	return total
