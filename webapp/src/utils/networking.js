@@ -1,18 +1,59 @@
 import axios from 'axios'
-axios.defaults.withCredentials = true
-export default {
+import storage from './storage'
+import router from '../router'
+/**
+ * 使用cookie,带上cookie之后跨域就不行了
+ */
+// axios.defaults.withCredentials = true
 
+/**
+ * 拦截器，为请求头添加jwt信息
+ */
+let http = axios.create({
+  baseURL: 'http://124.223.2.135/blog',
+  timeout: 10000
+})
+
+http.interceptors.request.use(
+  config => {
+    if (storage.get('JWT_TOKEN')) { // 判断是否存在token，如果存在的话，则每个http header都加上token
+      config.headers.Authorization = `token ${storage.get('JWT_TOKEN')}`
+    }
+    return config
+  },
+  err => {
+    return Promise.reject(err)
+  }
+)
+http.interceptors.response.use(
+  response => {
+    return response
+  },
+  error => {
+    if (error.response) {
+      console.log('axios:' + error.response.status)
+      switch (error.response.status) {
+        case 401:
+          // 返回 401 清除token信息并跳转到登录页面
+          storage.remove('JWT_TOKEN')
+          router.replace({
+            path: 'login',
+            query: {redirect: router.currentRoute.fullPath}
+          })
+      }
+    }
+    return Promise.reject(error.response.data) // 返回接口返回的错误信息
+  }
+)
+
+export default {
   httpMethod: {
     GET: 'get',
     POST: 'post',
     PUT: 'put',
     DELETE: 'delete'
   },
-  instance: axios.create({
-    baseURL: '/blog',
-    timeout: 10000
-  }),
-
+  instance: http,
   /**
    *
    * @param url

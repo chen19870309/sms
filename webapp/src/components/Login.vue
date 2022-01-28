@@ -1,7 +1,7 @@
 <template>
     <div class="box" >
     <!-- 粒子背景 -->
-    <vue-particles></vue-particles>
+    <vue-particles class="bg"></vue-particles>
     <site-header></site-header>
     <Card class="card-box">
     <Form ref="formLogin" :model="formLogin" :rules="formLoginRules" >
@@ -80,8 +80,10 @@ export default {
           NetWorking.doPost(API.login, null, data).then(response => {
             this.disabled = false
             let user = response.data
+            Cookie.set('jwt',response.jwt_token,{ expires: 1})
             Cookie.set('auth_token', user.Secret,{ expires: 1})
             Cookie.set('user',  JSON.stringify(user), { expires: 1})
+            this.$store.dispatch('saveJwt', response.jwt_token)
             this.$store.dispatch('createUser', user)
             this.$router.push({ path: this.$store.getters.nextUrl }).catch(err => {})
           }, (message) => {

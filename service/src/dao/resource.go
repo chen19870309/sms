@@ -55,6 +55,7 @@ func NewAuthCode(userid int64, code string) error {
 func CheckAuthCode(code string) *model.SmsUser {
 	res := &model.Resource{}
 	result := database.Table(TB_RESOURCE).Where("res_type = 'account' and res_val = ?", code).First(res)
+	//utils.Log.Infof("CheckAuthCode(%v)=>[%v]", code, result)
 	if result.Error != nil {
 		return nil
 	}

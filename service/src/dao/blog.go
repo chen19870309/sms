@@ -124,9 +124,9 @@ func GetUserBlogs(userid, page, pageSize int) []*model.BlogCtx {
 	blogs := []*model.BlogCtx{}
 	var result *gorm.DB
 	if userid > 0 {
-		result = database.Table(TB_BLOG).Limit(pageSize).Offset((page-1)*pageSize).Where("author_id = ?", userid).Find(&blogs).Order("update_time desc")
+		result = database.Table(TB_BLOG).Limit(pageSize).Offset((page-1)*pageSize).Where("author_id = ?", userid).Order("id desc").Find(&blogs)
 	} else { //查询公开的blog
-		result = database.Table(TB_BLOG).Limit(pageSize).Offset((page - 1) * pageSize).Where("status = 1").Find(&blogs).Order("update_time desc")
+		result = database.Table(TB_BLOG).Limit(pageSize).Offset((page - 1) * pageSize).Where("status = 1").Order("id desc").Find(&blogs)
 	}
 	if result.Error != nil {
 		return nil

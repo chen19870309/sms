@@ -4,6 +4,7 @@ type Response struct {
 	Code    int         `json:"code"`
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
+	Jwt     string      `json:"jwt_token"`
 	Data    interface{} `json:"data"`
 	Count   int         `json:"count"`
 }

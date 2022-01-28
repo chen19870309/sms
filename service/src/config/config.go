@@ -50,6 +50,7 @@ type app struct {
 	LogLevel   string `json:"log-level"`
 	BasePath   string `json:"base-path"`
 	StaticPath string `json:"static-path"`
+	Secret     string `json:"secret"`
 }
 
 type qiniu struct {

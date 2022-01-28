@@ -4,6 +4,7 @@ const state = {
   userinfo: {},
   hasGetInfo: false,
   token: '',
+  jwt: '',
   nextUrl: '/user'
 }
 
@@ -11,7 +12,8 @@ const state = {
 const getters = {
   currentUser: state => state.userinfo,
   nextUrl: state => state.nextUrl,
-  authToken: state => state.Token
+  authToken: state => state.Token,
+  jwt: state => state.Jwt
 }
 // actions
 const actions = {
@@ -20,6 +22,9 @@ const actions = {
   },
   saveToken ({commit}, token) {
     commit('setToken', token)
+  },
+  saveJwt ({commit}, jwt) {
+    commit('setJwt', jwt)
   },
   createUser ({commit}, user) {
     console.log('in create user')
@@ -47,6 +52,10 @@ const mutations = {
   setToken (state, token) {
     state.token = token
     storage.set('auth_token', token)
+  },
+  setJwt (state, jwt) {
+    state.jwt = jwt
+    storage.set('JWT_TOKEN', jwt)
   },
   [types.CREATE_USER] (state, user) {
     state.userinfo = user

@@ -50,7 +50,7 @@ export default {
     },
     uploaded (val) {
       this.up_percent = 100
-      this.markdown.insertContent('![image]('+val+')\n')
+      this.markdown.insertContent('![image](' + val + ')\n')
       setTimeout(() => {
         this.UploadModel = false
         this.up_percent = 0
@@ -65,7 +65,7 @@ export default {
         theme: this.theme,
         author_id: this.user.Id
       }
-      NetWorking.doPut(API.posts + this.blog.Code,null,params).then(response => {
+      NetWorking.doPut(API.posts + this.blog.Code, null, params).then(response => {
         this.$router.push({ path: '/page/' + this.blog.Code })
       }, (message) => {
         this.$Message.error('Put MarkDown Failed!' + message)
@@ -101,7 +101,7 @@ export default {
         this.$store.dispatch('deleteUser')
         this.$router.push({ path: '/login' })
       })
-    },
+    }
   },
   data () {
     return {
@@ -109,7 +109,7 @@ export default {
       up_percent: 0,
       UploadModel: false,
       qiniu: {},
-      markdown: {},
+      markdown: {}
     }
   },
   created () {
@@ -121,11 +121,11 @@ export default {
       this.$Message.error('Load MarkDown Failed!' + message)
     })
     NetWorking.doGet(API.uptoken).then(response => {
-        console.log('UpToken:', response.data)
-        this.qiniu = response.data
-      },(message) => {
-          this.$Message.error('Get User MarkDown Files Failed!' + message)
-      })
+      console.log('UpToken:', response.data)
+      this.qiniu = response.data
+    }, (message) => {
+      this.$Message.error('Get User MarkDown Files Failed!' + message)
+    })
   },
   computed: {
     ...mapGetters({

@@ -66,7 +66,7 @@ func QueryUser(id int64, code string) *model.SmsUser {
 	key := fmt.Sprintf("%d:%s", id, code)
 	t, b := utils.GetCache(key)
 	if b {
-		utils.Log.Infof("GetCache(%s)=%v", key, t)
+		//utils.Log.Infof("GetCache(%s)=%v", key, t)
 		user = t.(*model.SmsUser)
 		return user
 	}

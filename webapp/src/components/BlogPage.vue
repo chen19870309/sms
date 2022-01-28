@@ -46,7 +46,7 @@ export default {
       NetWorking.doGet(API.newblog).then(response => {
         let data = response.data
         this.$store.dispatch('createBlog', data)
-        this.$router.push({path: '/editer/' + data.Code}).catch( err => {
+        this.$router.push({path: '/editer/' + data.Code}).catch(err => {
           console.log('pass router')
         })
       }, (message) => {

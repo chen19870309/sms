@@ -117,8 +117,9 @@ export default {
           NetWorking.doPost(API.regist, null, data).then(response => {
             this.disabled = false
             let user = response.data
-            Cookie.set('auth_token', user.Secret)
-            this.$store.dispatch('createUser', user)
+            Cookie.set('auth_token', user.Secret,{ expires: 1})
+            Cookie.set('jwt',response.jwt,{ expires: 1})
+            this.$store.dispatch('createUser', user,{ expires: 1})
             this.$router.push({ path: '/login' }).catch(err => {})
           }, (message) => {
             this.disabled = false

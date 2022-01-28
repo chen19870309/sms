@@ -6,7 +6,6 @@ import router from './router'
 import store from '@/store'
 import md5 from 'js-md5'
 import less from 'less'
-
 import iView from 'iview'
 import 'iview/dist/styles/iview.css'
 

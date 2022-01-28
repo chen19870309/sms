@@ -121,7 +121,7 @@ create table tb_book_menu(
 );
 ```
 
-## 4.资源外链表
+## 4.资源表
 
 ```
 --mysql

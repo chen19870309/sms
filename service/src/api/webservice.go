@@ -104,37 +104,47 @@ func BlogAuth() gin.HandlerFunc {
 			c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(data)) // 关键点
 		}
 		ok := true
-		auth, err := c.Cookie("auth_token")
-		user := service.SecCache[auth]
-		if user == nil || user.Id == 0 {
-			u := dao.CheckAuthCode(auth)
-			if u != nil {
-				service.SecCache[auth] = &model.UserData{
-					Id:       u.Id,
-					Username: u.Username,
-					Nickname: u.Nickname,
-					Remark:   u.Remark,
+		var user *model.UserData
+		jwtStr := c.Request.Header["Authorization"]
+		//utils.Log.Info("Auth JWT:", jwtStr)
+		if len(jwtStr) != 0 && jwtStr[0] != "" { // 使用jwt校验用户登陆状态
+			text, err := utils.CheckJwt(jwtStr[0], config.App.Secret)
+			if err != nil {
+				utils.Log.Errorf("Jwt[%v] Auth Failed![%v]", jwtStr, err)
+			} else {
+				utils.Log.Errorf("Jwt[%v] Auth Success![%v]", jwtStr, text)
+				user = &model.UserData{
+					Remark: text,
+				}
+			}
+		} else { // 使用Cookie 授权登陆
+			auth, _ := c.Cookie("auth_token")
+			user = service.SecCache[auth]
+			if user == nil || user.Id == 0 {
+				u := dao.CheckAuthCode(auth)
+				if u != nil {
+					service.SecCache[auth] = &model.UserData{
+						Id:       u.Id,
+						Username: u.Username,
+						Nickname: u.Nickname,
+						Remark:   u.Remark,
+					}
 				}
 			}
 		}
 		if user != nil {
 			c.Set(_USERDATA, user)
 		}
-		ip := c.ClientIP()
 		url := c.Request.URL.String()
 		if strings.Contains(url, "newblog") || strings.Contains(url, "save") || strings.Contains(url, "blogcaches") || strings.Contains(url, "edit") {
-			if user != nil {
-				utils.Log.Infof("auth=%v ip=%v url=[%v] userid=[%d]", auth, ip, c.Request.URL, user.Id)
-				utils.Log.Infof("Params:%v", c.Params)
-			}
 			if user == nil {
 				ok = false
 				res := model.Response{
 					Code:    401,
 					Success: false,
-					Message: "auth failed!",
+					Message: "auth failed please login!",
 				}
-				c.JSONP(200, res)
+				c.JSONP(401, res)
 				c.AbortWithStatus(401)
 			}
 		}
@@ -231,6 +241,7 @@ func LoginBlog(c *gin.Context) {
 			res.Success = false
 			res.Message = "用户名或密码错误!"
 		} else {
+			res.Jwt = utils.GenJwt(user.Id, user.Username, config.App.Secret)
 			res.Data = user
 			service.SecCache[user.Secret] = &model.UserData{
 				Id:       user.Id,
@@ -372,7 +383,7 @@ func getBooks(pid int64, userid int) []model.BookItem {
 			continue
 		}
 		user := dao.QueryUser(int64(item.AuthorId), "")
-		utils.Log.Info(item.AuthorId, user)
+		//utils.Log.Info(item.AuthorId, user)
 		book := model.BookItem{
 			Id:    item.Id,
 			Title: item.Name,
