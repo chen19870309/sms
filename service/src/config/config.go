@@ -57,6 +57,7 @@ type qiniu struct {
 	Ak     string `json:"ak"`
 	Sk     string `json:"sk"`
 	Cb     string `json:"cb"`
+	Domain string `json:"domain"`
 	Bucket string `json:"bucket"`
 }
 

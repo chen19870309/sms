@@ -24,7 +24,7 @@ type WebS struct {
 }
 
 const _USERDATA = "_USERDATA_"
-const def = "http://r5uiv7l5f.hd-bkt.clouddn.com/bj1.jpeg"
+const def = "/bj1.jpeg"
 
 var service *WebS
 
@@ -108,13 +108,13 @@ func BlogAuth() gin.HandlerFunc {
 		jwtStr := c.Request.Header["Authorization"]
 		//utils.Log.Info("Auth JWT:", jwtStr)
 		if len(jwtStr) != 0 && jwtStr[0] != "" { // 使用jwt校验用户登陆状态
-			text, err := utils.CheckJwt(jwtStr[0], config.App.Secret)
+			userid, err := utils.CheckJwt(jwtStr[0], config.App.Secret)
 			if err != nil {
 				utils.Log.Errorf("Jwt[%v] Auth Failed![%v]", jwtStr, err)
 			} else {
-				utils.Log.Errorf("Jwt[%v] Auth Success![%v]", jwtStr, text)
+				//utils.Log.Errorf("Jwt[%v] Auth Success![%v]", jwtStr, text)
 				user = &model.UserData{
-					Remark: text,
+					Id: userid,
 				}
 			}
 		} else { // 使用Cookie 授权登陆
@@ -133,6 +133,7 @@ func BlogAuth() gin.HandlerFunc {
 			}
 		}
 		if user != nil {
+			utils.Log.Info("Auth User:", user)
 			c.Set(_USERDATA, user)
 		}
 		url := c.Request.URL.String()
@@ -495,7 +496,7 @@ func SearchBlog(c *gin.Context) {
 					Code:  item.Code,
 					Title: item.Title,
 					Sum:   utils.GetSum(item.Content),
-					Pic:   utils.GetPic(item.Content, def),
+					Pic:   utils.GetPic(item.Content, config.Qiniu.Domain+def),
 					Url:   utils.GetBookUrl(item.Code),
 				}
 				rs = append(rs, &data)
@@ -515,7 +516,7 @@ func WaperBlogs(userid, page, pageSize int) []*model.BookItem {
 			Code:       item.Code,
 			Title:      item.Title,
 			Sum:        utils.GetSum(item.Content),
-			Pic:        utils.GetPic(item.Content, def),
+			Pic:        utils.GetPic(item.Content, config.Qiniu.Domain+def),
 			Url:        utils.GetBookUrl(item.Code),
 			Day:        utils.GetMdTags(item.Content),
 			UpdateTime: item.UpdateTime.Format("2006-01-02"),

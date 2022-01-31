@@ -10,7 +10,7 @@ import router from '../router'
  * 拦截器，为请求头添加jwt信息
  */
 let http = axios.create({
-  baseURL: 'http://124.223.2.135/blog',
+  baseURL: 'https://www.xiaoxibaby.xyz/blog',
   timeout: 10000
 })
 

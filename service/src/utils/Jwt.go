@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -30,19 +31,22 @@ func GenJwt(userid int64, username, secret string) string {
 	return jwtStr
 }
 
-func CheckJwt(jwtStr, secret string) (string, error) {
+func CheckJwt(jwtStr, secret string) (int64, error) {
 	args := strings.Split(jwtStr, " ")
 	if len(args) == 2 && args[0] == "token" {
 		jwtStr = args[1]
+	} else {
+		return -1, errors.New("Wrong type of jwt token!")
 	}
-	token, err := jwt.Parse(jwtStr, func(token *jwt.Token) (interface{}, error) {
+	claims := &jwtCustomClaims{}
+	token, err := jwt.ParseWithClaims(jwtStr, claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return -1, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(secret), nil
 	})
 	if err != nil {
-		return "", err
+		return -1, err
 	}
-	return token.Raw, token.Claims.Valid()
+	return claims.Uid, token.Claims.Valid()
 }

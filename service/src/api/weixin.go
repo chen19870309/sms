@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/base64"
 	"encoding/xml"
 	"errors"
 	"net/http"
@@ -49,8 +50,10 @@ func check(c *gin.Context) bool {
 func CheckWeixin(c *gin.Context) {
 	// 每次都验证 URL，以判断来源是否合法
 	if !check(c) {
+		utils.Log.Error("CheckWeixin failed!", c.ClientIP())
 		c.AbortWithStatus(http.StatusNonAuthoritativeInfo)
 	} else {
+		utils.Log.Info("CheckWeixin OK!", c.ClientIP(), "|", c.Query("echostr"))
 		c.Writer.Write([]byte(c.Query("echostr")))
 	}
 }
@@ -58,12 +61,15 @@ func CheckWeixin(c *gin.Context) {
 func HandleWxMesage(c *gin.Context) {
 	// 每次都验证 URL，以判断来源是否合法
 	if !check(c) {
+		utils.Log.Error("CheckWeixin failed!", c.ClientIP())
 		c.AbortWithStatus(http.StatusNonAuthoritativeInfo)
 	} else {
 		msg, err := parseBody(c)
 		if err != nil {
+			utils.Log.Error("parseBody failed!", err)
 			c.AbortWithError(http.StatusBadRequest, err)
 		} else {
+			utils.Log.Info("HandleMessage !", msg)
 			reply := weixin.HandleMessage(msg)
 			// 如果返回为 nil，则默认返回""
 			ret := []byte("")
@@ -99,8 +105,11 @@ func parseBody(c *gin.Context) (msg *weixin.Message, err error) {
 		if !weixin.CheckSignature(config.WX.Token, c.Query("timestamp"), c.Query("nonce"), encMsg.Encrypt, c.Query("msg_signature")) {
 			return nil, errors.New("check signature error")
 		}
-
-		body, err = weixin.DecryptMsg(encMsg.Encrypt, []byte(config.WX.EncodingAeskey), config.WX.AppId)
+		keys, err := base64.StdEncoding.DecodeString(config.WX.EncodingAeskey + "=")
+		if err != nil {
+			return nil, err
+		}
+		body, err = weixin.DecryptMsg(encMsg.Encrypt, keys, config.WX.AppId)
 		if err != nil {
 			return nil, err
 		}
@@ -142,7 +151,11 @@ func packReply(reply weixin.ReplyMsg, encryptType, timestamp, nonce string) (ret
 
 	// 如果接收的消息加密了，那么回复的消息也需要签名加密
 	if encryptType == "aes" {
-		b64Enc, err := weixin.EncryptMsg(ret, []byte(config.WX.EncodingAeskey), config.WX.AppId)
+		keys, err := base64.StdEncoding.DecodeString(config.WX.EncodingAeskey + "=")
+		if err != nil {
+			return nil, err
+		}
+		b64Enc, err := weixin.EncryptMsg(ret, keys, config.WX.AppId)
 		if err != nil {
 			return nil, err
 		}

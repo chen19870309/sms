@@ -17,11 +17,18 @@ export default[
   {
     path: '/',
     name: 'index',
-    component: BlogIndex
+    component: BlogIndex,
+    meta: {
+      title: '个人中心'
+    }
   },
   {
     path: '/user',
-    component: Personal
+    name: 'user',
+    component: Personal,
+    meta: {
+      title: '个人中心'
+    }
   },
   {
     path: '/hello',
@@ -29,7 +36,10 @@ export default[
   },
   {
     path: '/tools',
-    component: JsonTool
+    component: JsonTool,
+    meta: {
+      title: 'web工具'
+    }
   },
   {
     path: '/login',
@@ -54,12 +64,18 @@ export default[
   {
     path: '/menu',
     name: 'menu',
-    component: Menu
+    component: Menu,
+    meta: {
+      title: '导航菜单'
+    }
   },
   {
     path: '/cache',
     name: 'cache',
-    component: BlogCache
+    component: BlogCache,
+    meta: {
+      title: '草稿箱'
+    }
   },
   {
     path: '/401',

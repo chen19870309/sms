@@ -3,7 +3,7 @@
         <div class="hdr-wrapper section-inner">
             <div class="hdr-left">
                 <div class="site-branding">
-                    <a href="/">Hola-CosMos</a>
+                    <a href="/">日常和技术笔记</a>
                 </div>
             </div>
             <div class="hdr-right">

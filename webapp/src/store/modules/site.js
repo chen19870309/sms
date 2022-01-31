@@ -2,9 +2,9 @@ import * as types from '../mutation-types'
 import storage from '@/utils/storage'
 const state = {
   siteinfo: {
-    name: '',
-    url: '',
-    beian: ''
+    name: '日常和技术笔记',
+    url: 'www.xiaoxibaby.xyz',
+    beian: '浙ICP备2022003375号-1'
   }
 }
 

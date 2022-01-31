@@ -5,6 +5,7 @@ import (
 	"sms/service/src/api/model"
 	"sms/service/src/config"
 	"sms/service/src/utils"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/qiniu/go-sdk/v7/storage"
@@ -42,9 +43,9 @@ func QiniuUpToken(c *gin.Context) {
 	tk := make(map[string]string)
 	tk["token"] = config.GetSimpleUpToken()
 	tk["create_time"] = utils.GetStdTime()
-	tk["domain"] = "http://r5uiv7l5f.hd-bkt.clouddn.com"
-	tk["bucket"] = "sp2022"
-	tk["prefix"] = "test"
+	tk["domain"] = config.Qiniu.Domain
+	tk["bucket"] = config.Qiniu.Bucket
+	tk["prefix"] = time.Now().Format("20060102_")
 	res := model.Response{
 		Code:    0,
 		Success: true,
