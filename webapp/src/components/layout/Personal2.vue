@@ -27,6 +27,7 @@
             </div>
             <div class="user-left-n clearfix">
                 <a href="#" class="btn btn-success infos"  @click.prevent="newblog" ><Icon type="md-paper" />&nbsp;开始写作</a>
+                <a href="#" class="btn btn-dashed ghost"  @click.prevent="godraft" ><Icon type="md-paper" />&nbsp;草稿箱</a>
                 <a href="#" class="btn btn-warning" @click.prevent="Model = true"><Icon type="md-alert" />&nbsp;修改密码</a>
             </div>
         </div>
@@ -36,6 +37,7 @@
                     <TabPane id="user-article" label="我的文章">
                         <List header="文章列表" border size="small">
                           <ListItem v-for="mk in markds" :key="mk.id">
+                              <Icon type="ios-archive" v-show="mk.status == 0" />
                               <Icon type="md-eye" v-show="mk.status == 1" />
                               <Icon type="ios-person" v-show="mk.status == 2" />
                               <a href="#" @click.prevent="editblog(mk.code)">#[{{ mk.id }}]|{{mk.updatetime}}|.[{{ mk.title }}]</a></ListItem>
@@ -86,8 +88,8 @@
 <upload :uptoken='qiniuuptoken'
         :filename='filename'
         browse_button='pickfile'
-        domain='http://r5uiv7l5f.hd-bkt.clouddn.com'
-        bucket_name='sp2022'
+        :domain='domian'
+        :bucket_name='bucketname'
         @on-percent='filePercent'
         @on-change='uploaded'>
         <Button type="ghost" id='pickfile' slot='button'>选择文件</Button>
@@ -122,6 +124,8 @@ export default {
       newpwd: '',
       markds: [],
       qiniuuptoken: '',
+      domain: '',
+      bucketname: '',
       up_percent: 0,
       filename: 'test',
       page: {
@@ -144,6 +148,9 @@ export default {
       NetWorking.doGet(API.uptoken).then(response => {
         console.log("UpToken:",response.data)
         this.qiniuuptoken = response.data.token
+        this.filename = response.data.prefix
+        this.domain = response.data.domain
+        this.bucketname =  response.data.backet
       },(message) => {
           this.$Message.error('Get User MarkDown Files Failed!' + message)
       })
@@ -159,6 +166,11 @@ export default {
           title: 'Update Info Failed!!',
           desc: message
         })
+      })
+    },
+    godraft () {
+      this.$router.push({ path: '/cache' }).catch(err => {
+        console.log('godraft!')
       })
     },
     newblog () {

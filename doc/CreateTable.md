@@ -144,3 +144,35 @@ create table tb_resource(
   expire_time timestamp default CURRENT_TIMESTAMP
 );
 ```
+
+## 5.卡片资源表
+```
+--mysql
+create table tb_card_res(
+    id bigint(20) not null auto_increment,
+    res_type varchar(64) not null default 'word',
+    pic varchar(128) not null default '',
+    sound varchar(128) not null default '',
+    pinyin varchar(64) not null default '',
+    scope varchar(64) not null default '',
+    gp varchar(32) not null default '',
+    create_time datetime default CURRENT_TIMESTAMP ,
+    expire_time datetime default CURRENT_TIMESTAMP,
+    primary key(id)
+) default charset=utf8;
+--postgres
+drop table tb_card_res;
+create table tb_card_res(
+    id serial primary key,
+    res_type varchar(64) not null default 'word',
+    data text,
+    word varchar(10) not null default '',
+    pic varchar(128) not null default '',
+    sound varchar(128) not null default '',
+    pinyin varchar(64) not null default '',
+    scope varchar(64) not null default '',
+    gp varchar(32) not null default '',
+    create_time timestamp default CURRENT_TIMESTAMP ,
+    expire_time timestamp default CURRENT_TIMESTAMP
+);
+```

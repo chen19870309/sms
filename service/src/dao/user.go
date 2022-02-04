@@ -177,3 +177,39 @@ func RegistUser(username, password, email, code, ip string) (*model.SmsUser, err
 	}
 	return user, nil
 }
+
+func SaveWxUser(openid, nickname, icon, data string) (*model.SmsUser, error) {
+	if openid == "" {
+		return nil, errors.New("openid is empty!")
+	}
+	user := &model.SmsUser{}
+	result := database.Table(TB_USER).Where("username = ?  and status in (0,1,2,3)", openid).First(user)
+	if result.Error != nil && result.Error.Error() != "record not found" {
+		return nil, result.Error
+	}
+	if user.Id > 0 {
+		user.UpdateTime = time.Now()
+		err := SaveUser(user)
+		return user, err
+	}
+	// 创建账号密码
+	user = &model.SmsUser{
+		Code:       utils.Gen8RCode(),
+		CreateTime: time.Now(),
+		UpdateTime: time.Now(),
+		Level:      3,
+		Status:     1,
+		Icon:       icon,
+		Nickname:   "新来的:" + nickname,
+		Username:   openid,
+		Secret:     "",
+		Remark:     data,
+		Email:      "",
+		LoginIp:    "",
+	}
+	result = database.Debug().Table(TB_USER).Create(user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return user, nil
+}

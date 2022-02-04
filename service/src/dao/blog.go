@@ -149,6 +149,9 @@ func PutBlog(code, data string, userid uint) *model.BlogCtx {
 		} else {
 			blog.Status = 1 //公开blog
 		}
+		if strings.Contains(blog.Tags, "scope") && strings.Contains(blog.Tags, "cardres") { //卡片资源
+			go SaveCardInfo(data)
+		}
 		SaveBlog(blog)
 		pid, err := CreateMonthMenu()
 		if err != nil {

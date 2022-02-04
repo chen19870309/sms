@@ -2,11 +2,14 @@ package api
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"net/http"
 	"sms/service/src/api/handler"
+	"sms/service/src/api/model"
 	"sms/service/src/config"
+	"sms/service/src/dao"
 	"sms/service/src/utils"
 
 	"github.com/arstd/weixin"
@@ -36,6 +39,63 @@ func InitWeixinService(web *WebS) {
 	wx := service.Serv.Group("weixin")
 	wx.GET("", CheckWeixin)
 	wx.POST("", HandleWxMesage)
+	wx.GET("/words", DealGetWords)
+	wx.POST("/:appid/login", DealLoginWX)
+}
+
+func DealGetWords(c *gin.Context) {
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+	}
+	data := []*model.Word{}
+	ls, err := dao.QueryScopedCard(c.Query("scope"), "words", c.Query("group"), 10)
+	if err != nil {
+		res.Success = false
+		res.Message = err.Error()
+	} else {
+		for _, a := range ls {
+			item := &model.Word{
+				Id:     int(a.Id),
+				Word:   a.Word,
+				PinYin: a.Pinyin,
+				Pic:    a.Pic,
+				Sound:  a.Sound,
+				Scope:  a.Scope,
+				Group:  a.Gp,
+			}
+			data = append(data, item)
+		}
+		res.Data = data
+	}
+	c.JSONP(200, res)
+}
+
+func DealLoginWX(c *gin.Context) {
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+	}
+	appid := c.Param("appid")
+	params := make(map[string]string)
+	body, err := c.GetRawData()
+	utils.Log.Infof("GetRawData:%v", err)
+	err = json.Unmarshal(body, &params)
+	utils.Log.Infof("DealLoginWX:%v|%v", appid, params)
+	secret := "f9e9734c2310119423c9cf726c5bc209"
+	resp, err := weixin.MiniLogin(appid, secret, params["code"])
+	utils.Log.Infof("MiniLogin:%v|%v", resp, err)
+	if err == nil && resp.ErrCode == 0 {
+		user, err := weixin.GetUserInfo(resp.OpenId, weixin.LangZHCN)
+		utils.Log.Infof("GetUserInfo:%v|%v", user, err)
+		b, _ := json.Marshal(user)
+		u, err := dao.SaveWxUser(user.OpenId, user.NickName, user.HeadImgURL, string(b))
+		utils.Log.Infof("SaveWxUser:%v|%v", u, err)
+		res.Data = u
+	}
+	c.JSONP(200, res)
 }
 
 func check(c *gin.Context) bool {
