@@ -4,13 +4,24 @@ import (
 	"fmt"
 	"sms/service/src/dao/model"
 	"sms/service/src/utils"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/Chain-Zhang/pinyin"
 	"github.com/jinzhu/gorm"
 )
 
 const TB_CARD_RES = "tb_card_res"
+
+func GetWordById(id int) *model.CardRes {
+	card := &model.CardRes{}
+	database.Debug().Table(TB_CARD_RES).Where("res_type = 'words' and id = ?", id).First(card)
+	if card.Id > 0 {
+		return card
+	}
+	return nil
+}
 
 func SaveCardRes(ctx *model.CardRes) error {
 	utils.Log.Infof("SaveCardRes[%v]", ctx)
@@ -72,7 +83,16 @@ func SaveCardInfo(data string) {
 		if strings.HasPrefix(str, "## ") {
 			beginCard = true
 			items := strings.Split(str, " ")
-			if len(items) == 3 {
+			if len(items) == 2 {
+				card.Word = items[1]
+				py, err := pinyin.New(card.Word).Split(" ").Mode(pinyin.Tone).Convert()
+				if err != nil {
+					card.Pinyin = ""
+					utils.Log.Errorf("pinyin Convert(%v) => error [%v]", card.Word, err)
+				} else {
+					card.Pinyin = py
+				}
+			} else if len(items) == 3 {
 				card.Word = items[1]
 				card.Pinyin = items[2]
 			} else {
@@ -95,7 +115,58 @@ func SaveCardInfo(data string) {
 	}
 }
 
-func QueryScopedCard(scope, ResType, gp string, pageSize int) ([]*model.CardRes, error) {
+func GetResScopes(userid, resType string) map[string]interface{} {
+	res := make(map[string]interface{})
+	rs := make([]model.UserScopeCount, 0)
+	sp1 := model.UserScopeCount{
+		Scope: "生字本",
+		Gp:    "private",
+	}
+	sp2 := model.UserScopeCount{
+		Scope: "已学会",
+		Gp:    "private",
+	}
+	result := database.Debug().Table(TB_CARD_RES).Select("scope, gp, count(id) as cnt").Group("scope,gp").Where("res_type = 'words'").Find(&rs)
+	if result.Error != nil {
+		utils.Log.Error("GetResScopes:", result.Error)
+	} else {
+		for _, item := range rs {
+			sp1.Cnt += CountUserScopeWords(userid, item.Scope, item.Gp, 1) //获取用户导入生字
+			c1 := CountUserScopeWords(userid, item.Scope, item.Gp, 1)      //获取用户已学会字数
+			item.Ucnt = c1
+			sp2.Cnt += c1
+			res[item.Scope] = item
+		}
+	}
+	//添加生字本
+	res[sp1.Scope] = sp1
+	//添加已学会
+	res[sp2.Scope] = sp2
+	return res
+}
+
+func CountUserScopeWords(userid, scope, gp string, status int) int {
+	ucnt := 0
+	result := database.Debug().Table(TB_USER_CARD_RES).Where("userid = ? and status = ? and scope = ? and gp = ?", userid, status, scope, gp).Count(&ucnt)
+	if result.Error != nil {
+		utils.Log.Error("CountUserScopeWords:", result.Error)
+	} else {
+		return ucnt
+	}
+	return 0
+}
+
+func QueryScopedCard(userid, scope, ResType, gp string, pageSize int) ([]*model.CardRes, error) {
+	if userid != "" {
+		uid, err := strconv.Atoi(userid)
+		if err == nil {
+			res, err := QueryUserStdWordCards(scope, gp, pageSize, uid)
+			if err == nil {
+				return res, err
+			}
+		}
+		utils.Log.Error("QueryUserStdWordCards:", err)
+	}
 	cards := []*model.CardRes{}
 	key := fmt.Sprintf("WORD_%v_%v_%v_%d", scope, ResType, gp, pageSize)
 	data, ok := utils.GetCache(key)
@@ -105,14 +176,62 @@ func QueryScopedCard(scope, ResType, gp string, pageSize int) ([]*model.CardRes,
 	}
 	var result *gorm.DB
 	if gp != "" {
-		result = database.Debug().Table(TB_CARD_RES).Limit(pageSize).Where("scope = ? and res_type = ? and gp = ?", scope, ResType, gp).Order("id desc").Find(&cards)
+		result = database.Table(TB_CARD_RES).Limit(pageSize).Where("scope = ? and res_type = ? and gp = ?", scope, ResType, gp).Order("id desc").Find(&cards)
 	} else { //查询公开的blog
-		result = database.Debug().Table(TB_CARD_RES).Limit(pageSize).Where("scope = ? and res_type = ? and gp = 'PB'", scope, ResType).Order("id desc").Find(&cards)
+		result = database.Table(TB_CARD_RES).Limit(pageSize).Where("scope = ? and res_type = ? and gp = 'PB'", scope, ResType).Order("id desc").Find(&cards)
 	}
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	// 缓存新字列表30分钟，较少数据库查询
 	utils.SetCache(key, cards, 30*time.Minute)
+	return cards, nil
+}
+
+func QueryUserStdWordCards(scope, group string, pageSize, userid int) ([]*model.CardRes, error) {
+	cards := []*model.CardRes{}
+	var result *gorm.DB
+	sub := database.Debug().Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 1", userid).SubQuery()
+	if scope == "生字本" {
+		sub = database.Debug().Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 0", userid).SubQuery()
+	}
+	result = database.Debug().Table(TB_CARD_RES).Limit(pageSize).Where("res_type = 'words' and id in ?", sub).Order("id desc").Find(&cards)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	if len(cards) > 0 {
+		return cards, nil
+	}
+	ls, err := GetUserCardsByScope(scope, group, userid, 0, pageSize)
+	if err != nil {
+		return nil, err
+	}
+	if len(ls) < pageSize { //没有生字或者生字不满足本次请求page数量
+		//已学会
+		sub := database.Debug().Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 1", userid).SubQuery()
+		//查询未学的字
+		result = database.Debug().Table(TB_CARD_RES).Limit(pageSize).Where("scope = ? and gp = ? and res_type = 'words' and id NOT in ?", scope, group, sub).Order("id desc").Find(&cards)
+		if result.Error != nil {
+			return nil, result.Error
+		}
+		if len(cards) > 0 {
+			for _, word := range cards {
+				NewUserCardRes(&model.UserCardRes{
+					Userid: int64(userid),
+					ResId:  word.Id,
+					Scope:  word.Scope,
+					Gp:     word.Gp,
+					Word:   word.Word,
+					Status: 0, //添加到生字本
+				})
+			}
+		}
+	}
+	//重新拉取生字
+	sub = database.Debug().Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 0", userid).SubQuery()
+	result = database.Debug().Table(TB_CARD_RES).Limit(pageSize).Where("scope = ? and gp = ? and res_type = 'words' and id in ? ", scope, group, sub).Order("id desc").Find(&cards)
+	if result.Error != nil {
+		return nil, result.Error
+	}
 	return cards, nil
 }

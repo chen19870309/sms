@@ -148,9 +148,12 @@ create table tb_resource(
 ## 5.卡片资源表
 ```
 --mysql
+drop table tb_card_res;
 create table tb_card_res(
     id bigint(20) not null auto_increment,
     res_type varchar(64) not null default 'word',
+    data text,
+    word varchar(10) not null default '',
     pic varchar(128) not null default '',
     sound varchar(128) not null default '',
     pinyin varchar(64) not null default '',
@@ -175,4 +178,36 @@ create table tb_card_res(
     create_time timestamp default CURRENT_TIMESTAMP ,
     expire_time timestamp default CURRENT_TIMESTAMP
 );
+```
+
+## 6.用户资源表
+```
+drop table tb_user_card_res;
+create table tb_user_card_res(
+    id bigint(20) not null auto_increment,
+    userid bigint(20) not null ,
+    res_id bigint(20) not null ,
+    word varchar(10) not null default '',
+    scope varchar(64) not null default '',
+    gp varchar(32) not null default '',
+    create_time datetime default CURRENT_TIMESTAMP ,
+    update_time datetime default CURRENT_TIMESTAMP,
+    status int not null default 0 comment '0生字,1已学会',
+    remark text,
+    primary key(id)
+) default charset=utf8;
+
+create table tb_user_card_res(
+    id serial primary key,
+    userid integer not null ,
+    res_id integer not null ,
+    word varchar(10) not null default '',
+    scope varchar(64) not null default '',
+    gp varchar(32) not null default '',
+    create_time timestamp default CURRENT_TIMESTAMP ,
+    update_time timestamp default CURRENT_TIMESTAMP,
+    status int not null default 0 comment '0生字,1已学会',
+    remark text,
+    primary key(id)
+)
 ```

@@ -40,6 +40,12 @@ func ServiceUpload(key string) {
 }
 
 func QiniuUpToken(c *gin.Context) {
+	data, ok := utils.GetCache("QiniuUpToken")
+	if ok {
+		res := data.(model.Response)
+		c.JSONP(200, res)
+		return
+	}
 	tk := make(map[string]string)
 	tk["token"] = config.GetSimpleUpToken()
 	tk["create_time"] = utils.GetStdTime()
@@ -52,5 +58,6 @@ func QiniuUpToken(c *gin.Context) {
 		Message: "ok",
 		Data:    tk,
 	}
+	utils.SetCache("QiniuUpToken", res, 2*time.Minute)
 	c.JSONP(200, res)
 }

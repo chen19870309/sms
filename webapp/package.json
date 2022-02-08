@@ -19,6 +19,7 @@
     "less": "^2.7.3",
     "qiniu-upload-vue": "^1.0.0",
     "vue": "^2.5.2",
+    "vue-cropper": "^0.5.8",
     "vue-json-viewer": "^2.2.21",
     "vue-markdown": "^2.1.0",
     "vue-meditor": "^2.1.1",

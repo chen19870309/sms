@@ -9,3 +9,10 @@ type Word struct {
 	Scope  string `json:"scope"`
 	Group  string `json:"group"`
 }
+
+type CheckWord struct {
+	Word
+	OpenId string `json:"openid"`
+	Userid int    `json:"userid"`
+	Status int    `json:"status"`
+}

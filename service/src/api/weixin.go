@@ -39,8 +39,10 @@ func InitWeixinService(web *WebS) {
 	wx := service.Serv.Group("weixin")
 	wx.GET("", CheckWeixin)
 	wx.POST("", HandleWxMesage)
-	wx.GET("/words", DealGetWords)
-	wx.POST("/:appid/login", DealLoginWX)
+	wx.GET("/scopes", DealScopes)         //获取字库分类
+	wx.GET("/words", DealGetWords)        //获取字库
+	wx.POST("/words", DealCheckWords)     //更新个人字库
+	wx.POST("/:appid/login", DealLoginWX) //小程序用户登陆
 }
 
 func DealGetWords(c *gin.Context) {
@@ -50,7 +52,7 @@ func DealGetWords(c *gin.Context) {
 		Message: "ok",
 	}
 	data := []*model.Word{}
-	ls, err := dao.QueryScopedCard(c.Query("scope"), "words", c.Query("group"), 10)
+	ls, err := dao.QueryScopedCard(c.Query("userid"), c.Query("scope"), "words", c.Query("group"), 10)
 	if err != nil {
 		res.Success = false
 		res.Message = err.Error()
@@ -68,7 +70,41 @@ func DealGetWords(c *gin.Context) {
 			data = append(data, item)
 		}
 		res.Data = data
+		res.Count = len(data)
 	}
+	c.JSONP(200, res)
+}
+
+func DealCheckWords(c *gin.Context) {
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+	}
+	check := &model.CheckWord{}
+	err := ParseData(c, check)
+	if err == nil {
+		if check.Id > 0 && check.Userid > 0 {
+			//check.Status = 0 生字本 1 熟悉字本
+			err = dao.EditUserCardRes(check.Userid, check.Id, check.Status)
+		} else {
+			err = errors.New("check params failed!")
+		}
+	}
+	if err != nil {
+		res.Success = false
+		res.Message = err.Error()
+	}
+	c.JSONP(200, res)
+}
+
+func DealScopes(c *gin.Context) {
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+	}
+	res.Data = dao.GetResScopes(c.Query("userid"), "words")
 	c.JSONP(200, res)
 }
 

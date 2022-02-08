@@ -7,6 +7,8 @@ import store from '@/store'
 import md5 from 'js-md5'
 import less from 'less'
 import iView from 'iview'
+import VueCropper from 'vue-cropper'
+// import 'vue-cropper/dist/index.css'
 import 'iview/dist/styles/iview.css'
 
 import './assets/css/webapp.css'
@@ -16,6 +18,7 @@ Vue.use(VueParticles)
 
 Vue.use(iView)
 Vue.use(less)
+Vue.use(VueCropper)
 
 Vue.config.productionTip = false
 Vue.prototype.$md5 = md5
