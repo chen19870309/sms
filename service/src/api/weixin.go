@@ -16,6 +16,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var aeskey []byte
+
 func InitWeixinService(web *WebS) {
 	weixin.Initialize(config.WX.OrignId, config.WX.AppId, config.WX.AppSecret, config.WX.Token, config.WX.EncodingAeskey)
 
@@ -201,11 +203,7 @@ func parseBody(c *gin.Context) (msg *weixin.Message, err error) {
 		if !weixin.CheckSignature(config.WX.Token, c.Query("timestamp"), c.Query("nonce"), encMsg.Encrypt, c.Query("msg_signature")) {
 			return nil, errors.New("check signature error")
 		}
-		keys, err := base64.StdEncoding.DecodeString(config.WX.EncodingAeskey + "=")
-		if err != nil {
-			return nil, err
-		}
-		body, err = weixin.DecryptMsg(encMsg.Encrypt, keys, config.WX.AppId)
+		body, err = weixin.DecryptMsg(encMsg.Encrypt, getAesKey(), config.WX.AppId)
 		if err != nil {
 			return nil, err
 		}
@@ -219,6 +217,13 @@ func parseBody(c *gin.Context) (msg *weixin.Message, err error) {
 	}
 
 	return msg, nil
+}
+
+func getAesKey() []byte {
+	if aeskey == nil || len(aeskey) != 32 {
+		aeskey, _ = base64.StdEncoding.DecodeString(config.WX.EncodingAeskey + "=")
+	}
+	return aeskey
 }
 
 func packReply(reply weixin.ReplyMsg, encryptType, timestamp, nonce string) (ret []byte, err error) {
@@ -247,11 +252,7 @@ func packReply(reply weixin.ReplyMsg, encryptType, timestamp, nonce string) (ret
 
 	// 如果接收的消息加密了，那么回复的消息也需要签名加密
 	if encryptType == "aes" {
-		keys, err := base64.StdEncoding.DecodeString(config.WX.EncodingAeskey + "=")
-		if err != nil {
-			return nil, err
-		}
-		b64Enc, err := weixin.EncryptMsg(ret, keys, config.WX.AppId)
+		b64Enc, err := weixin.EncryptMsg(ret, getAesKey(), config.WX.AppId)
 		if err != nil {
 			return nil, err
 		}

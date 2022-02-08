@@ -40,7 +40,7 @@ func AutoSaveBlog(code, theme, data string, authorid uint) error {
 		Title:      utils.GetMdTitle(data),
 		Tags:       utils.GetMdTags(data),
 	}
-	result := database.Debug().Table(TB_BLOG).Where("code = ? and author_id = ?", code, authorid).Update(blog)
+	result := database.Table(TB_BLOG).Where("code = ? and author_id = ?", code, authorid).Update(blog)
 	if result.Error != nil {
 		return result.Error
 	}

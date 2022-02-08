@@ -206,8 +206,7 @@ create table tb_user_card_res(
     gp varchar(32) not null default '',
     create_time timestamp default CURRENT_TIMESTAMP ,
     update_time timestamp default CURRENT_TIMESTAMP,
-    status int not null default 0 comment '0生字,1已学会',
-    remark text,
-    primary key(id)
-)
+    status int not null default 0,
+    remark text
+);
 ```
