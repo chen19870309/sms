@@ -207,7 +207,7 @@ func SaveWxUser(openid, nickname, icon, data string) (*model.SmsUser, error) {
 		Email:      "",
 		LoginIp:    "",
 	}
-	result = database.Debug().Table(TB_USER).Create(user)
+	result = database.Table(TB_USER).Create(user)
 	if result.Error != nil {
 		return nil, result.Error
 	}

@@ -41,8 +41,6 @@ func EchoMsgText(m *weixin.RecvText) weixin.ReplyMsg {
 }
 
 func EchoMsgImage(m *weixin.RecvImage) weixin.ReplyMsg {
-	utils.Log.Infof("%+v", m)
-
 	// echo message
 	ret := &weixin.ReplyImage{
 		ToUserName:   m.FromUserName,
@@ -52,12 +50,11 @@ func EchoMsgImage(m *weixin.RecvImage) weixin.ReplyMsg {
 		MediaId:      m.MediaId,
 	}
 
-	utils.Log.Infof("%+v", ret)
+	utils.Log.Infof("EchoMsgImage:%+v", ret)
 	return ret
 }
 
 func EchoMsgVoice(m *weixin.RecvVoice) weixin.ReplyMsg {
-	utils.Log.Infof("%+v", m)
 
 	// echo message
 	ret := &weixin.ReplyVoice{
@@ -67,13 +64,11 @@ func EchoMsgVoice(m *weixin.RecvVoice) weixin.ReplyMsg {
 		MediaId:      m.MediaId,
 	}
 
-	utils.Log.Infof("%+v", ret)
+	utils.Log.Infof("EchoMsgVoice:%+v", ret)
 	return ret
 }
 
 func EchoMsgVideo(m *weixin.RecvVideo) weixin.ReplyMsg {
-	utils.Log.Infof("%+v", m)
-
 	// MediaId ???
 	ret := &weixin.ReplyVideo{
 		ToUserName:   m.FromUserName,
@@ -84,7 +79,7 @@ func EchoMsgVideo(m *weixin.RecvVideo) weixin.ReplyMsg {
 		Description:  "thist is a test desc...",
 	}
 
-	utils.Log.Infof("%+v", ret)
+	utils.Log.Infof("EchoMsgVideo:%+v", ret)
 	return ret
 }
 

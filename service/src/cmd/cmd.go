@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"sms/service/src/config"
+	"sms/service/src/utils"
 	"strconv"
 	"strings"
 	"sync"
@@ -40,7 +40,7 @@ func (p *program) Init(env svc.Environment) error {
 
 func (p *program) Start() error {
 	addr := fmt.Sprintf(":%d", config.App.ListenPort)
-	log.Println("Address:", addr)
+	utils.Log.Info("Address:", addr)
 	go p.blog.Serv.Run(addr)
 	return nil
 }
@@ -48,7 +48,7 @@ func (p *program) Start() error {
 func (p *program) Stop() error {
 	p.once.Do(func() {
 		// exit
-		log.Println("call stop!")
+		utils.Log.Info("call stop!")
 		api.CloseEngine()
 	})
 	return nil

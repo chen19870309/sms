@@ -53,11 +53,21 @@ func NewAuthCode(userid int64, code string) error {
 }
 
 func CheckAuthCode(code string) *model.SmsUser {
-	res := &model.Resource{}
-	result := database.Table(TB_RESOURCE).Where("res_type = 'account' and res_val = ?", code).First(res)
-	//utils.Log.Infof("CheckAuthCode(%v)=>[%v]", code, result)
-	if result.Error != nil {
+	if code == "" {
 		return nil
+	}
+	res := &model.Resource{}
+	key := "RES_" + code
+	data, ok := utils.GetCache(key)
+	if ok {
+		res = data.(*model.Resource)
+	} else {
+		result := database.Table(TB_RESOURCE).Where("res_type = 'account' and res_val = ?", code).First(res)
+		utils.Log.Infof("CheckAuthCode(%v)=>[%v]", code, result)
+		if result.Error != nil {
+			return nil
+		}
+		utils.SetCache(key, res, 2*time.Minute)
 	}
 	if res.ExpireTime.Before(time.Now()) {
 		return nil

@@ -100,7 +100,6 @@ func BlogAuth() gin.HandlerFunc {
 		if err != nil {
 			utils.Log.Error("GetRawData Failed!:", err)
 		} else {
-			utils.Log.Infof("req=[%v]", string(data))
 			c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(data)) // 关键点
 		}
 		ok := true
@@ -137,6 +136,7 @@ func BlogAuth() gin.HandlerFunc {
 			c.Set(_USERDATA, user)
 		}
 		url := c.Request.URL.String()
+		utils.Log.Infof("[%v]uri=[%v] IP=[%v] req=[%v]", c.Request.Method, url, c.ClientIP(), string(data))
 		if strings.Contains(url, "newblog") || strings.Contains(url, "save") || strings.Contains(url, "blogcaches") || strings.Contains(url, "edit") {
 			if user == nil {
 				ok = false

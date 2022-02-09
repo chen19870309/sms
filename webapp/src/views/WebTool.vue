@@ -281,7 +281,7 @@ export default {
         let size = this.fileSize(pic);
         var file = this.exam.target.files[0]
         let key = this.qiniu.prefix + file.name;
-        let url = "http://upload.qiniu.com/putb64/"+size+"/key/"+Base64.encode(key);   
+        let url = "https://upload.qiniup.com/putb64/"+size+"/key/"+Base64.encode(key);   
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange=function(){
           if (xhr.readyState==4){//上传成功

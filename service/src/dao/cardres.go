@@ -120,21 +120,30 @@ func GetResScopes(userid, resType string) map[string]interface{} {
 	rs := make([]model.UserScopeCount, 0)
 	sp1 := model.UserScopeCount{
 		Scope: "生字本",
+		Color: "orange",
+		Icon:  "favor",
 		Gp:    "private",
 	}
 	sp2 := model.UserScopeCount{
 		Scope: "已学会",
+		Color: "green",
+		Icon:  "favorfill",
 		Gp:    "private",
 	}
-	result := database.Debug().Table(TB_CARD_RES).Select("scope, gp, count(id) as cnt").Group("scope,gp").Where("res_type = 'words'").Find(&rs)
+	result := database.Table(TB_CARD_RES).Select("scope, gp, count(id) as cnt").Group("scope,gp").Where("res_type = 'words'").Find(&rs)
 	if result.Error != nil {
 		utils.Log.Error("GetResScopes:", result.Error)
 	} else {
 		for _, item := range rs {
-			sp1.Cnt += CountUserScopeWords(userid, item.Scope, item.Gp, 1) //获取用户导入生字
+			sp1.Cnt += CountUserScopeWords(userid, item.Scope, item.Gp, 0) //获取用户导入生字
 			c1 := CountUserScopeWords(userid, item.Scope, item.Gp, 1)      //获取用户已学会字数
 			item.Ucnt = c1
 			sp2.Cnt += c1
+			item.Color = "cyan"
+			item.Icon = "favor"
+			if c1 == item.Cnt {
+				item.Icon = "favorfill"
+			}
 			res[item.Scope] = item
 		}
 	}
@@ -147,7 +156,7 @@ func GetResScopes(userid, resType string) map[string]interface{} {
 
 func CountUserScopeWords(userid, scope, gp string, status int) int {
 	ucnt := 0
-	result := database.Debug().Table(TB_USER_CARD_RES).Where("userid = ? and status = ? and scope = ? and gp = ?", userid, status, scope, gp).Count(&ucnt)
+	result := database.Table(TB_USER_CARD_RES).Where("userid = ? and status = ? and scope = ? and gp = ?", userid, status, scope, gp).Count(&ucnt)
 	if result.Error != nil {
 		utils.Log.Error("CountUserScopeWords:", result.Error)
 	} else {
@@ -191,11 +200,11 @@ func QueryScopedCard(userid, scope, ResType, gp string, pageSize int) ([]*model.
 func QueryUserStdWordCards(scope, group string, pageSize, userid int) ([]*model.CardRes, error) {
 	cards := []*model.CardRes{}
 	var result *gorm.DB
-	sub := database.Debug().Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 1", userid).SubQuery()
+	sub := database.Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 1", userid).SubQuery()
 	if scope == "生字本" {
-		sub = database.Debug().Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 0", userid).SubQuery()
+		sub = database.Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 0", userid).SubQuery()
 	}
-	result = database.Debug().Table(TB_CARD_RES).Limit(pageSize).Where("res_type = 'words' and id in ?", sub).Order("id desc").Find(&cards)
+	result = database.Table(TB_CARD_RES).Limit(pageSize).Where("res_type = 'words' and id in ?", sub).Order("id desc").Find(&cards)
 	if result.Error != nil {
 		return nil, result.Error
 	}

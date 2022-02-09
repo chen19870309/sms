@@ -3,6 +3,7 @@ package dao
 import (
 	"log"
 	"sms/service/src/config"
+	"sms/service/src/utils"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -17,6 +18,8 @@ func InitDB() {
 		log.Fatal(err)
 	}
 	db.SingularTable(true)
+	db.LogMode(true)
+	db.SetLogger(utils.Log)
 	db.DB().SetMaxOpenConns(40)
 	db.DB().SetMaxIdleConns(2)
 	database = db

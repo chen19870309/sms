@@ -30,10 +30,10 @@ func ServiceUpload(key string) {
 		},
 	}
 	upToken := config.GetSimpleUpToken()
-	utils.Log.Info("GetSimpleUpToken:", upToken)
+	utils.Log.Info("Qiniu GetSimpleUpToken:", upToken)
 	err := formUploader.PutFile(context.Background(), &ret, upToken, key, base+key, &putExtra)
 	if err != nil {
-		utils.Log.Error("PutFile:", err)
+		utils.Log.Error("Qiniu PutFile:", err)
 		return
 	}
 	utils.Log.Info(ret.Key, "|", ret.Hash)
