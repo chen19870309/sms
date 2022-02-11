@@ -55,7 +55,7 @@ func EditUserCardRes(userid, cardid, status int) error {
 func NewUserCardRes(ctx *model.UserCardRes) (*model.UserCardRes, error) {
 	card := &model.UserCardRes{}
 	var result *gorm.DB
-	result = database.Debug().Table(TB_USER_CARD_RES).Where("res_id = ? and gp = ? and word = ?", ctx.ResId, ctx.Gp, ctx.Word).First(card)
+	result = database.Debug().Table(TB_USER_CARD_RES).Where("userid = ? and res_id = ? and gp = ? and word = ?", ctx.Userid, ctx.ResId, ctx.Gp, ctx.Word).First(card)
 	if result.Error != nil && result.Error.Error() != "record not found" {
 		return nil, result.Error
 	}
@@ -92,7 +92,7 @@ func GetUserCardsByScope(scope, group string, userid, status, pageSize int) ([]*
 		return cards, nil
 	}
 	var result *gorm.DB
-	result = database.Debug().Table(TB_USER_CARD_RES).Limit(pageSize).Where("scope = ? and gp = ? and status = ? and userid = ?", scope, group, status, userid).Order("create_time desc").Find(&cards)
+	result = database.Table(TB_USER_CARD_RES).Limit(pageSize).Where("scope = ? and gp = ? and status = ? and userid = ?", scope, group, status, userid).Order("create_time desc").Find(&cards)
 	if result.Error != nil {
 		return nil, result.Error
 	}

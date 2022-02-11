@@ -1,0 +1,19 @@
+/* pages/xuexi/exam/exam.wxss */
+@import "../../../colorui/animation.wxss";
+.space {
+  margin-top: 2%;
+}
+.card {
+  background-color: #cfdef2 ;
+  margin: 3%;
+  padding-top: 12px;
+  padding: 3%;
+  border: 3rpx solid #cdcdcd;
+  border-radius: 15rpx;
+  text-align:center;
+}
+
+image[class*="gif-"] {
+  border-radius: 6rpx;
+  display: block;
+}

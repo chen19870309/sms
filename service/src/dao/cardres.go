@@ -200,18 +200,18 @@ func QueryScopedCard(userid, scope, ResType, gp string, pageSize int) ([]*model.
 func QueryUserStdWordCards(scope, group string, pageSize, userid int) ([]*model.CardRes, error) {
 	cards := []*model.CardRes{}
 	var result *gorm.DB
-	sub := database.Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 1", userid).SubQuery()
+	sub := database.Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 1", userid).SubQuery() //已学会
 	if scope == "生字本" {
-		sub = database.Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 0", userid).SubQuery()
+		sub = database.Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 0", userid).SubQuery() //生字本
 	}
 	result = database.Table(TB_CARD_RES).Limit(pageSize).Where("res_type = 'words' and id in ?", sub).Order("id desc").Find(&cards)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	if len(cards) > 0 {
+	if len(cards) > 0 && (scope == "生字本" || scope == "已学会") {
 		return cards, nil
 	}
-	ls, err := GetUserCardsByScope(scope, group, userid, 0, pageSize)
+	ls, err := GetUserCardsByScope(scope, group, userid, 0, pageSize) //获取没学会的
 	if err != nil {
 		return nil, err
 	}

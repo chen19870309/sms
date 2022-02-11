@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "xuexi": "/pages/xuexi/home/home",
+    "achieve": "/pages/achieve/home/home",
+    "taolun": "/pages/taolun/home/home"
+  },
+  "lazyCodeLoading": "requiredComponents"
+}

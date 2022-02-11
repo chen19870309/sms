@@ -1,0 +1,4 @@
+/* pages/xuexi/study/study.wxss */
+.space {
+  height: 3%;
+}

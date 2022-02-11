@@ -1,0 +1,7 @@
+/* pages/taolun/log/log.wxss */
+.space {
+  height: 64px;
+}
+.bg {
+  background-image: '/images/jiayouya.jpeg';
+}

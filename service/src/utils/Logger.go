@@ -39,7 +39,7 @@ func (s *LogFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 		if len(args) > 0 {
 			msg = args[1]
 			i := strings.Index(msg, "s")
-			msg = msg[i+1:]
+			msg = entry.Message[i+len(args[0])+2:]
 			file = filepath.Base(args[0][3:])
 			length = 0
 		}

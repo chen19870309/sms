@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/rand"
 	"encoding/base64"
 	"errors"
+	"io"
 )
 
 //高级加密标准（Adevanced Encryption Standard ,AES）
@@ -102,4 +104,53 @@ func DePwdCode(pwd string) ([]byte, error) {
 	//执行AES解密
 	return AesDeCrypt(pwdByte, PwdKey)
 
+}
+
+//aes加密，填充秘钥key的16位，24,32分别对应AES-128, AES-192, or AES-256.
+func AesCBCEncrypt(rawData, key, iv []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		panic(err)
+	}
+
+	//填充原文
+	blockSize := block.BlockSize()
+	rawData = PKCS7Padding(rawData, blockSize)
+	//初始向量IV必须是唯一，但不需要保密
+	cipherText := make([]byte, blockSize+len(rawData))
+	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		panic(err)
+	}
+
+	//block大小和初始向量大小一定要一致
+	mode := cipher.NewCBCEncrypter(block, iv)
+	mode.CryptBlocks(cipherText[blockSize:], rawData)
+
+	return cipherText, nil
+}
+
+func AesCBCDncrypt(encryptData, key, iv []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		panic(err)
+	}
+
+	blockSize := block.BlockSize()
+
+	if len(encryptData) < blockSize {
+		panic("ciphertext too short")
+	}
+	encryptData = encryptData[blockSize:]
+
+	// CBC mode always works in whole blocks.
+	if len(encryptData)%blockSize != 0 {
+		panic("ciphertext is not a multiple of the block size")
+	}
+	mode := cipher.NewCBCDecrypter(block, iv)
+
+	// CryptBlocks can work in-place if the two arguments are the same.
+	mode.CryptBlocks(encryptData, encryptData)
+	//解填充
+	encryptData, err = PKCS7UnPadding(encryptData)
+	return encryptData, nil
 }

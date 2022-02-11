@@ -1,0 +1,39 @@
+<!--pages/xuexi/exam/exam.wxml-->
+<view class="space"></view>
+<cu-custom bgColor="bg-gradual-blue" isBack="{{true}}"><view slot="backText">返回</view><view slot="content">测试</view></cu-custom>
+<scroll-view scroll-y class="scrollPage">
+  <view class="card" animation="{{animation}}" >
+    <image src='{{pic}}' mode='widthFix' class='png' style='width:100%;height:486rpx'></image>
+    <text class="cuIcon-notificationfill text-gray" bindtouchend="speeker"></text>
+  </view>
+  <view class="flex flex-wrap justify-around card">
+    <button class="cu-btn lg bg-{{item.color}} animation-{{animation==item.word?'shake':''}} margin-sm basis-sm shadow" bindtap="toggle" data-word="{{item.word}}" wx:for="{{list}}" wx:key="{{index}}">{{item.word}}</button>
+  </view>
+</scroll-view>
+<view class="cu-modal {{modalName=='Info'?'show':''}}">
+  <view class="cu-dialog">
+    <view class="cu-bar bg-white justify-end">
+      <view class="content">小西说:</view>
+      <view class="action" bindtap="hideModal">
+        <text class="cuIcon-close text-red"></text>
+      </view>
+    </view>
+    <view class="padding-xl">
+      {{message}}
+    </view>
+    <view class="padding-xl">
+      {{content}}
+    </view>
+  </view>
+</view>
+<view class="cu-modal bottom-modal {{modalName=='check'?'show':''}}">
+  <view class="cu-dialog">
+    <view class="cu-bar bg-white">
+      <view class="action text-green" bindtap="startExam">测试</view>
+      <view class="action text-blue" bindtap="startStudy">学习</view>
+    </view>
+    <view class="padding-xl">
+      {{message}}
+    </view>
+  </view>
+</view>

@@ -41,10 +41,35 @@ func InitWeixinService(web *WebS) {
 	wx := service.Serv.Group("weixin")
 	wx.GET("", CheckWeixin)
 	wx.POST("", HandleWxMesage)
-	wx.GET("/scopes", DealScopes)         //获取字库分类
-	wx.GET("/words", DealGetWords)        //获取字库
-	wx.POST("/words", DealCheckWords)     //更新个人字库
-	wx.POST("/:appid/login", DealLoginWX) //小程序用户登陆
+	wx.GET("/scopes", DealScopes)               //获取字库分类
+	wx.GET("/words", DealGetWords)              //获取字库
+	wx.POST("/words", DealCheckWords)           //更新个人字库
+	wx.POST("/:appid/userinfo", DealWXUserInfo) //小程序用户上传用户信息
+	wx.POST("/:appid/login", DealLoginWX)       //小程序用户登陆
+}
+
+func DealWXUserInfo(c *gin.Context) {
+	res := model.Response{
+		Code:    0,
+		Success: true,
+		Message: "ok",
+	}
+	appid := c.Param("appid")
+	params := make(map[string]interface{})
+	body, err := c.GetRawData()
+	if err == nil {
+		err = json.Unmarshal(body, &params)
+		utils.Log.Infof("DealWXUserInfo:%v|%v", appid, params)
+		userid := params["userid"].(float64)
+		data := params["data"].(map[string]interface{})
+		u, err := dao.UpdateUserInfo(data["avatarUrl"].(string), data["nickName"].(string), string(body), int(userid))
+		if err != nil {
+			utils.Log.Error("UpdateUserInfo failed!", err)
+		} else {
+			res.Data = u
+		}
+	}
+	c.JSONP(200, res)
 }
 
 func DealGetWords(c *gin.Context) {
@@ -123,15 +148,23 @@ func DealLoginWX(c *gin.Context) {
 	err = json.Unmarshal(body, &params)
 	utils.Log.Infof("DealLoginWX:%v|%v", appid, params)
 	secret := "f9e9734c2310119423c9cf726c5bc209"
-	resp, err := weixin.MiniLogin(appid, secret, params["code"])
-	utils.Log.Infof("MiniLogin:%v|%v", resp, err)
-	if err == nil && resp.ErrCode == 0 {
-		user, err := weixin.GetUserInfo(resp.OpenId, weixin.LangZHCN)
+	openid, err := utils.GetUserOpenidByCode(appid, secret, params["code"])
+	utils.Log.Infof("GetUserOpenidByCode:%v|%v", openid, err)
+	if err == nil {
+		user, err := utils.GetUserInfoByOpenId(appid, secret, openid)
 		utils.Log.Infof("GetUserInfo:%v|%v", user, err)
-		b, _ := json.Marshal(user)
-		u, err := dao.SaveWxUser(user.OpenId, user.NickName, user.HeadImgURL, string(b))
-		utils.Log.Infof("SaveWxUser:%v|%v", u, err)
-		res.Data = u
+		if err != nil {
+			u, err := dao.SaveWxUser(openid, "", "", "")
+			res.Jwt = utils.GenJwt(u.Id, u.Username, config.App.Secret)
+			res.Data = u
+			utils.Log.Infof("SaveWxUser:%v|%v", u, err)
+		} else {
+			b, _ := json.Marshal(user)
+			u, err := dao.SaveWxUser(openid, user["nickname"].(string), user["headimgurl"].(string), string(b))
+			res.Jwt = utils.GenJwt(u.Id, u.Username, config.App.Secret)
+			res.Data = u
+			utils.Log.Infof("SaveWxUser:%v|%v", u, err)
+		}
 	}
 	c.JSONP(200, res)
 }

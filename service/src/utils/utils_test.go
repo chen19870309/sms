@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"testing"
 )
 
@@ -47,4 +49,29 @@ func TestPic(t *testing.T) {
 	text := "# 正则表达式简明教程\n@sum:介绍regexp的使用方法和作用\n![image](http://r5uiv7l5f.hd-bkt.clouddn.com/testregexp.webp)\n\n## 1.Regexp是什么？"
 	t.Error(GetPic(text, "null"))
 	t.Error(GetSum(text))
+}
+
+func TestDec(t *testing.T) {
+	key := "hoO3uGXJDrl/oN/SzmWJ9g=="
+	iv := "xR6vDQfaX6QgREJ1tJ6wUQ=="
+	data := "YhCbGDqYf5tCSW2UcnXAMJfCV+DOlEdepEzqOEDa9DWUKz+1F+DI33Shnw+To9SOxmvdMGh/abY+LQojth1WSpnzC3Cab8HSS7NmXijMthsl1RCfR2UPdVjqFKZN9/l63QJX9cpugFMQuf6LiB1lp87XThCyKLUh/Vb/h6RUpeheehkOdcH4enS6RrPpFVvaR2bwtMHRf2aV5mBObrIWQLzqoIxgE5pFhASzI7Mcy9rmnJ1wQxJ+pYj0UPClTvPzDFjWLMaN2moHJgh6DAqrVc8VPoxyq1ZZBmReA8qretGcok1tmHQTkR310WNarSJ46pru8glaUVjX0gGKjTTmqeFFD7RZrOkBqJm6wWizrhi9aScfUxfutw2BG+2O/ZWSzQv31Ze/a9p49dViktn9JnW+lRtpkusMPpTSrZ1t8uEPTEyBlHJlAcxtrIWt+e4PXHxpk7ctkvt0xcEv6SjKUw=="
+	b1, _ := base64.StdEncoding.DecodeString(data)
+	k, _ := base64.StdEncoding.DecodeString(key)
+	i, _ := base64.StdEncoding.DecodeString(iv)
+	t.Error(i)
+	res, err := AesCBCDncrypt(b1, k, i)
+	t.Error(string(res))
+	t.Error(err)
+}
+
+var data = `{"userid":5,"data":{"nickName":"å¾®ä¿¡ç<94>¨æ<88>·","gender":0,"language":"","city":"","province":"","country":"","avatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/POgEwh4mIHO4nibH0KlMECNjjGxQUq24ZEaGT4poC6icRiccVGKSyXwibcPq4BWmiaIGuG1icwxaQX6grC9VemZoJ8rg/132"}}`
+
+func TestData(t *testing.T) {
+	params := make(map[string]interface{})
+	err := json.Unmarshal([]byte(data), &params)
+	t.Error(err)
+	userid := params["userid"].(float64)
+	data := params["data"].(map[string]interface{})
+	t.Error(userid)
+	t.Error(data["avatarUrl"].(string), data["nickName"].(string))
 }

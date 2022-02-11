@@ -1,0 +1,37 @@
+<!--pages/xuexi/home/home.wxml-->
+<!-- <image src='https://xiaoxibaby.xyz/sea.jpg' mode='widthFix' class='png' style='width:100%;height:486rpx'></image> -->
+<!-- <view class="cu-bar search bg-white">
+    <view class="search-form round">
+      <text class="cuIcon-search"></text>
+      <input type="text" placeholder="搜索你想学习的字" confirm-type="search"></input>
+    </view>
+    <view class="action">
+      <button class="cu-btn bg-green shadow-blur round " bindtouchend="showModal" data-target="Modal">搜索</button>
+    </view>
+</view> -->
+<view class="cu-modal {{modalName=='Info'?'show':''}}">
+  <view class="cu-dialog">
+    <view class="cu-bar bg-white justify-end">
+      <view class="content">小西说:</view>
+      <view class="action" bindtap="hideModal">
+        <text class="cuIcon-close text-red"></text>
+      </view>
+    </view>
+    <view class="padding-xl">
+      {{message}}
+    </view>
+  </view>
+</view>
+<view class="space"></view>
+<scroll-view scroll-y class="scrollPage">
+  <view class="card" animation="{{animation}}" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd" >
+    <image src='{{pic}}' mode='widthFix' class='png' style='width:100%;height:486rpx'></image>
+    <text class="cuIcon-notificationfill lg text-gray" bindtouchend="speeker"></text>
+  <view class="text-xsl padding">
+    <text class="text-green">{{pinYin}}</text>
+    <text class="text-black" bindtouchend="speeker">|{{word}}</text>
+  </view>
+  </view>
+  <view class='cu-tabbar-height'></view>
+</scroll-view>
+

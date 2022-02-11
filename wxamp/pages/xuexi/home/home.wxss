@@ -1,0 +1,20 @@
+/* pages/xuexi/home/home.wxss */
+@import "../../../colorui/animation.wxss";
+.card {
+  background-color: #cfdef2 ;
+  margin-top: 32px;
+  margin: 3%;
+  padding-top: 24px;
+  padding: 3%;
+  border: 3rpx solid #cdcdcd;
+  border-radius: 15rpx;
+  text-align:center;
+}
+
+image[class*="gif-"] {
+  border-radius: 6rpx;
+  display: block;
+}
+.space {
+  height: 64px;
+}

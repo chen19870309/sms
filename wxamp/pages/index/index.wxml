@@ -1,0 +1,36 @@
+<!--pages/index/index.wxml-->
+<achieve wx:if="{{PageCur=='achieve'}}"></achieve>
+<taolun wx:if="{{PageCur=='taolun'}}"></taolun>
+<view class="cu-modal {{modalName=='Modal'?'show':''}}">
+  <view class="cu-dialog">
+    <view class="cu-bar bg-white justify-end">
+      <view class="content">小西说:</view>
+      <view class="action" bindtap="hideModal">
+        <text class="cuIcon-close text-red"></text>
+      </view>
+    </view>
+    <view class="padding-xl">
+      功能还在开发中...😄
+    </view>
+  </view>
+</view>
+<view class="cu-bar tabbar bg-white shadow foot">
+  <view class="action" bindtap="NavChange" data-cur="achieve">
+    <view class='cuIcon-cu-image'>
+      <image src="/images/tabbar/xuexirenwu{{PageCur=='achieve'?'':'-fade'}}.png"></image>
+    </view>
+    <view class="{{PageCur=='achieve'?'text-green':'text-gray'}}">学习</view>
+  </view>
+  <view class="action" bindtap="NavChange" data-cur="kechengbiao">
+    <view class='cuIcon-cu-image'>
+      <image src="/images/tabbar/kechengbiao{{PageCur=='kechengbiao'?'':'-fade'}}.png"></image>
+    </view>
+    <view class="{{PageCur=='kechengbiao'?'text-green':'text-gray'}}">日程</view>
+  </view>
+  <view class="action" bindtap="NavChange" data-cur="taolun">
+    <view class='cuIcon-cu-image'>
+      <image src="/images/tabbar/taolun{{PageCur=='taolun'?'':'-fade'}}.png"></image>
+    </view>
+    <view class="{{PageCur=='taolun'?'text-green':'text-gray'}}">反馈</view>
+  </view>
+</view>

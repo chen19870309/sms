@@ -1,0 +1,4 @@
+<!--pages/auth/auth.wxml-->
+<view class='padding-xl'>
+  <button class='cu-btn  bg-green shadow lg block' open-type="getUserInfo" bindgetuserinfo="onGetUserInfo">微信登录</button>
+</view>

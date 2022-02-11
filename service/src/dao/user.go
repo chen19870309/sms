@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sms/service/src/dao/model"
 	"sms/service/src/utils"
+	"strings"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -79,6 +80,7 @@ func QueryUser(id int64, code string) *model.SmsUser {
 	if result.Error != nil {
 		return nil
 	}
+	user.Icon = reIcon(user.Icon)
 	utils.SetCache(key, user, 2*time.Minute)
 	return user
 }
@@ -98,6 +100,7 @@ func AuthUser(username, password, ip string) (*model.SmsUser, error) {
 		database.Table(TB_USER).Save(user)
 		user.Secret = utils.SHA1(utils.Gen8RCode())
 	}
+	user.Icon = reIcon(user.Icon)
 	return user, nil
 }
 
@@ -118,6 +121,7 @@ func ExchangeUserPwd(op, np string, userid int) (*model.SmsUser, error) {
 			return nil, result.Error
 		}
 	}
+	user.Icon = reIcon(user.Icon)
 	return user, nil
 }
 
@@ -130,9 +134,11 @@ func UpdateUserInfo(icon, nickname, remark string, userid int) (*model.SmsUser, 
 	} else {
 		user.UpdateTime = time.Now()
 		user.Nickname = nickname
-		user.Remark = remark
+		if remark != "" {
+			user.Remark = remark
+		}
 		if icon != "" {
-			user.Icon = icon
+			user.Icon = shortIcon(icon)
 		}
 		result = database.Table(TB_USER).Save(user)
 		if result.Error != nil {
@@ -140,6 +146,20 @@ func UpdateUserInfo(icon, nickname, remark string, userid int) (*model.SmsUser, 
 		}
 	}
 	return user, nil
+}
+
+func shortIcon(icon string) string {
+	if len(icon) > 128 && strings.HasPrefix(icon, "https://thirdwx.qlogo.cn") {
+		icon = icon[24:]
+	}
+	return icon
+}
+
+func reIcon(icon string) string {
+	if strings.HasPrefix(icon, "/") {
+		icon = "https://thirdwx.qlogo.cn" + icon
+	}
+	return icon
 }
 
 func RegistUser(username, password, email, code, ip string) (*model.SmsUser, error) {
@@ -179,8 +199,9 @@ func RegistUser(username, password, email, code, ip string) (*model.SmsUser, err
 }
 
 func SaveWxUser(openid, nickname, icon, data string) (*model.SmsUser, error) {
+	utils.Log.Infof("SaveWxUser(%v,%v)", openid, nickname)
 	if openid == "" {
-		return nil, errors.New("openid is empty!")
+		openid = "testweixinacc"
 	}
 	user := &model.SmsUser{}
 	result := database.Table(TB_USER).Where("username = ?  and status in (0,1,2,3)", openid).First(user)
@@ -199,7 +220,7 @@ func SaveWxUser(openid, nickname, icon, data string) (*model.SmsUser, error) {
 		UpdateTime: time.Now(),
 		Level:      3,
 		Status:     1,
-		Icon:       icon,
+		Icon:       shortIcon(icon),
 		Nickname:   "新来的:" + nickname,
 		Username:   openid,
 		Secret:     "",
@@ -211,5 +232,6 @@ func SaveWxUser(openid, nickname, icon, data string) (*model.SmsUser, error) {
 	if result.Error != nil {
 		return nil, result.Error
 	}
+	user.Icon = reIcon(user.Icon)
 	return user, nil
 }

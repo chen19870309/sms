@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "xuexi": "/pages/xuexi/home/home"
+  },
+  "lazyCodeLoading": "requiredComponents"
+}

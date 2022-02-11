@@ -1,0 +1,40 @@
+<!--pages/taolun/home/home.wxml-->
+<image src='https://xiaoxibaby.xyz/headbar.jpg' mode='widthFix' class='png' style='width:100%;height:486rpx'></image>
+<scroll-view scroll-y class="scrollPage bg">
+  <view class="flex p-xs margin-bottom-sm mb-sm uc radius">
+    <view class="flex-sub padding-sm margin-xs radius">
+      <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+      <view class="cu-avatar xl radius margin" style="background-image:url({{avatarUrl}});"></view>
+</button> 
+    </view>
+      <view class="flex-twice padding-sm margin-xs radius">
+        <view class="padding">
+        <view >昵称:{{ NickName }}</view>
+        <!-- <input type="nickname" class="weui-input" placeholder="请输入昵称"/> -->
+        <view >生字本:{{count1}} 字</view>
+        <view >已学会:{{count2}} 字</view>
+        </view>
+      </view>
+  </view>
+  <view class="cu-list menu card-menu margin-top-xl margin-bottom-xl shadow-lg radius">
+    <view class="cu-item arrow">
+      <button class="cu-btn content" open-type="feedback">
+        <text class="cuIcon-writefill text-cyan"></text>
+        <text class="text-grey">意见反馈</text>
+      </button>
+    </view>
+    <view class="cu-item arrow">
+      <navigator class="content" url="/pages/taolun/log/log" hover-class="none">
+        <text class="cuIcon-formfill text-green"></text>
+        <text class="text-grey">更新日志</text>
+      </navigator>
+    </view>
+    <view class="cu-item arrow">
+      <view class="content" bindtap="showQrcode">
+        <text class="cuIcon-appreciatefill text-red"></text>
+        <text class="text-grey">赞赏支持</text>
+      </view>
+    </view>
+  </view>
+  <view class="cu-tabbar-height"></view>
+</scroll-view>

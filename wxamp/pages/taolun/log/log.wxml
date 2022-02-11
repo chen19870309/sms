@@ -1,0 +1,16 @@
+<!--pages/taolun/log/log.wxml-->
+<cu-custom bgColor="bg-gradual-green" isBack="{{true}}"><view slot="backText">返回</view><view slot="content">更新日志</view></cu-custom>
+<view class="space"></view>
+<view class="cu-timeline">
+  <view class="cu-item text-green" wx:for="{{logs}}" wx:key>
+    <view class="bg-gradual-green content shadow">
+      <view class="cu-capsule radius">
+        <view class="cu-tag bg-white text-green">{{item.version}}</view>
+        <view class="cu-tag line-white">{{item.date}}</view>
+      </view>
+      <view class="margin-top-sm text-content" wx:for="{{item.ctxs}}" wx:for-item="ctx" wx:key>
+        <view>{{ctx}}</view>
+      </view>
+    </view>   
+  </view>
+</view>

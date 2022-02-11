@@ -1,0 +1,13 @@
+/* pages/taolun/home/home.wxss */
+.uc {
+  margin-top: 5px;
+  margin-left: 12px;
+  margin-right: 12px;
+  border: 3rpx solid #cdcdcd;
+  border-radius: 15rpx;
+  background-color: #ffffff;
+}
+
+.bg {
+  background-color: #ddf6d7;
+}
