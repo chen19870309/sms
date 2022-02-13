@@ -1,7 +1,8 @@
 /* pages/xuexi/exam/exam.wxss */
 @import "../../../colorui/animation.wxss";
 .space {
-  margin-top: 2%;
+  height: 15rpx;
+  margin-top: 3%;
 }
 .card {
   background-color: #cfdef2 ;

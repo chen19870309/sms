@@ -1,5 +1,5 @@
 <!--pages/taolun/home/home.wxml-->
-<image src='https://xiaoxibaby.xyz/headbar.jpg' mode='widthFix' class='png' style='width:100%;height:486rpx'></image>
+<image src='/images/jiayou.jpg' mode='widthFix' class='png' style='width:100%;height:486rpx'></image>
 <scroll-view scroll-y class="scrollPage bg">
   <view class="flex p-xs margin-bottom-sm mb-sm uc radius">
     <view class="flex-sub padding-sm margin-xs radius">

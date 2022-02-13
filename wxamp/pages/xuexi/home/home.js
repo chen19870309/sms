@@ -98,11 +98,11 @@ Component({
           return 
         }
         if (startY - endY > 10) {
-          this.movePage(-1)
+          this.movePage(-2)
           return
         }
         if (endY - startY > 10) {
-          this.movePage(1)
+          this.movePage(2)
           return 
         }
       }
@@ -113,13 +113,29 @@ Component({
     movePage(c) {
       let that = this
       var cur = 0
+      let updown = false
+      if(c == -2 || c == 2){
+        updown = true
+        c = c/2
+      }
       app.globalData.Round --
       if (app.globalData.Round <= 0) {
         that.showModal('好棒😄,本次已经学完'+app.globalData.Total+'个字了!休息一会吧🎉🎉🎉')
+        //记录diary
+        var myDate = new Date();//获取系统当前时间
+        var nowDate = myDate.getDate();
+        var str = ""
+        for(var i=0;i<app.globalData.Total;i++){
+          str += " "+app.globalData.MyWords[i].Word
+          if(i>0&&i%5==0) {
+            str += "\n"
+          }
+        }
+        app.putDiary(nowDate,'🎉本次学习的内容是:\n'+str)
         return 
       }
       if (app.globalData.Total == 1) return
-     console.log("movePage:",c,"|",cur,app.globalData.CurWord)
+     console.log("movePage:",c,"|",cur,updown)
       if (app.globalData.CurWord>0) {
         cur = (app.globalData.CurWord + c)%app.globalData.Total
       }else{
@@ -134,8 +150,13 @@ Component({
         timingFunction: 'ease',
         delay: 50,
       });
-      animation.opacity(0.2).translate(c*100,0).step()
-      animation.opacity(1.0).translate(0,0).step()
+      if(updown){
+        animation.opacity(0.2).translate(0,c*100).step()
+        animation.opacity(1.0).translate(0,0).step()
+      }else{
+        animation.opacity(0.2).translate(c*100,0).step()
+        animation.opacity(1.0).translate(0,0).step()
+      }
       that.setData({
         animation: animation.export(),
       })

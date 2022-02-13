@@ -165,11 +165,11 @@ func CountUserScopeWords(userid, scope, gp string, status int) int {
 	return 0
 }
 
-func QueryScopedCard(userid, scope, ResType, gp string, pageSize int) ([]*model.CardRes, error) {
+func QueryScopedCard(userid, scope, ResType, gp, word string, pageSize int) ([]*model.CardRes, error) {
 	if userid != "" {
 		uid, err := strconv.Atoi(userid)
 		if err == nil {
-			res, err := QueryUserStdWordCards(scope, gp, pageSize, uid)
+			res, err := QueryUserStdWordCards(scope, gp, word, pageSize, uid)
 			if err == nil {
 				return res, err
 			}
@@ -197,7 +197,7 @@ func QueryScopedCard(userid, scope, ResType, gp string, pageSize int) ([]*model.
 	return cards, nil
 }
 
-func QueryUserStdWordCards(scope, group string, pageSize, userid int) ([]*model.CardRes, error) {
+func QueryUserStdWordCards(scope, group, word string, pageSize, userid int) ([]*model.CardRes, error) {
 	cards := []*model.CardRes{}
 	var result *gorm.DB
 	sub := database.Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 1", userid).SubQuery() //已学会
@@ -207,6 +207,14 @@ func QueryUserStdWordCards(scope, group string, pageSize, userid int) ([]*model.
 	result = database.Table(TB_CARD_RES).Limit(pageSize).Where("res_type = 'words' and id in ?", sub).Order("id desc").Find(&cards)
 	if result.Error != nil {
 		return nil, result.Error
+	}
+	//添加特定生字
+	if word != "" {
+		item := model.CardRes{}
+		result = database.Table(TB_CARD_RES).Where("res_type = 'words' and word = ? ", word).First(&item)
+		if item.Id > 0 {
+			cards = append(cards, &item)
+		}
 	}
 	if len(cards) > 0 && (scope == "生字本" || scope == "已学会") {
 		return cards, nil
@@ -237,10 +245,15 @@ func QueryUserStdWordCards(scope, group string, pageSize, userid int) ([]*model.
 		}
 	}
 	//重新拉取生字
-	sub = database.Debug().Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 0", userid).SubQuery()
-	result = database.Debug().Table(TB_CARD_RES).Limit(pageSize).Where("scope = ? and gp = ? and res_type = 'words' and id in ? ", scope, group, sub).Order("id desc").Find(&cards)
+	sub = database.Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 0", userid).SubQuery()
+	result = database.Table(TB_CARD_RES).Limit(pageSize).Where("scope = ? and gp = ? and res_type = 'words' and id in ? ", scope, group, sub).Order("id desc").Find(&cards)
 	if result.Error != nil {
 		return nil, result.Error
 	}
+	//生字为空随机拉取group中的数据
+	if len(cards) == 0 {
+		result = database.Table(TB_CARD_RES).Limit(pageSize).Where("scope = ? and gp = ? and res_type = 'words' ", scope, group).Order("random()").Find(&cards)
+	}
+
 	return cards, nil
 }

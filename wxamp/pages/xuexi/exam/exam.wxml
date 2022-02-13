@@ -1,5 +1,7 @@
 <!--pages/xuexi/exam/exam.wxml-->
 <view class="space"></view>
+<view class="space"></view>
+<view class="space"></view>
 <cu-custom bgColor="bg-gradual-blue" isBack="{{true}}"><view slot="backText">返回</view><view slot="content">测试</view></cu-custom>
 <scroll-view scroll-y class="scrollPage">
   <view class="card" animation="{{animation}}" >

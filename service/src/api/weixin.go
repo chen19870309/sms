@@ -44,6 +44,8 @@ func InitWeixinService(web *WebS) {
 	wx.GET("/scopes", DealScopes)               //获取字库分类
 	wx.GET("/words", DealGetWords)              //获取字库
 	wx.POST("/words", DealCheckWords)           //更新个人字库
+	wx.GET("/diary", DealGetDiary)              //获取个人日记
+	wx.POST("/diary", DealPutDiary)             //插入日记
 	wx.POST("/:appid/userinfo", DealWXUserInfo) //小程序用户上传用户信息
 	wx.POST("/:appid/login", DealLoginWX)       //小程序用户登陆
 }
@@ -79,7 +81,7 @@ func DealGetWords(c *gin.Context) {
 		Message: "ok",
 	}
 	data := []*model.Word{}
-	ls, err := dao.QueryScopedCard(c.Query("userid"), c.Query("scope"), "words", c.Query("group"), 10)
+	ls, err := dao.QueryScopedCard(c.Query("userid"), c.Query("scope"), "words", c.Query("group"), c.Query("word"), 10)
 	if err != nil {
 		res.Success = false
 		res.Message = err.Error()

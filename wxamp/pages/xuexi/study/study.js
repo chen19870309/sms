@@ -14,7 +14,16 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    
+    console.log(options)
+    if(options.cur != undefined) {//打开的分享页面带过来的字
+      app.globalData.word = options.cur
+    }
+    if(options.scope != undefined) {
+    app.globalData.scope = options.scope
+    }
+    if(options.group != undefined) {
+    app.globalData.group = options.group
+    }
   },
 
   /**
@@ -63,6 +72,14 @@ Page({
    * 用户点击右上角分享
    */
   onShareAppMessage: function () {
-
+    var cur = app.globalData.CurWord
+    var world = app.globalData.MyWords[cur]
+    var scope = app.globalData.scope
+    var group = app.globalData.group
+    return {
+      title: '小西的学习卡片:'+world.Word,
+      desc: '一起来打卡学习吧!',
+      path: 'pages/xuexi/study/study?scope='+scope+'&group='+group+'&cur='+world.Word
+    }
   }
 })

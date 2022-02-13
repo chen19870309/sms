@@ -22,7 +22,8 @@
     </view>
   </view>
 </view>
-<view class="space"></view>
+<view class="space">
+</view>
 <scroll-view scroll-y class="scrollPage">
   <view class="card" animation="{{animation}}" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd" >
     <image src='{{pic}}' mode='widthFix' class='png' style='width:100%;height:486rpx'></image>
@@ -32,6 +33,8 @@
     <text class="text-black" bindtouchend="speeker">|{{word}}</text>
   </view>
   </view>
-  <view class='cu-tabbar-height'></view>
+  <view class='cu-tabbar-height text-center'>
+    <text class="text-gray space">上下或左右滑动卡片 开始学习吧😄</text>
+  </view>
 </scroll-view>
 

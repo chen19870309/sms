@@ -81,7 +81,7 @@ func QueryUser(id int64, code string) *model.SmsUser {
 		return nil
 	}
 	user.Icon = reIcon(user.Icon)
-	utils.SetCache(key, user, 2*time.Minute)
+	utils.SetCache(key, user, 2*time.Hour)
 	return user
 }
 

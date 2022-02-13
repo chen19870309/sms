@@ -1,6 +1,7 @@
 {
   "usingComponents": {
     "xuexi": "/pages/xuexi/home/home",
+    "kecheng": "/pages/achieve/kecheng/kecheng",
     "achieve": "/pages/achieve/home/home",
     "taolun": "/pages/taolun/home/home"
   },

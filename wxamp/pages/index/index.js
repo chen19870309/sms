@@ -16,9 +16,9 @@ Page({
       PageCur: e.currentTarget.dataset.cur
     })
     if (e.currentTarget.dataset.cur=='kechengbiao') {
-      wx.navigateTo({
-        url: '/pages/auth/auth',
-      })
+      // wx.navigateTo({
+      //   url: '/pages/auth/auth',
+      // })
       //this.showModal()
     }
   },
@@ -36,6 +36,16 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    console.log(options)
+    if(options.cur != undefined) {
+    app.globalData.CurWord = options.cur
+    }
+    if(options.scope != undefined) {
+    app.globalData.scope = options.scope
+    }
+    if(options.group != undefined) {
+    app.globalData.group = options.group
+    }
     this.setData({
       PageCur: 'achieve'
     })
@@ -108,7 +118,7 @@ Page({
     var scope = app.globalData.scope
     var group = app.globalData.group
     return {
-      title: '小西的学习卡片:'+world,
+      title: '小西的学习卡片:'+world.Word,
       desc: '一起来打卡学习吧!',
       path: 'pages/index/index?scope='+scope+'&group='+group+'&cur='+cur
     }

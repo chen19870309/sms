@@ -2,12 +2,18 @@ package utils
 
 import (
 	"crypto/tls"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/regions"
+	tts "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tts/v20190823"
 )
 
 var tr = &http.Transport{
@@ -93,4 +99,40 @@ func GetUserInfoByOpenId(appid, secret, openid string) (map[string]interface{}, 
 		return nil, errors.New(rs["errmsg"].(string))
 	}
 	return rs, nil
+}
+
+var ttscClient *tts.Client
+
+const format = `{
+	"ModelType":1,
+	"Volume":5,
+	"Speed":-0.8,
+	"VoiceType":1001
+}`
+
+func init() {
+	credential := common.NewCredential("AKIDaz80b3FAoDMEp9DzVjhOoxpRmqd9OM3U", "B5i4AzXnoY1D9oCJ9i01lEQLzNUBaiaB")
+	ttscClient, _ = tts.NewClient(credential, regions.Shanghai, profile.NewClientProfile())
+}
+
+func TextToVoice(text string) error {
+	request := tts.NewTextToVoiceRequest()
+	request.FromJsonString(format)
+	sessionid := Gen8RCode() + fmt.Sprintf("-%v", time.Now().UnixMicro())
+	request.SessionId = &sessionid
+	request.Text = &text
+	res, err := ttscClient.TextToVoice(request)
+	if err != nil {
+		Log.Error("TextToVoice failed!", err)
+		return err
+	} else {
+		Log.Info("TextToVoice:", res)
+		data, err := base64.StdEncoding.DecodeString(*res.Response.Audio)
+		if err != nil {
+			Log.Error("TextToVoice debase64 failed!", res.ToJsonString())
+		} else {
+			err = ioutil.WriteFile("./test.wav", data, 0755)
+		}
+		return err
+	}
 }

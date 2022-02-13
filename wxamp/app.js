@@ -48,6 +48,7 @@ App({
     userInfo: {},
     Scopes: [],
     MyWords: [],
+    word:'',
     CurWord: 0,
     Total: 0,
     Round: 0, //测试或学习的次数
@@ -113,6 +114,10 @@ App({
         data: {
           userid: that.globalData.userid
         },
+        header: {
+          'content-type': 'application/json',
+          'Authorization': 'token '+that.globalData.jwt
+        },
         success: function(res){
           //that.globalData.Scopes = res.data.data
           let sps = res.data.data
@@ -151,14 +156,29 @@ App({
       data: {
         scope: that.globalData.scope,
         group: that.globalData.group,
-        userid: that.globalData.userid
+        userid: that.globalData.userid,
+        word: that.globalData.word
+      },
+      header: {
+        'content-type': 'application/json',
+        'Authorization': 'token '+that.globalData.jwt
       },
       success: function(res){
         console.log("get words success:",res.data.data)
         res.data.data.sort(function() {
           return .5 - Math.random();
         });
-        that.globalData.CurWord = 0
+        if(that.globalData.word != ''){
+          for(var i=0,len=res.data.data.length; i < len; i++){
+            let item = res.data.data[i]
+            if (item.Word == that.globalData.word) {
+              that.globalData.CurWord = i
+              break
+            }
+          }
+        }else{
+          that.globalData.CurWord = 0
+        }
         that.globalData.MyWords = res.data.data
         that.globalData.Total = res.data.data.length
         that.cacheWords()
@@ -168,6 +188,65 @@ App({
       },
       fail: function(res) {
         console.log("get words fail:",res)
+      }
+    })
+  },
+  getDiary: function(callback) {
+    var myDate = new Date();//获取系统当前时间
+    let that = this
+    wx.request({
+      url: 'https://www.xiaoxibaby.xyz/weixin/diary',
+      data: {
+        userid: that.globalData.userid,
+        year: myDate.getFullYear(),
+        month: myDate.getMonth()+1 
+      },
+      header: {
+        'content-type': 'application/json',
+        'Authorization': 'token '+that.globalData.jwt
+      },
+      success: function(res){
+        console.log("get diary success",res)
+        let arr = res.data.data
+        arr.sort(function(a,b){
+          return b.day - a.day
+        })
+        callback(arr)
+      },
+      fail: function(res){
+        console.log("get diary failed!",res)
+        callback()
+      }
+    })
+  },
+  putDiary: function(nowDate,val,callback) {
+    var myDate = new Date();//获取系统当前时间
+    let that = this
+    wx.request({
+      method:'POST',
+      url: 'https://www.xiaoxibaby.xyz/weixin/diary',
+      data: {
+        userid: that.globalData.userid,
+        year: myDate.getFullYear(),
+        month: myDate.getMonth()+1 ,
+        day: nowDate,
+        remark: val
+      },
+      header: {
+        'content-type': 'application/json',
+        'Authorization': 'token '+that.globalData.jwt
+      },
+      success: function(res){
+        console.log("put diary success",res)
+        if (callback != undefined){
+          callback(res)
+        }
+      },
+      fail: function(res){
+        console.log("put diary failed!",res)
+        if (callback != undefined){
+          callback(res)
+        }
       }
     })
   },

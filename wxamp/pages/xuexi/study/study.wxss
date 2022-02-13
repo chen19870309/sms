@@ -1,4 +1,5 @@
 /* pages/xuexi/study/study.wxss */
 .space {
-  height: 3%;
+  height: 64px;
+  margin-top: 2%;
 }

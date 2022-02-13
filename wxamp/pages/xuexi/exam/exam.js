@@ -38,7 +38,11 @@ Page({
       app.globalData.group =  options.group
       app.getwords(this.initExam)
     }
-    this.showCheckModal('开始学习还是测试？')
+    if (options.cur == undefined) {//打开的分享页
+      this.showCheckModal('开始学习还是测试？')
+    }else{
+      this.startExam()
+    }
   }
   },
   showModal(message,ctx) {
@@ -140,7 +144,15 @@ Page({
    * 用户点击右上角分享
    */
   onShareAppMessage: function () {
-
+    var cur = app.globalData.CurWord
+    var world = app.globalData.MyWords[cur]
+    var scope = app.globalData.scope
+    var group = app.globalData.group
+    return {
+      title: '小西的测试:'+scope,
+      desc: '一起来打卡学习吧!',
+      path: 'pages/xuexi/exam/exam?scope='+scope+'&group='+group+'&cur='+world.Word
+    }
   },
   speeker: function() {
     var cur = app.globalData.CurWord
@@ -194,8 +206,16 @@ Page({
             }
           })
         }
-        var str = '本次得分是：'+Math.ceil(score)+'分'
+        var str = '本次得分是：'+Math.ceil(score)+'分\n'
         that.showModal('🎉本次测试完成🎉',str)
+        //记录diary
+        var myDate = new Date();//获取系统当前时间
+        var nowDate = myDate.getDate();
+        for(var i=0;i<app.globalData.Total;i++){
+          var w = app.globalData.MyWords[i].Word
+          str += " '"+w+"'答对"+maps[w]+"次 \n"
+        }
+        app.putDiary(nowDate,'🎉完成测试🎉，具体明细如下:\n'+str)
       }else{
       that.nextWord()
       that.initExam()

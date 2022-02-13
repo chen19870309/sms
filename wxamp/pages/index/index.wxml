@@ -1,6 +1,7 @@
 <!--pages/index/index.wxml-->
 <achieve wx:if="{{PageCur=='achieve'}}"></achieve>
 <taolun wx:if="{{PageCur=='taolun'}}"></taolun>
+<kecheng wx:if="{{PageCur=='kecheng'}}"></kecheng>
 <view class="cu-modal {{modalName=='Modal'?'show':''}}">
   <view class="cu-dialog">
     <view class="cu-bar bg-white justify-end">
@@ -21,9 +22,9 @@
     </view>
     <view class="{{PageCur=='achieve'?'text-green':'text-gray'}}">学习</view>
   </view>
-  <view class="action" bindtap="NavChange" data-cur="kechengbiao">
+  <view class="action" bindtap="NavChange" data-cur="kecheng">
     <view class='cuIcon-cu-image'>
-      <image src="/images/tabbar/kechengbiao{{PageCur=='kechengbiao'?'':'-fade'}}.png"></image>
+      <image src="/images/tabbar/kechengbiao{{PageCur=='kecheng'?'':'-fade'}}.png"></image>
     </view>
     <view class="{{PageCur=='kechengbiao'?'text-green':'text-gray'}}">日程</view>
   </view>

@@ -16,3 +16,13 @@ type CheckWord struct {
 	Userid int    `json:"userid"`
 	Status int    `json:"status"`
 }
+
+type DiaryData struct {
+	Id     int    `json:"id"`
+	Userid int    `json:"userid"`
+	Year   int    `json:"year"`
+	Month  int    `json:"month"`
+	Day    int    `json:"day"`
+	Remark string `json:"remark"`
+	Status int    `json:"status"`
+}

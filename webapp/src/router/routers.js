@@ -19,7 +19,7 @@ export default[
     name: 'index',
     component: BlogIndex,
     meta: {
-      title: '个人中心'
+      title: ' ( ゜- ゜)つロ ～～一起学习吧~'
     }
   },
   {
@@ -44,22 +44,34 @@ export default[
   {
     path: '/login',
     name: 'login',
-    component: Login
+    component: Login,
+    meta: {
+      title: '用户登陆'
+    }
   },
   {
     path: '/regist',
     name: 'regist',
-    component: Regist
+    component: Regist,
+    meta: {
+      title: '账号注册'
+    }
   },
   {
     path: '/editer/:code',
     name: 'editer',
-    component: Editer
+    component: Editer,
+    meta: {
+      title: '写文章'
+    }
   },
   {
     path: '/page/:code',
     name: 'page',
-    component: Page
+    component: Page,
+    meta: {
+      title: '(๑•̀ㅂ•́)و✧'
+    }
   },
   {
     path: '/menu',
@@ -79,18 +91,30 @@ export default[
   },
   {
     path: '/401',
-    component: P401
+    component: P401,
+    meta: {
+      title: 'ヽ(*。>Д<)o゜'
+    }
   },
   {
     path: '/404',
-    component: P404
+    component: P404,
+    meta: {
+      title: 'ヽ(*。>Д<)o゜'
+    }
   },
   {
     path: '/500',
-    component: P500
+    component: P500,
+    meta: {
+      title: 'ヽ(*。>Д<)o゜'
+    }
   },
   {
     path: '*',
-    component: P404
+    component: P404,
+    meta: {
+      title: 'ヽ( ￣д￣;)ノ∑(っ'
+    }
   }
 ]

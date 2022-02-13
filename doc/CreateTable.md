@@ -210,3 +210,19 @@ create table tb_user_card_res(
     remark text
 );
 ```
+
+## 用户日志表
+```
+create table tb_user_diary(
+    id serial primary key,
+    userid integer not null ,
+    year integer not null ,
+    month integer not null ,
+    day integer not null ,
+    create_time timestamp default CURRENT_TIMESTAMP ,
+    update_time timestamp default CURRENT_TIMESTAMP,
+    status int not null default 0,
+    color varchar(32) not null default 'orange',
+    diary text
+);
+```
