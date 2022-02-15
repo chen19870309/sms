@@ -23,7 +23,7 @@ Component({
     var count1 = 0,count2 = 0
     let scopes = app.globalData.Scopes
     for(var i in scopes){
-      console.log("call ready!",scopes[i])
+      //console.log("call ready!",scopes[i])
       if (scopes[i].title=="生字本") {
         count1 = scopes[i].cnt
       }
@@ -31,12 +31,18 @@ Component({
         count2 = scopes[i].cnt
       }
     }
-    this.setData({
-      NickName: app.globalData.NickName,
-      avatarUrl:app.globalData.AvatarUrl,
-      count1:count1,
-      count2:count2
-    })
+    if(app.globalData.AuthWX){
+      this.setData({
+        NickName: app.globalData.NickName,
+        avatarUrl:app.globalData.AvatarUrl,
+        count1:count1,
+        count2:count2
+      })
+    }else{
+      wx.navigateTo({
+        url: '/pages/auth/auth',
+      })
+    }
   },
 
   /**

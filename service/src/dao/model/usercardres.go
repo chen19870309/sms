@@ -16,6 +16,7 @@ type UserCardRes struct {
 }
 
 type UserScopeCount struct {
+	Id    int
 	Scope string
 	Gp    string
 	Color string

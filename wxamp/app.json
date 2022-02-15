@@ -4,7 +4,8 @@
     "pages/auth/auth",
     "pages/xuexi/exam/exam",
     "pages/taolun/log/log",
-    "pages/xuexi/study/study"
+    "pages/xuexi/study/study",
+    "pages/taolun/thanks/thanks"
   ],
   "window": {
     "navigationBarBackgroundColor": "#39b54a",

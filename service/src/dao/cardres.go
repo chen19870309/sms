@@ -43,7 +43,7 @@ func NewCardRes(ctx *model.CardRes) (*model.CardRes, error) {
 	d, _ := time.ParseDuration("24h")
 	card := &model.CardRes{}
 	var result *gorm.DB
-	result = database.Debug().Table(TB_CARD_RES).Where("res_type = ? and gp = ? and word = ?", ctx.ResType, ctx.Gp, ctx.Word).First(card)
+	result = database.Debug().Table(TB_CARD_RES).Where("res_type = ? and scope = ？ and gp = ? and word = ?", ctx.ResType, ctx.Scope, ctx.Gp, ctx.Word).First(card)
 	if result.Error != nil && result.Error.Error() != "record not found" {
 		return nil, result.Error
 	}
@@ -119,12 +119,14 @@ func GetResScopes(userid, resType string) map[string]interface{} {
 	res := make(map[string]interface{})
 	rs := make([]model.UserScopeCount, 0)
 	sp1 := model.UserScopeCount{
+		Id:    0,
 		Scope: "生字本",
 		Color: "orange",
 		Icon:  "favor",
 		Gp:    "private",
 	}
 	sp2 := model.UserScopeCount{
+		Id:    0,
 		Scope: "已学会",
 		Color: "green",
 		Icon:  "favorfill",
@@ -134,7 +136,8 @@ func GetResScopes(userid, resType string) map[string]interface{} {
 	if result.Error != nil {
 		utils.Log.Error("GetResScopes:", result.Error)
 	} else {
-		for _, item := range rs {
+		for i, item := range rs {
+			item.Id = i + 1
 			sp1.Cnt += CountUserScopeWords(userid, item.Scope, item.Gp, 0) //获取用户导入生字
 			c1 := CountUserScopeWords(userid, item.Scope, item.Gp, 1)      //获取用户已学会字数
 			item.Ucnt = c1
@@ -211,7 +214,7 @@ func QueryUserStdWordCards(scope, group, word string, pageSize, userid int) ([]*
 	//添加特定生字
 	if word != "" {
 		item := model.CardRes{}
-		result = database.Table(TB_CARD_RES).Where("res_type = 'words' and word = ? ", word).First(&item)
+		result = database.Table(TB_CARD_RES).Where("res_type = 'words' and scope = ? and word = ? ", scope, word).First(&item)
 		if item.Id > 0 {
 			cards = append(cards, &item)
 		}

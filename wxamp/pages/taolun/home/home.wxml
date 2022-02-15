@@ -3,9 +3,9 @@
 <scroll-view scroll-y class="scrollPage bg">
   <view class="flex p-xs margin-bottom-sm mb-sm uc radius">
     <view class="flex-sub padding-sm margin-xs radius">
-      <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+      <!-- <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+      </button>  -->
       <view class="cu-avatar xl radius margin" style="background-image:url({{avatarUrl}});"></view>
-</button> 
     </view>
       <view class="flex-twice padding-sm margin-xs radius">
         <view class="padding">
@@ -27,6 +27,12 @@
       <navigator class="content" url="/pages/taolun/log/log" hover-class="none">
         <text class="cuIcon-formfill text-green"></text>
         <text class="text-grey">更新日志</text>
+      </navigator>
+    </view>
+    <view class="cu-item arrow">
+      <navigator class="content" url="/pages/taolun/thanks/thanks" hover-class="none">
+        <text class="cuIcon-favorfill text-red"></text>
+        <text class="text-grey">特别感谢</text>
       </navigator>
     </view>
     <view class="cu-item arrow">

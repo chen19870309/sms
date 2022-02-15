@@ -3,13 +3,14 @@ App({
   onLaunch: function () {
     wx.getSystemInfo({
       success: e => {
+        console.log(e)
         this.globalData.StatusBar = e.statusBarHeight;
         let capsule = wx.getMenuButtonBoundingClientRect()["top"];
         if (capsule) {
           this.globalData.Custom = capsule;
           this.globalData.CustomBar = capsule.bottom + capsule.top - e.statusBarHeight;
         } else {
-          this.globalData.CustomBar = e.statusBarHeight + 50;
+          this.globalData.CustomBar = e.statusBarHeight + 150;
         }
       }
     })
@@ -27,19 +28,21 @@ App({
             url: 'pages/auth/auth',
           })
         }
-        let appInfo = wx.getAppBaseInfo();
-        console.log("appInfo",appInfo)
-        let deviceInfo = wx.getDeviceInfo();
-        console.log("deviceInfo",deviceInfo)
+        // let appInfo = wx.getAppBaseInfo();
+        // console.log("appInfo",appInfo)
+        // let deviceInfo = wx.getDeviceInfo();
+        // console.log("deviceInfo",deviceInfo)
         that.cacheWords()
       }
     })
   },
   globalData: {
+    Host: 'https://www.xiaoxibaby.xyz',
     group: 'PB',   //普通公开群组
     scope: 'common',  //基础字范围
     appInfo: {},
     deviceInfo: {},
+    AuthWX:false,
     NickName: '',
     AvatarUrl: '',
     usercode: '',
@@ -76,7 +79,7 @@ App({
           console.log("wx.login success:",res)
           var code = res.code
           wx.request({
-            url: 'https://www.xiaoxibaby.xyz/weixin/wx77fbd12265db4add/login',
+            url: that.globalData.Host+'/weixin/wx77fbd12265db4add/login',
             method: 'POST',
             data: {
               code: code
@@ -110,7 +113,7 @@ App({
     let that = this
     this.authJWT().then(()=>{
       wx.request({
-        url: 'https://www.xiaoxibaby.xyz/weixin/scopes',
+        url: that.globalData.Host+'/weixin/scopes',
         data: {
           userid: that.globalData.userid
         },
@@ -128,6 +131,7 @@ App({
               let item = sps[key]
               console.log("item",item)
               arr.push({
+                id: item.Id,
                 title: item.Scope,
                 name: item.Gp=='private'?'共'+item.Cnt+'字':'共'+item.Cnt+'字/'+item.Ucnt+'字',
                 cnt: item.Cnt,
@@ -137,6 +141,9 @@ App({
                 group: item.Gp
               })
             }
+            arr.sort(function(a,b){
+              return a.id - b.id
+            })
             that.globalData.Scopes = arr
           }
           if (callback != undefined) {
@@ -152,7 +159,7 @@ App({
   getwords: function(callback) {
     let that = this
     wx.request({
-      url: 'https://www.xiaoxibaby.xyz/weixin/words',
+      url: that.globalData.Host+'/weixin/words',
       data: {
         scope: that.globalData.scope,
         group: that.globalData.group,
@@ -195,7 +202,7 @@ App({
     var myDate = new Date();//获取系统当前时间
     let that = this
     wx.request({
-      url: 'https://www.xiaoxibaby.xyz/weixin/diary',
+      url: that.globalData.Host+'/weixin/diary',
       data: {
         userid: that.globalData.userid,
         year: myDate.getFullYear(),
@@ -224,7 +231,7 @@ App({
     let that = this
     wx.request({
       method:'POST',
-      url: 'https://www.xiaoxibaby.xyz/weixin/diary',
+      url: that.globalData.Host+'/weixin/diary',
       data: {
         userid: that.globalData.userid,
         year: myDate.getFullYear(),
@@ -258,7 +265,7 @@ App({
       if (!item.Pic.startsWith("http://tmp/")){
         let imgkey = 'image_cache_'+item.Word
         var path = wx.getStorageSync(imgkey)
-        if (path != undefined && path != '' && !path.endsWith("json")){
+        if (path != undefined && path != '' && !path.endsWith("json") && !path.endsWith("jpg")){
           try {
             fs.accessSync(path)        
             console.log("get cache path:",path)
@@ -282,7 +289,7 @@ App({
       if (!item.Sound.startsWith("http://tmp/")){
         let soundkey = 'sound_cache_'+item.Word
         var path = wx.getStorageSync(soundkey)
-        if (path != undefined && path != '' && !path.endsWith("json")){
+        if (path != undefined && path != '' && !path.endsWith("json")  && (path.endsWith("wav") || path.endsWith("m4a"))){
           try {
             fs.accessSync(path)        
             console.log("get ",soundkey,"cache path:",path)
@@ -293,10 +300,12 @@ App({
           }
         }
         wx.downloadFile({ 
-          url: item.Sound,
+          url: decodeURI(item.Sound),
           success(res){
-            console.log('声音缓存成功1', res.tempFilePath)
-            wx.setStorageSync(soundkey, res.tempFilePath)
+            let path = res.tempFilePath
+            console.log('声音缓存成功1', path)
+            this.globalData.MyWords[i].Sound = path
+            wx.setStorageSync(soundkey, path)
           }
         })
       }

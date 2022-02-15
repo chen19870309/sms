@@ -192,7 +192,7 @@ Page({
           }
           wx.request({
             method: 'post',
-            url: 'https://www.xiaoxibaby.xyz/weixin/words',
+            url: app.globalData.Host+'/weixin/words',
             data: {
               Id: w.Id,
               userid: userid,
@@ -208,14 +208,24 @@ Page({
         }
         var str = '本次得分是：'+Math.ceil(score)+'分\n'
         that.showModal('🎉本次测试完成🎉',str)
+        if (score == 100) {
+          str += "太棒了🎈"
+          app.globalData.bgm.src="/pages/xuexi/exam/success.wav"
+          app.globalData.bgm.play()
+        }else{
+          str += "字/[答错次数]:"
+        }
         //记录diary
         var myDate = new Date();//获取系统当前时间
         var nowDate = myDate.getDate();
         for(var i=0;i<app.globalData.Total;i++){
           var w = app.globalData.MyWords[i].Word
-          str += " '"+w+"'答对"+maps[w]+"次 \n"
+            var c= 3-maps[w]
+            if(c > 0) {
+              str += " "+w+"["+c+"]"
+            }
         }
-        app.putDiary(nowDate,'🎉完成测试🎉，具体明细如下:\n'+str)
+        app.putDiary(nowDate,'🎉完成测试🎉:\n'+str)
       }else{
       that.nextWord()
       that.initExam()
@@ -225,6 +235,9 @@ Page({
       animation: word,
       first: false,
     })
+    var bgm = app.globalData.bgm
+    bgm.src = "/pages/xuexi/exam/fail.wav"
+    bgm.play()
     setTimeout(function() {
       that.setData({
         animation: ''

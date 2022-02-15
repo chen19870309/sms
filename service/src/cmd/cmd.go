@@ -34,6 +34,9 @@ func (p *program) Init(env svc.Environment) error {
 	if config.WX.OrignId != "" {
 		api.InitWeixinService(blog)
 	}
+	if config.TCloud.AppId != "" {
+		api.InitTCloudAPI()
+	}
 	p.blog = blog
 	return nil
 }
@@ -41,6 +44,7 @@ func (p *program) Init(env svc.Environment) error {
 func (p *program) Start() error {
 	addr := fmt.Sprintf(":%d", config.App.ListenPort)
 	utils.Log.Info("Address:", addr)
+	go api.AutoGenScope() //自动生成字库信息
 	go p.blog.Serv.Run(addr)
 	return nil
 }

@@ -89,11 +89,11 @@ Component({
       if (moveFlag) {
         moveFlag = false;
         //console.log("startX - endX:",startX - endX);
-        if (startX - endX > 10) {
+        if (startX - endX > 5) {
           this.movePage(-1)
           return
         }
-        if (endX - startX > 10) {
+        if (endX - startX > 5) {
           this.movePage(1)
           return 
         }

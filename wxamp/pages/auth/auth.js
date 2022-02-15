@@ -63,15 +63,19 @@ Page({
     if (e.detail.userInfo) {
       app.globalData.userInfo = e.detail.userInfo;
       wx.request({
-        url: 'https://www.xiaoxibaby.xyz/weixin/wx77fbd12265db4add/userinfo',
+        url: app.globalData.Host+'/weixin/wx77fbd12265db4add/userinfo',
         method: 'POST',
         data: {
           userid: app.globalData.userid,
           data: e.detail.userInfo
+        },
+        success: function(res){
+          console.log(res)
+          app.globalData.AuthWX = true
         }
       })
       wx.navigateTo({
-        url: '/pages/index/index',
+        url: '/pages/index/index?page=taolun',
       })
     }
   }

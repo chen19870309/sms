@@ -75,8 +75,3 @@ func TestData(t *testing.T) {
 	t.Error(userid)
 	t.Error(data["avatarUrl"].(string), data["nickName"].(string))
 }
-
-func TestTTS(t *testing.T) {
-	err := TextToVoice("西，小西的西")
-	t.Error(err)
-}

@@ -19,13 +19,16 @@ var Mail mail
 
 var WX weixin
 
+var TCloud tencentCloud
+
 type Conf struct {
-	Db     database `json:"db"`
-	Site   site     `json:"site"`
-	App    app      `json:"app"`
-	Qiniu  qiniu    `json:"qiniu"`
-	Mail   mail     `json:"mail"`
-	Weixin weixin   `json:"weixin"`
+	Db     database     `json:"db"`
+	Site   site         `json:"site"`
+	App    app          `json:"app"`
+	Qiniu  qiniu        `json:"qiniu"`
+	Mail   mail         `json:"mail"`
+	Weixin weixin       `json:"weixin"`
+	TCloud tencentCloud `json:"tcloud"`
 }
 
 type database struct {
@@ -75,6 +78,11 @@ type weixin struct {
 	AppSecret      string `json:"app-secret"`
 	Token          string `json:"token"`
 	EncodingAeskey string `json:"encoding-aeskey"`
+}
+
+type tencentCloud struct {
+	AppId  string `json:"app-id"`
+	Secret string `json:"secret"`
 }
 
 func InitApp(port int64, level, base, static string) {
@@ -163,6 +171,7 @@ func InitConf(conf string) error {
 	Qiniu = config.Qiniu
 	Mail = config.Mail
 	WX = config.Weixin
+	TCloud = config.TCloud
 	return nil
 }
 

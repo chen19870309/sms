@@ -46,8 +46,12 @@ Page({
     if(options.group != undefined) {
     app.globalData.group = options.group
     }
+    var page = 'achieve' 
+    if(options.page != undefined) {
+      page = options.page
+    }
     this.setData({
-      PageCur: 'achieve'
+      PageCur: page
     })
     app.globalData.bgm = bgm
   },
