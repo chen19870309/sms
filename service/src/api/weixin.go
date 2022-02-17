@@ -101,6 +101,7 @@ func DealGetWords(c *gin.Context) {
 		res.Data = data
 		res.Count = len(data)
 	}
+	utils.Log.Info("DealGetWords result = >", res)
 	c.JSONP(200, res)
 }
 

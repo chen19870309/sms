@@ -82,7 +82,7 @@ func GenScopeDataByFile(file string) error {
 		sound := ""
 		if args[0] == "ai" { //调用云平台的ai语言合成
 			TextToVoice(tk[0], args[1])
-			sound = "https://www.xiaoxibaby.xyz/static/sound/gp1/" + tk[0] + ".wav"
+			sound = "https://www.xiaoxibaby.xyz/static/sound/gp1/" + tk[0] + ".m4a"
 		} else {
 			sound = args[3]
 		}

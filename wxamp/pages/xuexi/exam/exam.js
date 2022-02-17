@@ -16,7 +16,8 @@ Page({
     ready: false,
     list: [],
     didwords: [],
-    first:true
+    first:true,
+    loading:true
   },
 
   /**
@@ -36,12 +37,15 @@ Page({
     if (options.scope!=undefined && options.group!=undefined){
       app.globalData.scope =  options.scope
       app.globalData.group =  options.group
-      app.getwords(this.initExam)
-    }
-    if (options.cur == undefined) {//打开的分享页
-      this.showCheckModal('开始学习还是测试？')
-    }else{
-      this.startExam()
+      this.setData({loading:true})
+      let that = this
+      app.getwords(()=>{
+        app.cacheWords(()=>{
+            that.setData({loading:false})
+            that.initExam()
+            that.showCheckModal('开始学习还是测试？')
+        })
+      })
     }
   }
   },
@@ -210,7 +214,7 @@ Page({
         that.showModal('🎉本次测试完成🎉',str)
         if (score == 100) {
           str += "太棒了🎈"
-          app.globalData.bgm.src="/pages/xuexi/exam/success.wav"
+          app.globalData.bgm.src="/pages/xuexi/exam/success.m4a"
           app.globalData.bgm.play()
         }else{
           str += "字/[答错次数]:"
@@ -226,6 +230,7 @@ Page({
             }
         }
         app.putDiary(nowDate,'🎉完成测试🎉:\n'+str)
+        wx.setStorageSync('scopes', null)
       }else{
       that.nextWord()
       that.initExam()
@@ -236,7 +241,7 @@ Page({
       first: false,
     })
     var bgm = app.globalData.bgm
-    bgm.src = "/pages/xuexi/exam/fail.wav"
+    bgm.src = "/pages/xuexi/exam/fail.m4a"
     bgm.play()
     setTimeout(function() {
       that.setData({

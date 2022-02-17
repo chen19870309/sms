@@ -5,36 +5,42 @@ App({
       success: e => {
         console.log(e)
         this.globalData.StatusBar = e.statusBarHeight;
-        let capsule = wx.getMenuButtonBoundingClientRect()["top"];
+        let capsule = wx.getMenuButtonBoundingClientRect();
         if (capsule) {
+          console.log(capsule)
           this.globalData.Custom = capsule;
           this.globalData.CustomBar = capsule.bottom + capsule.top - e.statusBarHeight;
         } else {
-          this.globalData.CustomBar = e.statusBarHeight + 150;
+          this.globalData.CustomBar = e.statusBarHeight + 50;
         }
       }
     })
+    this.globalData.userid = wx.getStorageSync('userid')
+    console.log("this.globalData.userid[",this.globalData.userid ,"]")
+    if(this.globalData.userid == undefined || this.globalData.userid <= 0) {
+      this.authJWT()
+    }
     // 查看是否授权
     let that = this
-    wx.getSetting({
-      success (res){
-        if (res.authSetting['scope.userInfo']) {
-          // 已经授权，可以直接调用 getUserInfo 获取头像昵称
-          wx.getUserInfo({
-            success: that.login
-          })
-        }else{
-          wx.navigateTo({
-            url: 'pages/auth/auth',
-          })
-        }
-        // let appInfo = wx.getAppBaseInfo();
-        // console.log("appInfo",appInfo)
-        // let deviceInfo = wx.getDeviceInfo();
-        // console.log("deviceInfo",deviceInfo)
-        that.cacheWords()
-      }
-    })
+    // wx.getSetting({
+    //   success (res){
+    //     if (res.authSetting['scope.userInfo']) {
+    //       // 已经授权，可以直接调用 getUserInfo 获取头像昵称
+    //       wx.getUserInfo({
+    //         success: that.login
+    //       })
+    //     }else{
+    //       wx.navigateTo({
+    //         url: 'pages/auth/auth',
+    //       })
+    //     }
+    //     // let appInfo = wx.getAppBaseInfo();
+    //     // console.log("appInfo",appInfo)
+    //     // let deviceInfo = wx.getDeviceInfo();
+    //     // console.log("deviceInfo",deviceInfo)
+    //     that.cacheWords()
+    //   }
+    // })
   },
   globalData: {
     Host: 'https://www.xiaoxibaby.xyz',
@@ -55,6 +61,8 @@ App({
     CurWord: 0,
     Total: 0,
     Round: 0, //测试或学习的次数
+    Loading:false,
+    FromShare: false
   },
   login: function(res) {
     if(res != undefined) {
@@ -67,7 +75,7 @@ App({
   authJWT: function() {
     let that = this
     return new Promise((resolve,reject) => {
-      if(that.globalData.jwt != ''){
+      if(that.getLocalData('jwt_token') != null){
         resolve()
       }else{
       wx.login({
@@ -91,9 +99,12 @@ App({
               console.log("success:",res)
               if(res.data.data != undefined && res.data.data != null){
                that.globalData.jwt = res.data.jwt_token
+               that.setLocalData('jwt_token',res.data.jwt_token,600)
                that.globalData.userid = res.data.data.Id
+               wx.setStorageSync('userid', res.data.data.Id)
+               wx.setStorageSync('NICKNAME', res.data.data.Nickname)
                that.globalData.userInfo = res.data.data
-               console.log( that.globalData.jwt )
+               console.log( res.data.data )
                console.log( that.globalData.userid )
               }
               resolve(res)
@@ -111,6 +122,15 @@ App({
   },
   getScopes: function(callback) {
     let that = this
+    let arrs = that.getLocalData('scopes')
+    if(arrs != undefined && arrs != null && arrs.length > 0) {
+      that.globalData.Scopes = arrs
+      if (callback != undefined) {
+        callback()
+      }
+      return
+    }
+    that.globalData.Loading = true
     this.authJWT().then(()=>{
       wx.request({
         url: that.globalData.Host+'/weixin/scopes',
@@ -119,9 +139,10 @@ App({
         },
         header: {
           'content-type': 'application/json',
-          'Authorization': 'token '+that.globalData.jwt
+          'Authorization': 'token '+that.getLocalData('jwt_token')
         },
         success: function(res){
+          that.globalData.Loading = false
           //that.globalData.Scopes = res.data.data
           let sps = res.data.data
           var arr = []
@@ -145,6 +166,7 @@ App({
               return a.id - b.id
             })
             that.globalData.Scopes = arr
+            that.setLocalData('scopes',arr,60)//缓存1分钟
           }
           if (callback != undefined) {
             callback()
@@ -152,12 +174,31 @@ App({
         },
         fail: function(res) {
           console.log("get words fail:",res)
+          that.globalData.Loading = false
         }
       })
     })
   },
+  setLocalData(key,data,expire) {
+    var t1 = Date.parse(new Date())
+    var t2 = t1 + expire*1000
+    console.log(t2,key)
+    wx.setStorageSync(key, data)
+    wx.setStorageSync(key+'_TTL', t2)
+  },
+  getLocalData(key) {
+    var t1 = Date.parse(new Date())
+    var t2 = wx.getStorageSync(key+'_TTL')
+    console.log(t2,key)
+    var data = wx.getStorageSync(key)
+    if(data && t2 > t1) {
+      return data
+    }
+    return null
+  },
   getwords: function(callback) {
     let that = this
+    that.globalData.Loading = true
     wx.request({
       url: that.globalData.Host+'/weixin/words',
       data: {
@@ -168,7 +209,7 @@ App({
       },
       header: {
         'content-type': 'application/json',
-        'Authorization': 'token '+that.globalData.jwt
+        'Authorization': 'token '+that.getLocalData('jwt_token')
       },
       success: function(res){
         console.log("get words success:",res.data.data)
@@ -188,12 +229,11 @@ App({
         }
         that.globalData.MyWords = res.data.data
         that.globalData.Total = res.data.data.length
-        that.cacheWords()
-        if (callback != undefined){
-          callback()
-        }
+        that.cacheWords(callback)
+        that.globalData.Loading = false
       },
       fail: function(res) {
+        that.globalData.Loading = false
         console.log("get words fail:",res)
       }
     })
@@ -201,6 +241,12 @@ App({
   getDiary: function(callback) {
     var myDate = new Date();//获取系统当前时间
     let that = this
+    let arrs = that.getLocalData('diarys')
+    if(arrs != undefined && arrs != null && arrs.length>0) {
+      callback(arrs)
+      return 
+    }
+    that.globalData.Loading = true
     wx.request({
       url: that.globalData.Host+'/weixin/diary',
       data: {
@@ -210,7 +256,7 @@ App({
       },
       header: {
         'content-type': 'application/json',
-        'Authorization': 'token '+that.globalData.jwt
+        'Authorization': 'token '+that.getLocalData('jwt_token')
       },
       success: function(res){
         console.log("get diary success",res)
@@ -218,10 +264,13 @@ App({
         arr.sort(function(a,b){
           return b.day - a.day
         })
+        that.globalData.Loading = false
+        that.setLocalData('diarys',arr,60)
         callback(arr)
       },
       fail: function(res){
         console.log("get diary failed!",res)
+        that.globalData.Loading = false
         callback()
       }
     })
@@ -257,15 +306,15 @@ App({
       }
     })
   },
-  cacheWords: function(){
-    let that = this
+  cacheWords: function(callback){
+    var that = this
     const fs = wx.getFileSystemManager()
     for(var i=0,len=this.globalData.MyWords.length; i < len; i++){
       let item = this.globalData.MyWords[i]
       if (!item.Pic.startsWith("http://tmp/")){
-        let imgkey = 'image_cache_'+item.Word
+        let imgkey = 'image_'+item.Id+'_'+item.Word
         var path = wx.getStorageSync(imgkey)
-        if (path != undefined && path != '' && !path.endsWith("json") && !path.endsWith("jpg")){
+        if (path != undefined && path != '' && !path.endsWith("json")){
           try {
             fs.accessSync(path)        
             console.log("get cache path:",path)
@@ -280,6 +329,7 @@ App({
           success(res){
             console.log('图片缓存成功1', res.tempFilePath)
             wx.setStorageSync(imgkey, res.tempFilePath)
+            item.Pic = res.tempFilePath
           }
         })
       }
@@ -287,7 +337,7 @@ App({
     for(var i=0,len=this.globalData.MyWords.length; i < len; i++){
       let item = this.globalData.MyWords[i]
       if (!item.Sound.startsWith("http://tmp/")){
-        let soundkey = 'sound_cache_'+item.Word
+        let soundkey = 'sound_'+item.Id+'_'+item.Word
         var path = wx.getStorageSync(soundkey)
         if (path != undefined && path != '' && !path.endsWith("json")  && (path.endsWith("wav") || path.endsWith("m4a"))){
           try {
@@ -304,11 +354,18 @@ App({
           success(res){
             let path = res.tempFilePath
             console.log('声音缓存成功1', path)
-            this.globalData.MyWords[i].Sound = path
             wx.setStorageSync(soundkey, path)
+            item.Sound = path
           }
         })
       }
     }
+    
+    if (callback != undefined){
+      callback()
+    }
+  },
+  sleep: function(t) {
+    return new Promise((resolve)=> setTimeout(resolve,t))
   }
 })

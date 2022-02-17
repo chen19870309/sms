@@ -17,12 +17,13 @@ Page({
     console.log(options)
     if(options.cur != undefined) {//打开的分享页面带过来的字
       app.globalData.word = options.cur
+      app.globalData.FromShare = true
     }
     if(options.scope != undefined) {
-    app.globalData.scope = options.scope
+      app.globalData.scope = options.scope
     }
     if(options.group != undefined) {
-    app.globalData.group = options.group
+      app.globalData.group = options.group
     }
   },
 

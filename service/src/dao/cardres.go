@@ -43,7 +43,7 @@ func NewCardRes(ctx *model.CardRes) (*model.CardRes, error) {
 	d, _ := time.ParseDuration("24h")
 	card := &model.CardRes{}
 	var result *gorm.DB
-	result = database.Debug().Table(TB_CARD_RES).Where("res_type = ? and scope = ？ and gp = ? and word = ?", ctx.ResType, ctx.Scope, ctx.Gp, ctx.Word).First(card)
+	result = database.Debug().Table(TB_CARD_RES).Where("res_type = ? and scope = ? and gp = ? and word = ?", ctx.ResType, ctx.Scope, ctx.Gp, ctx.Word).First(card)
 	if result.Error != nil && result.Error.Error() != "record not found" {
 		return nil, result.Error
 	}
@@ -202,6 +202,7 @@ func QueryScopedCard(userid, scope, ResType, gp, word string, pageSize int) ([]*
 
 func QueryUserStdWordCards(scope, group, word string, pageSize, userid int) ([]*model.CardRes, error) {
 	cards := []*model.CardRes{}
+	item := model.CardRes{}
 	var result *gorm.DB
 	sub := database.Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 1", userid).SubQuery() //已学会
 	if scope == "生字本" {
@@ -213,7 +214,6 @@ func QueryUserStdWordCards(scope, group, word string, pageSize, userid int) ([]*
 	}
 	//添加特定生字
 	if word != "" {
-		item := model.CardRes{}
 		result = database.Table(TB_CARD_RES).Where("res_type = 'words' and scope = ? and word = ? ", scope, word).First(&item)
 		if item.Id > 0 {
 			cards = append(cards, &item)
@@ -257,6 +257,8 @@ func QueryUserStdWordCards(scope, group, word string, pageSize, userid int) ([]*
 	if len(cards) == 0 {
 		result = database.Table(TB_CARD_RES).Limit(pageSize).Where("scope = ? and gp = ? and res_type = 'words' ", scope, group).Order("random()").Find(&cards)
 	}
-
+	if item.Id > 0 {
+		cards = append(cards, &item)
+	}
 	return cards, nil
 }

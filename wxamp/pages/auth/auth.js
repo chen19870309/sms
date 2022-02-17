@@ -70,7 +70,12 @@ Page({
           data: e.detail.userInfo
         },
         success: function(res){
-          console.log(res)
+          console.log(res.data)
+          //wx.setStorage("NICKNAME",res.data.data.Nickname)
+          //wx.setStorage("AVATAR",e.detail.userInfo.avatarUrl)
+          //wx.setStorage('AUTH_WX',true)
+          app.globalData.NickName = res.data.data.Nickname
+          app.globalData.avatarUrl = e.detail.userInfo.avatarUrl
           app.globalData.AuthWX = true
         }
       })

@@ -31,10 +31,11 @@ Component({
         count2 = scopes[i].cnt
       }
     }
+    //if(wx.getStorage("AUTH_WX")){
     if(app.globalData.AuthWX){
       this.setData({
         NickName: app.globalData.NickName,
-        avatarUrl:app.globalData.AvatarUrl,
+        avatarUrl:app.globalData.avatarUrl,
         count1:count1,
         count2:count2
       })

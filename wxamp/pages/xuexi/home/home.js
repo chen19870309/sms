@@ -21,7 +21,8 @@ Component({
     pic: '',
     word: '',
     pinYin: '',
-    message: ''
+    message: '',
+    loading: true
   },
   ready() {
     let that = this
@@ -31,22 +32,39 @@ Component({
     //   word: app.globalData.MyWords[0].Word,
     //   pinYin: app.globalData.MyWords[0].PinYin
     // })
-    app.getwords(()=>{
-      var cur = app.globalData.CurWord
-      app.globalData.Round = 5*app.globalData.Total
+    if(app.globalData.FromShare) {
       that.setData({
-      animation: '',
-      pic: app.globalData.MyWords[cur].Pic,
-      word: app.globalData.MyWords[cur].Word,
-      pinYin: app.globalData.MyWords[cur].PinYin
+        loading: true
+      })
+    app.getwords(()=>{
+      app.cacheWords(()=>{
+        that.startStudy()
+      })
     })
-    that.speeker()
-    })
+    }else{
+      that.startStudy()
+    }
   },
   /**
    * 组件的方法列表
    */
   methods: {
+    startStudy() {
+      var cur = app.globalData.CurWord
+      app.globalData.Round = 5*app.globalData.Total
+      this.setData({
+        animation: '',
+        loading: false,
+        pic: app.globalData.MyWords[cur].Pic,
+        word: app.globalData.MyWords[cur].Word,
+        pinYin: app.globalData.MyWords[cur].PinYin
+      })
+      if(app.globalData.FromShare){
+        app.globalData.FromShare= false
+      }else{
+        this.speeker()
+      }
+    },
     showModal(msg) {
       this.setData({
         modalName: 'Info',
