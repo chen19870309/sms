@@ -7,6 +7,8 @@ Page({
    */
   data: {
     MyWords: [],
+    cv_w: 300,
+    cv_h: 400,
     CurWord: 0
   },
 
@@ -31,7 +33,7 @@ Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
-
+   
   },
 
   /**

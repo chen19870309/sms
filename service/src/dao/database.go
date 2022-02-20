@@ -12,6 +12,8 @@ import (
 
 var database *gorm.DB
 
+const ENCODE = "enc"
+
 func InitDB() {
 	db, err := gorm.Open(config.DB.Driver, config.GetConnArgs())
 	if err != nil {

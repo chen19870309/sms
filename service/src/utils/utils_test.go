@@ -52,9 +52,11 @@ func TestPic(t *testing.T) {
 }
 
 func TestDec(t *testing.T) {
-	key := "hoO3uGXJDrl/oN/SzmWJ9g=="
-	iv := "xR6vDQfaX6QgREJ1tJ6wUQ=="
+
 	data := "YhCbGDqYf5tCSW2UcnXAMJfCV+DOlEdepEzqOEDa9DWUKz+1F+DI33Shnw+To9SOxmvdMGh/abY+LQojth1WSpnzC3Cab8HSS7NmXijMthsl1RCfR2UPdVjqFKZN9/l63QJX9cpugFMQuf6LiB1lp87XThCyKLUh/Vb/h6RUpeheehkOdcH4enS6RrPpFVvaR2bwtMHRf2aV5mBObrIWQLzqoIxgE5pFhASzI7Mcy9rmnJ1wQxJ+pYj0UPClTvPzDFjWLMaN2moHJgh6DAqrVc8VPoxyq1ZZBmReA8qretGcok1tmHQTkR310WNarSJ46pru8glaUVjX0gGKjTTmqeFFD7RZrOkBqJm6wWizrhi9aScfUxfutw2BG+2O/ZWSzQv31Ze/a9p49dViktn9JnW+lRtpkusMPpTSrZ1t8uEPTEyBlHJlAcxtrIWt+e4PXHxpk7ctkvt0xcEv6SjKUw=="
+	iv := "xR6vDQfaX6QgREJ1tJ6wUQ=="
+	key := "hoO3uGXJDrl/oN/SzmWJ9g=="
+
 	b1, _ := base64.StdEncoding.DecodeString(data)
 	k, _ := base64.StdEncoding.DecodeString(key)
 	i, _ := base64.StdEncoding.DecodeString(iv)

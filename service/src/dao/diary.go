@@ -3,6 +3,7 @@ package dao
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"math/rand"
 	"sms/service/src/dao/model"
 	"sms/service/src/utils"
@@ -50,21 +51,22 @@ func NewUserDiary(id, userid, year, month, day int, remark string) error {
 		Status:     1,
 		CreateTime: t,
 		UpdateTime: t,
+		Diary:      remark,
 	}
 	// if err == nil && d0.Id > 0 {
 	// 	diary.Id = d0.Id
 	// 	diary.CreateTime = d0.CreateTime
 	// 	remark = remark + "\n" + d0.Diary
 	// }
-	rs, err := utils.AesEcrypt([]byte(remark), []byte(utils.MD5(user.Code)))
-	if err != nil {
-		return err
-	}
-	diary.Diary = base64.StdEncoding.EncodeToString(rs)
+	// rs, err := utils.AesEcrypt([]byte(remark), []byte(utils.MD5(user.Code)))
+	// if err != nil {
+	// 	return err
+	// }
+	// diary.Diary = base64.StdEncoding.EncodeToString(rs)
 	return SaveUserDiary(&diary)
 }
 
-func DecDiary(userid int, diary string) string {
+func DecStr(userid int, diary string) string {
 	user := QueryUser(int64(userid), "")
 	if user == nil || user.Id <= 0 {
 		utils.Log.Errorf("QueryUser(%d) failed! empty user", userid)
@@ -85,6 +87,7 @@ func DecDiary(userid int, diary string) string {
 }
 
 func GetUserDayDiary(id, userid, year, month, day int) (*model.UserDiary, error) {
+	CacheUserCode(fmt.Sprintf("%d", userid))
 	diary := &model.UserDiary{}
 	var result *gorm.DB
 	if id > 0 {
@@ -92,21 +95,29 @@ func GetUserDayDiary(id, userid, year, month, day int) (*model.UserDiary, error)
 	} else {
 		result = database.Table(TB_USER_DIARY).Where("userid = ? and year = ? and month = ? and day = ? and status in (0,1)", userid, year, month, day).First(diary)
 	}
-	if diary.Diary != "" {
-		diary.Diary = DecDiary(userid, diary.Diary)
-	}
+	// if diary.Diary != "" {
+	// 	diary.Diary = DecStr(userid, diary.Diary)
+	// }
 	return diary, result.Error
 }
 
 func GetUserMonthDiary(userid, year, month string) []*model.UserDiary {
+	CacheUserCode(userid)
 	res := []*model.UserDiary{}
 	result := database.Table(TB_USER_DIARY).Where("userid = ? and year = ? and month = ? and status in (0,1)", userid, year, month).Find(&res)
 	if result.Error != nil {
 		utils.Log.Errorf("GetUserMonthDiary(%v,%v,%v) failed! %v", userid, year, month, result.Error)
 	}
-	id, _ := strconv.Atoi(userid)
-	for _, item := range res {
-		item.Diary = DecDiary(id, item.Diary)
-	}
+	// id, _ := strconv.Atoi(userid)
+	// for _, item := range res {
+	// 	item.Diary = DecStr(id, item.Diary)
+	// }
 	return res
+}
+
+func CacheUserCode(userid string) {
+	id, _ := strconv.ParseInt(userid, 10, 64)
+	user := QueryUser(id, "")
+	keyname := fmt.Sprintf("user_code_%v", user.Id)
+	utils.SetCache(keyname, user.Code, 2*time.Hour)
 }

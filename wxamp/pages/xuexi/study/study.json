@@ -1,6 +1,7 @@
 {
   "usingComponents": {
-    "xuexi": "/pages/xuexi/home/home"
+    "xuexi": "/pages/xuexi/home/home",
+    "drawimg": "/pages/xuexi/draw/draw"
   },
   "lazyCodeLoading": "requiredComponents"
 }

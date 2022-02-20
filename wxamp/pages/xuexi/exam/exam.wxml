@@ -1,6 +1,6 @@
 <!--pages/xuexi/exam/exam.wxml-->
-<cu-custom bgColor="bg-gradual-blue" isBack="{{true}}"><view slot="backText">返回</view><view slot="content">测试</view></cu-custom>
-<view wx:if="{{loading}}" class="cu-load bg-blue loading card">努力加载中...</view>
+<cu-custom bgColor="bg-gradual-blue" isBack="{{true}}"><view slot="backText">返回</view><view slot="content">{{title}}</view></cu-custom>
+<view wx:if="{{loading}}" class="cu-load bg-blue loading card">{{loadstr}}</view>
 <scroll-view wx:if="{{!loading}}" scroll-y class="scrollPage">
   <view class="card" animation="{{animation}}" >
     <image src='{{pic}}' mode='widthFix' class='png' style='width:100%;height:486rpx' bindtouchend="speeker"></image>

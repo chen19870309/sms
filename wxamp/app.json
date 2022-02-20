@@ -5,6 +5,7 @@
     "pages/xuexi/exam/exam",
     "pages/taolun/log/log",
     "pages/xuexi/study/study",
+    "pages/xuexi/book/book",
     "pages/taolun/thanks/thanks"
   ],
   "window": {
@@ -22,5 +23,5 @@
     "downloadFile": 10000
   },
   "lazyCodeLoading": "requiredComponents",
-  "debug": true
+  "debug": false
 }

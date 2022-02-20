@@ -5,6 +5,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    title:'',
     colors:['red','orange','olive','mauve'],
     pic: '',
     word: '',
@@ -17,7 +18,8 @@ Page({
     list: [],
     didwords: [],
     first:true,
-    loading:true
+    loading:true,
+    loadstr: '努力'
   },
 
   /**
@@ -37,17 +39,32 @@ Page({
     if (options.scope!=undefined && options.group!=undefined){
       app.globalData.scope =  options.scope
       app.globalData.group =  options.group
+      wx.showLoading({
+        title: '数据加载中...',
+        mask: true
+      })
       this.setData({loading:true})
       let that = this
       app.getwords(()=>{
         app.cacheWords(()=>{
-            that.setData({loading:false})
-            that.initExam()
-            that.showCheckModal('开始学习还是测试？')
+            //that.checkStatus()
+            this.setData({loading:false})
+            this.initExam()
+            wx.hideLoading()
+            this.showCheckModal('开始学习还是测试？')
         })
       })
     }
   }
+  },
+  checkStatus() {
+    // while(app.globalData.Total*2 > app.globalData.LoadCount){
+      // console.log(app.globalData.Total,app.getLocalData('LoadCount'))
+    //   this.setData({
+    //     loadstr:app.globalData.LoadCount+'/'+app.globalData.Total*2 
+    //   })
+      // app.sleep(4000).then(this.checkStatus())
+    // }
   },
   showModal(message,ctx) {
     this.setData({
@@ -64,7 +81,8 @@ Page({
   },
   startExam() {
     this.setData({
-      modalName: null
+      modalName: null,
+      title: '测试'
     })
     app.globalData.Round = 3*app.globalData.Total
     this.initExam()
@@ -86,9 +104,13 @@ Page({
   initExam() {
     var cur = app.globalData.CurWord
     var selections = []
+    var colors = this.data.colors
+    colors.sort(function() {
+      return .5 - Math.random();
+    });
     for (var i = 0;i<4;i++){
       selections.push({
-        color: this.data.colors[i],
+        color: colors[i],
         word: app.globalData.MyWords[(cur+i)%app.globalData.Total].Word
       })
     }

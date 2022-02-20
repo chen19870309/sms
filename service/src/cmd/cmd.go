@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"sms/service/src/config"
 	"sms/service/src/utils"
 	"strconv"
@@ -11,6 +12,7 @@ import (
 	"sms/service/src/api"
 
 	"github.com/judwhite/go-svc"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/urfave/cli/v2"
 )
 
@@ -45,8 +47,18 @@ func (p *program) Start() error {
 	addr := fmt.Sprintf(":%d", config.App.ListenPort)
 	utils.Log.Info("Address:", addr)
 	go api.AutoGenScope() //自动生成字库信息
+	go Metrics()          //开启监控
 	go p.blog.Serv.Run(addr)
 	return nil
+}
+
+func Metrics() {
+	// create a new mux server
+	server := http.NewServeMux()
+	// register a new handler for the /metrics endpoint
+	server.Handle("/metrics", promhttp.Handler())
+	// start an http server using the mux server
+	http.ListenAndServe(":9001", server)
 }
 
 func (p *program) Stop() error {

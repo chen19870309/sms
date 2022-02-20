@@ -60,6 +60,7 @@ App({
     word:'',
     CurWord: 0,
     Total: 0,
+    LoadCount: 0,
     Round: 0, //测试或学习的次数
     Loading:false,
     FromShare: false
@@ -175,6 +176,9 @@ App({
         fail: function(res) {
           console.log("get words fail:",res)
           that.globalData.Loading = false
+          if (callback != undefined) {
+            callback()
+          }
         }
       })
     })
@@ -309,6 +313,7 @@ App({
   cacheWords: function(callback){
     var that = this
     const fs = wx.getFileSystemManager()
+    this.globalData.LoadCount = 0
     for(var i=0,len=this.globalData.MyWords.length; i < len; i++){
       let item = this.globalData.MyWords[i]
       if (!item.Pic.startsWith("http://tmp/")){
@@ -318,7 +323,9 @@ App({
           try {
             fs.accessSync(path)        
             console.log("get cache path:",path)
-            this.globalData.MyWords[i].Pic = path
+            that.globalData.MyWords[i].Pic = path
+            that.globalData.LoadCount++
+            that.setLocalData('LoadCount',that.globalData.LoadCount,60)
             continue
           } catch(e) {
             console.error(e)
@@ -330,6 +337,8 @@ App({
             console.log('图片缓存成功1', res.tempFilePath)
             wx.setStorageSync(imgkey, res.tempFilePath)
             item.Pic = res.tempFilePath
+            that.globalData.LoadCount++
+            that.setLocalData('LoadCount',that.globalData.LoadCount,60)
           }
         })
       }
@@ -339,11 +348,13 @@ App({
       if (!item.Sound.startsWith("http://tmp/")){
         let soundkey = 'sound_'+item.Id+'_'+item.Word
         var path = wx.getStorageSync(soundkey)
-        if (path != undefined && path != '' && !path.endsWith("json")  && (path.endsWith("wav") || path.endsWith("m4a"))){
+        if (path != undefined && path != '' && !path.endsWith("json")  && (path.endsWith("mp3") || path.endsWith("m4a"))){
           try {
             fs.accessSync(path)        
             console.log("get ",soundkey,"cache path:",path)
-            this.globalData.MyWords[i].Sound = path
+            that.globalData.MyWords[i].Sound = path
+            that.globalData.LoadCount++
+            that.setLocalData('LoadCount',that.globalData.LoadCount,60)
             continue
           } catch(e) {
             console.error(e)
@@ -352,10 +363,13 @@ App({
         wx.downloadFile({ 
           url: decodeURI(item.Sound),
           success(res){
-            let path = res.tempFilePath
+            let path = res.tempFilePath  
+            // fs.renameSync(res.tempFilePath,path)
             console.log('声音缓存成功1', path)
             wx.setStorageSync(soundkey, path)
             item.Sound = path
+            that.globalData.LoadCount++
+            that.setLocalData('LoadCount',that.globalData.LoadCount,60)
           }
         })
       }
