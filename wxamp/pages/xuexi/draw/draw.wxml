@@ -1,0 +1,22 @@
+<!--pages/xuexi/draw/draw.wxml-->
+<view class="container">
+  <canvas class="word" type="2d" id="xuexi_{{index}}" disable-scroll='true' wx:for="{{words}}"
+    style="width:{{canvasWidth}}rpx;height:{{canvasHeight}}rpx"
+    wx:key="index"></canvas>
+</view>
+<scroll-view wx:if="{{!loading}}" scroll-y class="scrollPage" hidden="{{isSuc}}">
+<view class="flex flex-wrap justify-around card">
+    <button class="cu-btn lg bg-{{item.color}} animation-{{animation==item.word?'shake':''}} margin-sm basis-sm shadow" bindtap="toggle" data-word="{{item.word}}" wx:for="{{list}}" wx:key="index">{{item.word}}</button>
+</view>
+
+<view class="controller" hidden="{{isSuc}}">
+  <view class="colorContr">
+    <block wx:for="{{colors}}">
+      <button bindtap="selectColor" class="colorBtn {{curColor == item ? 'selected' : ''}}" data-value="{{item}}" style="background-color:{{item}}"></button>
+    </block>
+  </view>
+  <slider bindchange='changeBold' min="1" max="20" value="15" block-size="18"/>
+  <button bindtap="clearCanvas" class="clearBtn"  hidden="{{isSuc}}" >clear</button>
+</view>
+</scroll-view>
+

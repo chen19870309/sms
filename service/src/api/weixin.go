@@ -62,6 +62,7 @@ func DealWXUserInfo(c *gin.Context) {
 	if err == nil {
 		err = json.Unmarshal(body, &params)
 		utils.Log.Infof("DealWXUserInfo:%v|%v", appid, params)
+		//if reflect.TypeOf(params["userid"]) == "string"
 		userid := params["userid"].(float64)
 		data := params["data"].(map[string]interface{})
 		u, err := dao.UpdateUserInfo(data["avatarUrl"].(string), data["nickName"].(string), string(body), int(userid))

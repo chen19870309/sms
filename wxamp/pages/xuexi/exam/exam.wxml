@@ -29,7 +29,7 @@
 <view class="cu-modal bottom-modal {{modalName=='check'?'show':''}}">
   <view class="cu-dialog">
     <view class="cu-bar bg-white">
-      <view class="action text-green" bindtap="startExam">测试</view>
+      <view class="action text-green" bindtap="startExam">练习</view>
       <view class="action text-blue" bindtap="startStudy">学习</view>
     </view>
     <view class="padding-xl">

@@ -254,8 +254,9 @@ func QueryUserStdWordCards(scope, group, word string, pageSize, userid int) ([]*
 		return nil, result.Error
 	}
 	//生字为空随机拉取group中的数据
-	if len(cards) == 0 {
-		result = database.Table(TB_CARD_RES).Limit(pageSize).Where("scope = ? and gp = ? and res_type = 'words' ", scope, group).Order("random()").Find(&cards)
+	ilen := len(cards)
+	if ilen < pageSize { //补全pageSize
+		result = database.Table(TB_CARD_RES).Limit(pageSize-ilen).Where("scope = ? and gp = ? and res_type = 'words' ", scope, group).Order("random()").Find(&cards)
 	}
 	if item.Id > 0 {
 		cards = append(cards, &item)

@@ -58,10 +58,11 @@ func TextToVoice(key, text string) error {
 
 //扫描目录生成字库
 func AutoGenScope() {
-	GenScopeDataByFile(config.App.BasePath + "常用字.csv")
-	// TextToVoice("静夜思", "静夜思 唐，李白 床前明月光，疑是地上霜。举头望明月，低头思故乡")
-	// TextToVoice("咏鹅", "咏鹅 唐，骆宾王 鹅鹅鹅，曲项向天歌。白毛浮绿水，红掌拨清波")
-	//TextToVoice("尘", "尘,灰尘的尘")
+	//GenScopeDataByFile(config.App.BasePath + "常用字.csv")
+	//TextToVoice("静夜思", "静夜思 唐，李白 床前明月光，疑是地上霜。举头望明月，低头思故乡")
+	//TextToVoice("咏鹅", "咏鹅 唐，骆宾王 鹅鹅鹅，曲项向天歌。白毛浮绿水，红掌拨清波")
+	//TextToVoice("A", "A,apple")
+	//TextToVoice("B", "B,banana")
 }
 
 func GenScopeDataByFile(file string) error {

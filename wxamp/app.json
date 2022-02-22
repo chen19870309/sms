@@ -1,11 +1,11 @@
 {
   "pages": [
+    "pages/xuexi/book/book",
     "pages/index/index",
     "pages/auth/auth",
     "pages/xuexi/exam/exam",
     "pages/taolun/log/log",
     "pages/xuexi/study/study",
-    "pages/xuexi/book/book",
     "pages/taolun/thanks/thanks"
   ],
   "window": {

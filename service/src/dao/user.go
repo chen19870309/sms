@@ -140,6 +140,11 @@ func UpdateUserInfo(icon, nickname, remark string, userid int) (*model.SmsUser, 
 		if icon != "" {
 			user.Icon = shortIcon(icon)
 		}
+		if nickname == "微信用户" {
+			headid := user.Id%20 + 1
+			user.Icon = fmt.Sprintf("https://www.xiaoxibaby.xyz/static/header/01/%d.jpeg", headid)
+			user.Nickname = fmt.Sprintf("天使用户:%04d", user.Id)
+		}
 		result = database.Table(TB_USER).Save(user)
 		if result.Error != nil {
 			return nil, result.Error
@@ -209,6 +214,9 @@ func SaveWxUser(openid, nickname, icon, data string) (*model.SmsUser, error) {
 		return nil, result.Error
 	}
 	if user.Id > 0 {
+		headid := user.Id%20 + 1
+		user.Icon = fmt.Sprintf("https://www.xiaoxibaby.xyz/static/header/01/%d.jpeg", headid)
+		user.Nickname = fmt.Sprintf("天使用户:%04d", user.Id)
 		user.UpdateTime = time.Now()
 		err := SaveUser(user)
 		return user, err

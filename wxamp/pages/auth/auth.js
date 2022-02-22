@@ -75,7 +75,7 @@ Page({
           //wx.setStorage("AVATAR",e.detail.userInfo.avatarUrl)
           //wx.setStorage('AUTH_WX',true)
           app.globalData.NickName = res.data.data.Nickname
-          app.globalData.avatarUrl = e.detail.userInfo.avatarUrl
+          app.globalData.avatarUrl = res.data.data.Icon
           app.globalData.AuthWX = true
         }
       })

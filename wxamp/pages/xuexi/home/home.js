@@ -59,11 +59,7 @@ Component({
         word: app.globalData.MyWords[cur].Word,
         pinYin: app.globalData.MyWords[cur].PinYin
       })
-      if(app.globalData.FromShare){
-        app.globalData.FromShare= false
-      }else{
-        this.speeker()
-      }
+      this.speeker()
     },
     showModal(msg) {
       this.setData({

@@ -1,0 +1,16 @@
+/* pages/xuexi/book/book.wxss */
+.card {
+  background-color: #cfdef2 ;
+  margin-top: 32px;
+  margin: 1%;
+  padding-top: 24px;
+  padding: 1%;
+  border: 3rpx solid #cdcdcd;
+  border-radius: 15rpx;
+  text-align:center;
+}
+
+image[class*="gif-"] {
+  border-radius: 6rpx;
+  display: block;
+}

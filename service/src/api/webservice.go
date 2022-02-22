@@ -13,6 +13,9 @@ import (
 	"sms/service/src/utils"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/gin-gonic/gin"
 	gomail "github.com/go-mail/gomail"
@@ -28,10 +31,21 @@ const def = "/bj1.jpeg"
 
 var service *WebS
 
+// prometheus监控指标
+var httpHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	Namespace:   "http_server",
+	Subsystem:   "",
+	Name:        "requests_seconds",
+	Help:        "Histogram of response latency (seconds) of http handlers.",
+	ConstLabels: nil,
+	Buckets:     nil,
+}, []string{"method", "code", "uri", "ip"})
+
 func init() {
 	service = &WebS{
 		SecCache: make(map[string]*model.UserData),
 	}
+	prometheus.MustRegister(httpHistogram)
 	service.Serv = gin.Default()
 	service.Serv.Use(Cors())
 	service.Serv.Use(BlogAuth())
@@ -90,7 +104,15 @@ func Cors() gin.HandlerFunc {
 		if method == "OPTIONS" {
 			c.AbortWithStatus(http.StatusNoContent)
 		}
+		t0 := time.Now()
 		c.Next()
+		uris := strings.Split(c.Request.RequestURI, "?")
+		httpHistogram.WithLabelValues(
+			c.Request.Method,
+			fmt.Sprintf("%v", c.Writer.Status()),
+			uris[0],
+			c.ClientIP(),
+		).Observe(time.Since(t0).Seconds())
 	}
 }
 

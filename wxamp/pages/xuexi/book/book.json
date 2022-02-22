@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "drawimg": "/pages/xuexi/draw/draw"
+  },
+  "lazyCodeLoading": "requiredComponents"
+}

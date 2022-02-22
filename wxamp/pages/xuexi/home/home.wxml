@@ -26,10 +26,10 @@
 <scroll-view wx:if="{{!loading}}" scroll-y class="scrollPage">
   <view class="card" animation="{{animation}}" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd" >
     <image src='{{pic}}' mode='widthFix' class='png' style='width:100%;height:486rpx'></image>
-    <text class="cuIcon-notificationfill lg text-gray" bindtouchend="speeker"></text>
   <view class="text-xsl padding">
-    <text class="text-green">{{pinYin}}</text>
-    <text class="text-black" bindtouchend="speeker">|{{word}}</text>
+    <text class="text-green" wx:if="{{pinYin != ''}}">{{pinYin}}</text>
+    <text class="text-black" bindtouchend="speeker" wx:if="{{word != ''}}">{{word}}</text>
+    <text class="cuIcon-notificationfill lg text-gray" bindtouchend="speeker"></text>
   </view>
   </view>
   <view class='cu-tabbar-height text-center'>

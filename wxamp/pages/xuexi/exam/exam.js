@@ -51,7 +51,11 @@ Page({
             this.setData({loading:false})
             this.initExam()
             wx.hideLoading()
-            this.showCheckModal('开始学习还是测试？')
+            if(app.globalData.group ==  'read') {//故事，古诗等只读的开启学习模式
+              that.startStudy()
+            }else{
+              this.showCheckModal('开始学习还是练习？')
+            }
         })
       })
     }
@@ -175,7 +179,7 @@ Page({
     var scope = app.globalData.scope
     var group = app.globalData.group
     return {
-      title: '小西的测试:'+scope,
+      title: '小西的练习:'+scope,
       desc: '一起来打卡学习吧!',
       path: 'pages/xuexi/exam/exam?scope='+scope+'&group='+group+'&cur='+world.Word
     }
@@ -233,7 +237,7 @@ Page({
           })
         }
         var str = '本次得分是：'+Math.ceil(score)+'分\n'
-        that.showModal('🎉本次测试完成🎉',str)
+        that.showModal('🎉本次练习完成🎉',str)
         if (score == 100) {
           str += "太棒了🎈"
           app.globalData.bgm.src="/pages/xuexi/exam/success.m4a"
@@ -251,7 +255,7 @@ Page({
               str += " "+w+"["+c+"]"
             }
         }
-        app.putDiary(nowDate,'🎉完成测试🎉:\n'+str)
+        app.putDiary(nowDate,'🎉完成练习🎉:\n'+str)
         wx.setStorageSync('scopes', null)
       }else{
       that.nextWord()
