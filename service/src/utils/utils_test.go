@@ -3,7 +3,14 @@ package utils
 import (
 	"encoding/base64"
 	"encoding/json"
+	"sms/service/src/api/model"
 	"testing"
+
+	validator "github.com/go-playground/validator/v10"
+
+	"github.com/go-playground/locales/zh"
+	ut "github.com/go-playground/universal-translator"
+	zh_translations "github.com/go-playground/validator/v10/translations/zh"
 )
 
 const mdata = `# Title
@@ -76,4 +83,33 @@ func TestData(t *testing.T) {
 	data := params["data"].(map[string]interface{})
 	t.Error(userid)
 	t.Error(data["avatarUrl"].(string), data["nickName"].(string))
+}
+
+func TestValidate(t *testing.T) {
+	validate := validator.New()
+	reg := model.RegistData{}
+	js := "{\"username\":\"1\",\"email\":\"123\"}"
+	json.Unmarshal([]byte(js), &reg)
+	err := validate.Struct(reg)
+	t.Error(err)
+}
+
+func TestValidateZh(t *testing.T) {
+	validate := validator.New()
+	//验证
+	zh_ch := zh.New()
+	uni := ut.New(zh_ch)
+	trans, _ := uni.GetTranslator("zh")
+	//验证器注册翻译器
+	zh_translations.RegisterDefaultTranslations(validate, trans)
+	reg := model.RegistData{}
+	js := "{\"username\":\"1\",\"email\":\"123\"}"
+	json.Unmarshal([]byte(js), &reg)
+	err := validate.Struct(reg)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			t.Errorf(err.Translate(trans))
+		}
+		return
+	}
 }

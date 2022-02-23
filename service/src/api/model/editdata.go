@@ -11,8 +11,8 @@ type UserData struct {
 }
 
 type RegistData struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Code     string `json:"code"`
-	Email    string `json:"email"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
+	Code     string `json:"code" validate:"required"`
+	Email    string `json:"email" validate:"required,email"`
 }

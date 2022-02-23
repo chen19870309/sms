@@ -16,7 +16,9 @@ Component({
   data: {
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     count1: 0,
-    count2: 0
+    count2: 0,
+    isForm: false,
+    touchTime:0
   },
 
   ready() {
@@ -31,13 +33,18 @@ Component({
         count2 = scopes[i].cnt
       }
     }
-    //if(wx.getStorage("AUTH_WX")){
-    if(app.globalData.AuthWX){
+    let mode = wx.getStorageSync('STDMODE')
+    let sex = wx.getStorageSync('SEX')
+    console.log(mode,sex)
+    if(wx.getStorageSync("AUTH_WX")){
+    //if(app.globalData.AuthWX){
       this.setData({
         NickName: app.globalData.NickName,
         avatarUrl:app.globalData.avatarUrl,
         count1:count1,
-        count2:count2
+        count2:count2,
+        mode: mode,
+        sex:sex
       })
     }else{
       wx.navigateTo({
@@ -60,6 +67,49 @@ Component({
       console.log(e.detail)
       this.setData({
         avatarUrl:e.detail.avatarUrl ,
+      })
+    },
+    dealSetting() {
+      var t1 = Date.parse(new Date())
+      if(t1 - this.data.touchTime > 200) {
+        if(this.data.isForm) {
+          wx.request({
+            url: app.globalData.Host+'/weixin/wx77fbd12265db4add/userinfo',
+            method: 'POST',
+            data: {
+              userid: app.globalData.userid,
+              data: {
+                sex: wx.getStorageSync('SEX'),
+                avatarUrl: "",
+                nickName: wx.getStorageSync('NICKNAME'),
+                mode: wx.setStorageSync('STDMODE')
+              }
+            }, 
+            header: {
+              'content-type': 'application/json',
+              'Authorization': 'token '+app.getLocalData('jwt_token')
+            },
+            success: function(res) {
+              console.log(res)
+            }
+          })
+        }
+        this.setData({
+          isForm: !this.data.isForm,
+          touchTime: t1
+        })
+      }
+    },
+    changeMode(e) {//true为学习模式
+      wx.setStorageSync('STDMODE',e.detail.value)
+    },
+    changeSex(e) {//true位男性
+      wx.setStorageSync('SEX',e.detail.value)
+    },
+    changeNickName(e) {
+      wx.setStorageSync('NICKNAME',e.detail.value)
+      this.setData({
+        NickName: e.detail.value
       })
     }
   }

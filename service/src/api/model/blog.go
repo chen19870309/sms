@@ -14,14 +14,14 @@ type SearchReq struct {
 }
 
 type BlogAutoSave struct {
-	Data     string `json:"data"`
+	Data     string `json:"data" validate:"required"`
 	Theme    string `json:"theme"`
-	AuthorId uint   `json:"author_id"`
+	AuthorId uint   `json:"author_id" validate:"required"`
 }
 
 type UserLogin struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
 type BookItem struct {

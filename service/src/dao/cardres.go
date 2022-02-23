@@ -168,11 +168,11 @@ func CountUserScopeWords(userid, scope, gp string, status int) int {
 	return 0
 }
 
-func QueryScopedCard(userid, scope, ResType, gp, word string, pageSize int) ([]*model.CardRes, error) {
+func QueryScopedCard(userid, scope, ResType, gp, word, mode string, pageSize int) ([]*model.CardRes, error) {
 	if userid != "" {
 		uid, err := strconv.Atoi(userid)
 		if err == nil {
-			res, err := QueryUserStdWordCards(scope, gp, word, pageSize, uid)
+			res, err := QueryUserStdWordCards(scope, gp, word, mode, pageSize, uid)
 			if err == nil {
 				return res, err
 			}
@@ -200,8 +200,9 @@ func QueryScopedCard(userid, scope, ResType, gp, word string, pageSize int) ([]*
 	return cards, nil
 }
 
-func QueryUserStdWordCards(scope, group, word string, pageSize, userid int) ([]*model.CardRes, error) {
+func QueryUserStdWordCards(scope, group, word, mode string, pageSize, userid int) ([]*model.CardRes, error) {
 	cards := []*model.CardRes{}
+	sps := []*model.CardRes{}
 	item := model.CardRes{}
 	var result *gorm.DB
 	sub := database.Table(TB_USER_CARD_RES).Select("res_id").Where("userid = ? and status = 1", userid).SubQuery() //已学会
@@ -220,6 +221,17 @@ func QueryUserStdWordCards(scope, group, word string, pageSize, userid int) ([]*
 		}
 	}
 	if len(cards) > 0 && (scope == "生字本" || scope == "已学会") {
+		return cards, nil
+	}
+	if mode == "" {
+		mode = "true"
+	}
+	if mode != "true" { //娱乐模式随机返回20个新字
+		result = database.Table(TB_CARD_RES).Limit(20).Where("scope = ? and gp = ? and res_type = 'words' ", scope, group).Order("random()").Find(&cards)
+		if result.Error != nil {
+			utils.Log.Infof("随机拉取新字")
+			return nil, result.Error
+		}
 		return cards, nil
 	}
 	ls, err := GetUserCardsByScope(scope, group, userid, 0, pageSize) //获取没学会的
@@ -253,13 +265,19 @@ func QueryUserStdWordCards(scope, group, word string, pageSize, userid int) ([]*
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	//生字为空随机拉取group中的数据
-	ilen := len(cards)
-	if ilen < pageSize { //补全pageSize
-		result = database.Table(TB_CARD_RES).Limit(pageSize-ilen).Where("scope = ? and gp = ? and res_type = 'words' ", scope, group).Order("random()").Find(&cards)
-	}
 	if item.Id > 0 {
 		cards = append(cards, &item)
+	}
+	ilen := len(cards)
+	if ilen < pageSize { //补全pageSize
+		result = database.Table(TB_CARD_RES).Limit(pageSize-ilen).Where("scope = ? and gp = ? and res_type = 'words' ", scope, group).Order("random()").Find(&sps)
+		if result.Error != nil {
+			return nil, result.Error
+		} else {
+			for i, _ := range sps {
+				cards = append(cards, sps[i])
+			}
+		}
 	}
 	return cards, nil
 }

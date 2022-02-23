@@ -69,6 +69,7 @@ func DealWXUserInfo(c *gin.Context) {
 		if err != nil {
 			utils.Log.Error("UpdateUserInfo failed!", err)
 		} else {
+			res.Jwt = utils.GenJwt(u.Id, u.Username, config.App.Secret)
 			res.Data = u
 		}
 	}
@@ -82,7 +83,7 @@ func DealGetWords(c *gin.Context) {
 		Message: "ok",
 	}
 	data := []*model.Word{}
-	ls, err := dao.QueryScopedCard(c.Query("userid"), c.Query("scope"), "words", c.Query("group"), c.Query("word"), 10)
+	ls, err := dao.QueryScopedCard(c.Query("userid"), c.Query("scope"), "words", c.Query("group"), c.Query("word"), c.Query("mode"), 10)
 	if err != nil {
 		res.Success = false
 		res.Message = err.Error()

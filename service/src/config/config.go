@@ -52,6 +52,7 @@ type app struct {
 	ListenPort int64  `json:"listen-port"`
 	LogLevel   string `json:"log-level"`
 	BasePath   string `json:"base-path"`
+	ScopeFile  string `json:"scope-file"`
 	StaticPath string `json:"static-path"`
 	Secret     string `json:"secret"`
 }

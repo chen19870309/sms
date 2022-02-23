@@ -215,8 +215,10 @@ func SaveWxUser(openid, nickname, icon, data string) (*model.SmsUser, error) {
 	}
 	if user.Id > 0 {
 		headid := user.Id%20 + 1
-		user.Icon = fmt.Sprintf("https://www.xiaoxibaby.xyz/static/header/01/%d.jpeg", headid)
-		user.Nickname = fmt.Sprintf("天使用户:%04d", user.Id)
+		if user.Nickname == "微信用户" {
+			user.Icon = fmt.Sprintf("https://www.xiaoxibaby.xyz/static/header/01/%d.jpeg", headid)
+			user.Nickname = fmt.Sprintf("天使用户:%04d", user.Id)
+		}
 		user.UpdateTime = time.Now()
 		err := SaveUser(user)
 		return user, err

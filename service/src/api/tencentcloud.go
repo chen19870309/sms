@@ -58,11 +58,14 @@ func TextToVoice(key, text string) error {
 
 //扫描目录生成字库
 func AutoGenScope() {
-	//GenScopeDataByFile(config.App.BasePath + "常用字.csv")
-	//TextToVoice("静夜思", "静夜思 唐，李白 床前明月光，疑是地上霜。举头望明月，低头思故乡")
-	//TextToVoice("咏鹅", "咏鹅 唐，骆宾王 鹅鹅鹅，曲项向天歌。白毛浮绿水，红掌拨清波")
-	//TextToVoice("A", "A,apple")
-	//TextToVoice("B", "B,banana")
+	if config.App.ScopeFile != "" {
+		GenScopeDataByFile(config.App.BasePath + config.App.ScopeFile)
+	}
+	// TextToVoice("机", "机，手机的机")
+	// TextToVoice("图", "图，地图的图")
+	// TextToVoice("狮", "狮，狮子的狮")
+	// TextToVoice("王", "王，国王的王")
+	// TextToVoice("小", "小，小细菌的小")
 }
 
 func GenScopeDataByFile(file string) error {
@@ -84,17 +87,20 @@ func GenScopeDataByFile(file string) error {
 		}
 		tk := strings.Split(args[1], "，")
 		sound := ""
+		image := ""
 		if args[0] == "ai" { //调用云平台的ai语言合成
-			TextToVoice(tk[0], args[1])
-			sound = "https://www.xiaoxibaby.xyz/static/sound/gp1/" + tk[0] + ".m4a"
+			//TextToVoice(tk[0], args[1])
+			image = "https://www.xiaoxibaby.xyz/static/image/gp1/" + tk[0] + ".jpg"
+			sound = "https://www.xiaoxibaby.xyz/static/sound/gp1/" + tk[0] + ".mp3"
 		} else {
+			image = args[2]
 			sound = args[3]
 		}
 		bstr := []byte("## ")
-		bstr = append(bstr, []byte(tk[0]+"\n")...)                                    //标题
-		bstr = append(bstr, []byte("> "+args[1]+"\n")...)                             //内容
-		bstr = append(bstr, []byte(fmt.Sprintf("[sound](%s)\n", sound))...)           //声音
-		bstr = append(bstr, []byte(fmt.Sprintf("![image](%s)\n***\n\n", args[2]))...) //图片
+		bstr = append(bstr, []byte(tk[0]+"\n")...)                                  //标题
+		bstr = append(bstr, []byte("> "+args[1]+"\n")...)                           //内容
+		bstr = append(bstr, []byte(fmt.Sprintf("[sound](%s)\n", sound))...)         //声音
+		bstr = append(bstr, []byte(fmt.Sprintf("![image](%s)\n***\n\n", image))...) //图片
 
 		bdata = append(bdata, bstr...)
 	}

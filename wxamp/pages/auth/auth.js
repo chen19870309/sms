@@ -73,9 +73,16 @@ Page({
           console.log(res.data)
           //wx.setStorage("NICKNAME",res.data.data.Nickname)
           //wx.setStorage("AVATAR",e.detail.userInfo.avatarUrl)
-          //wx.setStorage('AUTH_WX',true)
+          app.setLocalData('AUTH_WX',true,3600)
+          app.setLocalData('jwt_token',res.data.jwt_token,3600)
           app.globalData.NickName = res.data.data.Nickname
-          app.globalData.avatarUrl = res.data.data.Icon
+          wx.downloadFile({ 
+            url: res.data.data.Icon,
+            success(res){
+              wx.setStorageSync("AvatarUrl", res.tempFilePath)
+              app.globalData.avatarUrl = res.tempFilePath
+            }
+          })
           app.globalData.AuthWX = true
         }
       })

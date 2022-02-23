@@ -39,7 +39,7 @@ var httpHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 	Help:        "Histogram of response latency (seconds) of http handlers.",
 	ConstLabels: nil,
 	Buckets:     nil,
-}, []string{"method", "code", "uri", "ip"})
+}, []string{"method", "code", "uri"})
 
 func init() {
 	service = &WebS{
@@ -111,7 +111,6 @@ func Cors() gin.HandlerFunc {
 			c.Request.Method,
 			fmt.Sprintf("%v", c.Writer.Status()),
 			uris[0],
-			c.ClientIP(),
 		).Observe(time.Since(t0).Seconds())
 	}
 }
@@ -257,6 +256,7 @@ func LoginBlog(c *gin.Context) {
 		res.Success = false
 		res.Message = err.Error()
 	} else {
+
 		secure, _ := utils.PwdCode(req.Password)
 		user, err := dao.AuthUser(req.Username, secure, c.ClientIP())
 		if err != nil {

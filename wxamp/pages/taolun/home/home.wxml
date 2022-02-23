@@ -41,6 +41,27 @@
         <text class="text-grey">赞赏支持</text>
       </view>
     </view>
+    <view class="cu-item {{ !isForm?'arrow':'unfold' }}"  bindtap="dealSetting">
+      <button class="cu-btn content" bindtap="dealSetting">
+        <text class="cuIcon-settings text-cyan"></text>
+        <text class="text-grey">设置</text>
+      </button>
   </view>
+  <form  hidden="{{ !isForm }}" >
+  <view class="cu-form-group margin-top">
+		<view class="title">学习模式</view>
+		<switch class="orange radius sm" bindchange="changeMode" checked="{{mode}}"></switch>
+	</view>
+  <view class="cu-form-group">
+  	<view class="title">性别设定</view>
+		<switch class="switch-sex"  bindchange="changeSex" checked="{{sex}}"></switch>
+	</view>
+  <view class="cu-form-group">
+		<view class="title">昵称</view>
+		<input placeholder="自定义昵称" value="{{NickName}}" bindinput="changeNickName"></input>
+	</view>
+</form>
+  </view>
+
   <view class="cu-tabbar-height"></view>
 </scroll-view>

@@ -1,6 +1,7 @@
 //app.js
 App({
   onLaunch: function () {
+    const fs = wx.getFileSystemManager()
     wx.getSystemInfo({
       success: e => {
         console.log(e)
@@ -16,10 +17,18 @@ App({
       }
     })
     this.globalData.userid = wx.getStorageSync('userid')
-    console.log("this.globalData.userid[",this.globalData.userid ,"]")
-    if(this.globalData.userid == undefined || this.globalData.userid <= 0) {
-      this.authJWT()
+    this.globalData.AuthWX = wx.getStorageSync("AUTH_WX") ? true:false
+    this.globalData.NickName = wx.getStorageSync('NICKNAME') 
+    this.globalData.AvatarUrl = wx.setStorageSync("AvatarUrl")
+    try{
+      fs.accessSync(this.globalData.AvatarUrl)
+    }catch(e){
+
     }
+    console.log("this.globalData.userid[",this.globalData.userid ,"]")
+    // if(this.globalData.userid == undefined || this.globalData.userid <= 0) {
+    //   this.authJWT()
+    // }
     // 查看是否授权
     let that = this
     // wx.getSetting({
@@ -100,10 +109,11 @@ App({
               console.log("success:",res)
               if(res.data.data != undefined && res.data.data != null){
                that.globalData.jwt = res.data.jwt_token
-               that.setLocalData('jwt_token',res.data.jwt_token,600)
+               that.setLocalData('jwt_token',res.data.jwt_token,3600)
                that.globalData.userid = res.data.data.Id
                wx.setStorageSync('userid', res.data.data.Id)
                wx.setStorageSync('NICKNAME', res.data.data.Nickname)
+               wx.setStorageSync('AvatarUrl', res.data.data.Icon)
                that.globalData.userInfo = res.data.data
                console.log( res.data.data )
                console.log( that.globalData.userid )
@@ -203,13 +213,18 @@ App({
   getwords: function(callback) {
     let that = this
     that.globalData.Loading = true
+    let mode = wx.getStorageSync('STDMODE')
+    if (mode != true) {
+      mode = false
+    }
     wx.request({
       url: that.globalData.Host+'/weixin/words',
       data: {
         scope: that.globalData.scope,
         group: that.globalData.group,
         userid: that.globalData.userid,
-        word: that.globalData.word
+        word: that.globalData.word,
+        mode: mode
       },
       header: {
         'content-type': 'application/json',

@@ -1376,6 +1376,10 @@ button.icon.lg {
 	padding-right: 90rpx
 }
 
+.cu-list.menu>.cu-item.unfold {
+	padding-right: 90rpx
+}
+
 .cu-list.menu>.cu-item.arrow:before {
 	position: absolute;
 	top: 0;
@@ -1387,6 +1391,23 @@ button.icon.lg {
 	height: 30rpx;
 	color: var(--grey);
 	content: "\e6a3";
+	text-align: center;
+	font-size: 34rpx;
+	font-family: "cuIcon";
+	line-height: 30rpx
+}
+
+.cu-list.menu>.cu-item.unfold:before {
+	position: absolute;
+	top: 0;
+	right: 30rpx;
+	bottom: 0;
+	display: block;
+	margin: auto;
+	width: 30rpx;
+	height: 30rpx;
+	color: var(--grey);
+	content: "\e661";
 	text-align: center;
 	font-size: 34rpx;
 	font-family: "cuIcon";
