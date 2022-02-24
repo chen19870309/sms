@@ -33,17 +33,17 @@ Component({
         count2 = scopes[i].cnt
       }
     }
-    let mode = wx.getStorageSync('STDMODE')
+    let stdmode = wx.getStorageSync('STDMODE')
     let sex = wx.getStorageSync('SEX')
-    console.log(mode,sex)
-    if(wx.getStorageSync("AUTH_WX")){
-    //if(app.globalData.AuthWX){
+    console.log("store:",stdmode,sex)
+    //if(wx.getStorageSync("AUTH_WX")){
+    if(app.globalData.AuthWX){
       this.setData({
         NickName: app.globalData.NickName,
-        avatarUrl:app.globalData.avatarUrl,
+        avatarUrl: app.globalData.AvatarUrl,
         count1:count1,
         count2:count2,
-        mode: mode,
+        stdmode: stdmode,
         sex:sex
       })
     }else{
@@ -70,6 +70,7 @@ Component({
       })
     },
     dealSetting() {
+      let that = this
       var t1 = Date.parse(new Date())
       if(t1 - this.data.touchTime > 200) {
         if(this.data.isForm) {
@@ -82,7 +83,7 @@ Component({
                 sex: wx.getStorageSync('SEX'),
                 avatarUrl: "",
                 nickName: wx.getStorageSync('NICKNAME'),
-                mode: wx.setStorageSync('STDMODE')
+                stdmode: wx.setStorageSync('STDMODE')
               }
             }, 
             header: {
@@ -91,6 +92,10 @@ Component({
             },
             success: function(res) {
               console.log(res)
+              app.globalData.AvatarUrl = res.data.data.Icon
+              that.setData({
+                avatarUrl: res.data.data.Icon
+              })
             }
           })
         }
@@ -107,6 +112,7 @@ Component({
       wx.setStorageSync('SEX',e.detail.value)
     },
     changeNickName(e) {
+      app.globalData.NickName = e.detail.value
       wx.setStorageSync('NICKNAME',e.detail.value)
       this.setData({
         NickName: e.detail.value

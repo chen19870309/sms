@@ -17,20 +17,14 @@ App({
       }
     })
     this.globalData.userid = wx.getStorageSync('userid')
-    this.globalData.AuthWX = wx.getStorageSync("AUTH_WX") ? true:false
     this.globalData.NickName = wx.getStorageSync('NICKNAME') 
     this.globalData.AvatarUrl = wx.setStorageSync("AvatarUrl")
-    try{
-      fs.accessSync(this.globalData.AvatarUrl)
-    }catch(e){
-
-    }
     console.log("this.globalData.userid[",this.globalData.userid ,"]")
-    // if(this.globalData.userid == undefined || this.globalData.userid <= 0) {
-    //   this.authJWT()
-    // }
+    if(this.globalData.userid == "" || this.globalData.userid <= 0) {
+      this.authJWT()
+    }
     // 查看是否授权
-    let that = this
+    // let that = this
     // wx.getSetting({
     //   success (res){
     //     if (res.authSetting['scope.userInfo']) {
@@ -76,7 +70,7 @@ App({
   },
   login: function(res) {
     if(res != undefined) {
-     console.log(res.userInfo)
+     console.log(res)
      this.globalData.NickName = res.userInfo.nickName
      this.globalData.AvatarUrl = res.userInfo.avatarUrl
      this.globalData.userInfo = res.userInfo

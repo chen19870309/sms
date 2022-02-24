@@ -50,7 +50,7 @@
   <form  hidden="{{ !isForm }}" >
   <view class="cu-form-group margin-top">
 		<view class="title">学习模式</view>
-		<switch class="orange radius sm" bindchange="changeMode" checked="{{mode}}"></switch>
+		<switch class="orange radius sm" bindchange="changeMode" checked="{{stdmode}}"></switch>
 	</view>
   <view class="cu-form-group">
   	<view class="title">性别设定</view>

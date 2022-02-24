@@ -75,14 +75,18 @@ Page({
           //wx.setStorage("AVATAR",e.detail.userInfo.avatarUrl)
           app.setLocalData('AUTH_WX',true,3600)
           app.setLocalData('jwt_token',res.data.jwt_token,3600)
+          app.setLocalData("NICKNAME", res.data.data.Nickname,3600)
           app.globalData.NickName = res.data.data.Nickname
-          wx.downloadFile({ 
-            url: res.data.data.Icon,
-            success(res){
-              wx.setStorageSync("AvatarUrl", res.tempFilePath)
-              app.globalData.avatarUrl = res.tempFilePath
-            }
-          })
+          app.setLocalData("AvatarUrl", res.data.data.Icon,3600)
+          app.globalData.AvatarUrl = res.data.data.Icon
+          console.log(app.globalData)
+          // wx.downloadFile({ 
+          //   url: res.data.data.Icon,
+          //   success(res){
+          //     wx.setStorageSync("AvatarUrl", res.tempFilePath)
+          //     app.globalData.avatarUrl = res.tempFilePath
+          //   }
+          // })
           app.globalData.AuthWX = true
         }
       })
